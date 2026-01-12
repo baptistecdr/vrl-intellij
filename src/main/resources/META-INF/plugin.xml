@@ -1,0 +1,121 @@
+<!-- Plugin Configuration File: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <!-- Unique identifier of the plugin. It should be FQN, cannot be changed between the plugin versions. -->
+    <id>eu.bcosp.vrl-intellij</id>
+
+    <!-- Public plugin name should be written in Title Case.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-name -->
+    <name>VRL (Vector Remap Language)</name>
+
+    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+    <vendor url="https://github.com/baptistecdr">Baptiste C.</vendor>
+
+    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-description -->
+    <description><![CDATA[
+        VRL is a plugin for the IntelliJ IDEA platform that provides syntax highlighting, code completion, and other features for the VRL (Vector Remap Language) programming language.
+        This is an unofficial plugin and is not affiliated with the official VRL project.
+    ]]></description>
+
+    <!-- Product and plugin compatibility requirements.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
+
+    <!-- Extensions defined by the plugin.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType name="VRL" language="VRL" extensions="vrl" fieldName="INSTANCE"
+                  implementationClass="eu.bcosp.vrlintellij.VRLFileType"/>
+
+        <lang.parserDefinition
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.psi.VRLParserDefinition"/>
+
+        <lang.syntaxHighlighterFactory
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.highlighting.VRLHighlighterFactory"/>
+
+        <colorSettingsPage
+                implementation="eu.bcosp.vrlintellij.colors.VRLColorSettingsPage"/>
+
+        <annotator
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.annotators.VRLNamedArgumentAnnotator"/>
+
+        <annotator
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.annotators.VRLPathAnnotator"/>
+
+        <completion.contributor
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.contributors.VRLCompletionContributor"/>
+
+        <lang.documentationProvider
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.documentation.VRLDocumentationProvider"/>
+
+        <lang.commenter
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.commenter.VRLCommenter"/>
+
+        <lang.braceMatcher
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.matching.VRLBraceMatcher"/>
+
+        <lang.quoteHandler
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.quotes.VRLQuoteHandler"/>
+
+        <quoteHandler
+                fileType="VRL"
+                className="eu.bcosp.vrlintellij.quotes.VRLQuoteHandler"/>
+
+        <lang.foldingBuilder
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.folding.VRLFoldingBuilder"/>
+
+        <lang.findUsagesProvider
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.references.VRLFindUsagesProvider"/>
+
+        <referencesSearch
+                implementation="eu.bcosp.vrlintellij.references.VRLReferencesSearcher"/>
+
+        <localInspection
+                language="VRL"
+                shortName="VRLUnknownFunction"
+                displayName="Unknown function"
+                groupName="VRL"
+                enabledByDefault="true"
+                level="WARNING"
+                implementationClass="eu.bcosp.vrlintellij.inspections.VRLUnknownFunctionInspection"/>
+
+        <localInspection
+                language="VRL"
+                shortName="VRLInvalidTimestamp"
+                displayName="Invalid timestamp literal"
+                groupName="VRL"
+                enabledByDefault="true"
+                level="WARNING"
+                implementationClass="eu.bcosp.vrlintellij.inspections.VRLInvalidTimestampInspection"/>
+
+        <localInspection
+                language="VRL"
+                shortName="VRLUnhandledFallibleCall"
+                displayName="Unhandled fallible function call"
+                groupName="VRL"
+                enabledByDefault="true"
+                level="ERROR"
+                implementationClass="eu.bcosp.vrlintellij.inspections.VRLUnhandledFallibleCallInspection"/>
+
+        <codeInsight.declarativeInlayProvider
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.hints.VRLTypeHintsProvider"
+                group="TYPES_GROUP"
+                providerId="eu.bcosp.vrlintellij.typeHints"
+                isEnabledByDefault="true"
+                bundle="messages.VRLBundle"
+                nameKey="inlay.hints.type.name"
+                descriptionKey="inlay.hints.type.description"/>
+    </extensions>
+</idea-plugin>

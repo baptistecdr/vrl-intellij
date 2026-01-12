@@ -1,0 +1,83 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  release:
+    name: Publish to JetBrains Marketplace
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v6
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Set plugin version from tag
+        run: echo "PLUGIN_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+
+      - name: Install pandoc
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y pandoc
+
+      - name: Generate release notes
+        id: release_notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes=$(gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
+            -f tag_name="${GITHUB_REF_NAME}" \
+            --jq .body)
+          delimiter="EOF_$(openssl rand -hex 8)"
+
+          {
+            echo "markdown<<$delimiter"
+            echo "$notes"
+            echo "$delimiter"
+          } >> "$GITHUB_OUTPUT"
+
+          # The Marketplace change-notes field renders a small HTML subset, not Markdown.
+          html=$(echo "$notes" | pandoc -f gfm -t html)
+          {
+            echo "html<<$delimiter"
+            echo "$html"
+            echo "$delimiter"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build
+        run: ./gradlew build
+
+      - name: Verify plugin
+        run: ./gradlew verifyPlugin
+
+      - name: Sign plugin
+        env:
+          CERTIFICATE_CHAIN: ${{ secrets.CERTIFICATE_CHAIN }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          PRIVATE_KEY_PASSWORD: ${{ secrets.PRIVATE_KEY_PASSWORD }}
+        run: ./gradlew signPlugin
+
+      - name: Publish to JetBrains Marketplace
+        env:
+          PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
+          CHANGE_NOTES: ${{ steps.release_notes.outputs.html }}
+        run: ./gradlew publishPlugin
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/distributions/*.zip
+          body: ${{ steps.release_notes.outputs.markdown }}
