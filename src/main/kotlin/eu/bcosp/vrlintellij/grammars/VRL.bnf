@@ -1,0 +1,171 @@
+{
+    parserClass="eu.bcosp.vrlintellij.parser.VRLParser"
+    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+    psiClassPrefix="VRL"
+    psiImplClassSuffix="Impl"
+    psiPackage="eu.bcosp.vrlintellij.psi"
+    psiImplPackage="eu.bcosp.vrlintellij.psi.impl"
+
+    elementTypeHolderClass="eu.bcosp.vrlintellij.psi.VRLElementTypes"
+    elementTypeClass="eu.bcosp.vrlintellij.psi.VRLCompositeType"
+    tokenTypeClass="eu.bcosp.vrlintellij.psi.VRLTokenType"
+
+    tokens=[
+        // Whitespace and comments
+        WHITE_SPACE='regexp:\s+'
+        COMMENT='regexp:#[^\r\n]*'
+
+        // Keywords
+        IF='if'
+        ELSE='else'
+        FOR='for'
+        WHILE='while'
+        LOOP='loop'
+        BREAK='break'
+        CONTINUE='continue'
+        RETURN='return'
+        ABORT='abort'
+        TRUE='true'
+        FALSE='false'
+        NULL='null'
+        IN='in'
+
+        // Operators
+        ASSIGN='='
+        MERGE_ASSIGN='|='
+        NULL_COALESCE_ASSIGN='??='
+        EQ='=='
+        NE='!='
+        GE='>='
+        LE='<='
+        GT='>'
+        LT='<'
+        AND='&&'
+        OR='||'
+        NULL_COALESCE='??'
+        NOT='!'
+        PLUS='+'
+        MINUS='-'
+        STAR='*'
+        SLASH='/'
+        PERCENT='%'
+        PIPE='|'
+
+        // Punctuation
+        LPAREN='('
+        RPAREN=')'
+        LBRACE='{'
+        RBRACE='}'
+        LBRACKET='['
+        RBRACKET=']'
+        COMMA=','
+        COLON=':'
+        SEMICOLON=';'
+        DOT='.'
+        QUESTION='?'
+        ARROW='->'
+
+        // Literals (regexp patterns for reference)
+        FLOAT_LITERAL='regexp:[0-9][0-9_]\.[0-9][0-9_]([eE][+-]?[0-9]+)?'
+        INTEGER_LITERAL='regexp:[0-9][0-9_]*'
+        STRING='regexp:"([^"\\]|\\.)*"'
+        RAW_STRING="regexp:s'([^']|'')*'"
+        REGEX="regexp:r'([^']|'')*'"
+        TIMESTAMP="regexp:t'[^']*'"
+        IDENTIFIER='regexp:[a-zA-Z_][a-zA-Z0-9_]*'
+        FUNCTION_CALL='regexp:[a-zA-Z_][a-zA-Z0-9_]*(?=[(!])'
+    ]
+}
+
+root ::= statement*
+
+statement ::= expression (SEMICOLON | &RBRACE)?
+
+expression ::= assignment_expr
+
+assignment_expr ::= or_expr ((ASSIGN | MERGE_ASSIGN | NULL_COALESCE_ASSIGN) assignment_expr)?
+
+or_expr ::= and_expr (OR and_expr)*
+
+and_expr ::= null_coalesce_expr (AND null_coalesce_expr)*
+
+null_coalesce_expr ::= comparison_expr (NULL_COALESCE comparison_expr)*
+
+comparison_expr ::= additive_expr ((EQ | NE | GT | GE | LT | LE) additive_expr)?
+
+additive_expr ::= multiplicative_expr ((PLUS | MINUS) multiplicative_expr)*
+
+multiplicative_expr ::= unary_expr ((STAR | SLASH | PERCENT) unary_expr)*
+
+unary_expr ::= (NOT | MINUS)* postfix_expr
+
+postfix_expr ::= primary_expr postfix_suffix*
+
+postfix_suffix ::= call_suffix
+                 | LBRACKET expression RBRACKET
+                 | DOT IDENTIFIER
+                 | QUESTION
+
+call_suffix ::= raise_flag? LPAREN argument_list? RPAREN
+
+argument_list ::= argument (COMMA argument)*
+
+argument ::= IDENTIFIER COLON expression
+           | assignment_expr
+
+primary_expr ::= literal
+               | path_expr
+               | IDENTIFIER
+               | FUNCTION_CALL
+               | block_expr
+               | if_expr
+               | for_expr
+               | while_expr
+               | loop_expr
+               | abort_expr
+               | return_expr
+               | LPAREN expression RPAREN
+               | array_expr
+               | object_expr
+               | closure_expr
+
+literal ::= FLOAT_LITERAL
+          | INTEGER_LITERAL
+          | STRING
+          | RAW_STRING
+          | TRUE
+          | FALSE
+          | NULL
+          | REGEX
+          | TIMESTAMP
+
+path_expr ::= DOT path_segment*
+
+path_segment ::= IDENTIFIER | LBRACKET (INTEGER_LITERAL | STRING) RBRACKET
+
+block_expr ::= LBRACE statement* RBRACE
+
+if_expr ::= IF expression block_expr (ELSE (if_expr | block_expr))?
+
+for_expr ::= FOR IDENTIFIER (COMMA IDENTIFIER)? IN expression block_expr
+
+while_expr ::= WHILE expression block_expr
+
+loop_expr ::= LOOP block_expr
+
+abort_expr ::= ABORT expression?
+
+return_expr ::= RETURN expression?
+
+array_expr ::= LBRACKET (expression (COMMA expression)*)? RBRACKET
+
+object_expr ::= LBRACE (object_field (COMMA object_field)*)? RBRACE
+
+object_field ::= (IDENTIFIER | STRING) COLON expression
+
+closure_expr ::= PIPE closure_params? PIPE expression
+
+closure_params ::= IDENTIFIER (COMMA IDENTIFIER)*
+
+raise_flag ::= NOT

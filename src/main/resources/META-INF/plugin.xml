@@ -1,0 +1,49 @@
+<!-- Plugin Configuration File: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <!-- Unique identifier of the plugin. It should be FQN, cannot be changed between the plugin versions. -->
+    <id>eu.bcosp.vrl-intellij</id>
+
+    <!-- Public plugin name should be written in Title Case.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-name -->
+    <name>VRL (Vector Remap Language)</name>
+
+    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+    <vendor url="https://github.com/baptistecdr">Baptiste C.</vendor>
+
+    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-description -->
+    <description><![CDATA[
+        VRL is a plugin for the IntelliJ IDEA platform that provides syntax highlighting, code completion, and other features for the VRL (Vector Remap Language) programming language.
+        This is an unofficial plugin and is not affiliated with the official VRL project.
+    ]]></description>
+
+    <!-- Product and plugin compatibility requirements.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
+
+    <!-- Extensions defined by the plugin.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType name="VRL" language="VRL" extensions="vrl" fieldName="INSTANCE"
+                  implementationClass="eu.bcosp.vrlintellij.VRLFileType"/>
+
+        <lang.parserDefinition
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.psi.VRLParserDefinition"/>
+
+        <lang.syntaxHighlighterFactory
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.highlighting.VRLHighlighterFactory"/>
+
+        <colorSettingsPage
+                implementation="eu.bcosp.vrlintellij.colors.VRLColorSettingsPage"/>
+
+        <annotator
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.annotators.VRLNamedArgumentAnnotator"/>
+
+        <completion.contributor
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.contributors.VRLCompletionContributor"/>
+    </extensions>
+</idea-plugin>
