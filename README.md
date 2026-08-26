@@ -1,7 +1,7 @@
 <h3 align="center">VRL (Vector Remap Language)</h3>
 <p align="center">
     An IntelliJ Platform plugin that adds language support for VRL (Vector Remap Language) — syntax
-    highlighting, completion, inspections, and refactoring for <code>.vrl</code> files.
+    highlighting, completion, inspections, formatting, and refactoring for <code>.vrl</code> files.
     <br>
     <a href="https://github.com/baptistecdr/vrl-intellij/issues/new">Report bug</a>
     ·
@@ -25,6 +25,7 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
 - Quick documentation on hover for every VRL function
 - Go to Declaration, Find Usages, and Rename for variables and closure parameters
 - Code folding, brace/bracket/quote matching, line commenting (`#`)
+- Reformat Code support (indentation and spacing for blocks, objects, arrays, and operators)
 - Inline type hints on assignments, e.g. `x: string = parse_json(...)`, including VRL's
   error-destructuring form (`value, err = fallible_call()`)
 - Inspections:

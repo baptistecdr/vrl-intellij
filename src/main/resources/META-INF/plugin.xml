@@ -74,6 +74,10 @@
                 language="VRL"
                 implementationClass="eu.bcosp.vrlintellij.folding.VRLFoldingBuilder"/>
 
+        <lang.formatter
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.formatting.VRLFormattingModelBuilder"/>
+
         <lang.findUsagesProvider
                 language="VRL"
                 implementationClass="eu.bcosp.vrlintellij.references.VRLFindUsagesProvider"/>
