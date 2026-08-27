@@ -6,7 +6,7 @@ plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "2.1.20"
     id("org.jetbrains.intellij.platform") version "2.10.2"
-    id("org.jetbrains.grammarkit") version "2023.3.0.1"
+    id("org.jetbrains.grammarkit") version "2023.3.0.4"
 }
 
 group = "eu.bcosp"
