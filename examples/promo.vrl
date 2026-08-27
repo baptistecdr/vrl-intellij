@@ -1,0 +1,62 @@
+# Normalize an incoming HTTP access log event.
+# Showcases: paths, metadata, string/regex/timestamp literals, error handling,
+# closures, conditionals, and object/array construction.
+
+# Parse the raw message as JSON; on failure, tag the event instead of dropping it.
+parsed, err = parse_json(.message)
+if err != null {
+    .parse_error = true
+    .raw = .message
+    abort
+}
+
+. = merge(., parsed)
+
+# Metadata set by upstream sources (e.g. Datadog API key) lives under `%`.
+.api_key = %datadog_api_key
+
+# Raise-on-error (`!`) for calls we're confident are well-formed.
+.timestamp = parse_timestamp!(.timestamp, format: "%Y-%m-%dT%H:%M:%S%.fZ")
+.status_code = to_int!(.status)
+
+# `??` falls back to a default instead of raising.
+.user_agent = .headers."User-Agent" ?? "unknown"
+
+# Path indexing and quoted segments.
+.client_ip = .request["remote_addr"]
+
+# Regex + raw string literals.
+if match(.path, r'^/api/v[0-9]+/') {
+    .api_version = replace(.path, r'^/api/(v[0-9]+)/.*', "$1")
+}
+
+# Redact sensitive query params via a closure.
+.query_params = map_values(.query_params) -> |value| {
+    if match(value, r'(?i)(token|password|secret)') {
+        "***REDACTED***"
+    } else {
+        value
+    }
+}
+
+# Tag slow requests.
+.tags = []
+if .duration_ms > 1000 {
+    .tags = push(.tags, "slow")
+}
+
+.severity = if .status_code >= 500 {
+    "error"
+} else if .status_code >= 400 {
+    "warning"
+} else {
+    "info"
+}
+
+# Drop noisy health-check traffic entirely.
+if .path == "/healthz" {
+    abort
+}
+
+del(.headers)
+del(.message)
