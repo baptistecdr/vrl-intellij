@@ -11,6 +11,8 @@
 <div align="center">
 
 [![Build](https://github.com/baptistecdr/vrl-intellij/actions/workflows/build.yml/badge.svg)](https://github.com/baptistecdr/vrl-intellij/actions/workflows/build.yml)
+[![Version](https://img.shields.io/jetbrains/plugin/v/33859.svg)](https://plugins.jetbrains.com/plugin/33859-vrl-vector-remap-language-)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/33859.svg)](https://plugins.jetbrains.com/plugin/33859-vrl-vector-remap-language-)
 
 </div>
 
@@ -35,8 +37,12 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
 
 ## Quick start
 
-This plugin isn't published on the JetBrains Marketplace yet. Until then, build it from source (see
-below) and install it manually via *Settings/Preferences → Plugins → ⚙️ → Install Plugin from Disk...*
+Install it from the [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/33859-vrl-vector-remap-language-),
+or from your IDE via *Settings/Preferences → Plugins → Marketplace → search for "VRL (Vector Remap
+Language)"*.
+
+You can also build it from source (see below) and install it manually via
+*Settings/Preferences → Plugins → ⚙️ → Install Plugin from Disk...*
 
 ## How to build
 

@@ -4,6 +4,7 @@
 
 # Parse the raw message as JSON; on failure, tag the event instead of dropping it.
 parsed, err = parse_json(.message)
+
 if err != null {
     .parse_error = true
     .raw = .message
