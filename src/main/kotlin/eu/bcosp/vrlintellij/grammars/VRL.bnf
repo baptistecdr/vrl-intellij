@@ -118,7 +118,7 @@ postfix_suffix ::= call_suffix
 
 call_suffix ::= raise_flag? LPAREN argument_list? RPAREN (ARROW closure_expr)?
 
-argument_list ::= argument (COMMA argument)*
+argument_list ::= argument (COMMA argument)* COMMA?
 
 argument ::= IDENTIFIER COLON expression
            | assignment_expr
@@ -175,9 +175,9 @@ abort_expr ::= ABORT expression?
 
 return_expr ::= RETURN expression?
 
-array_expr ::= LBRACKET (expression (COMMA expression)*)? RBRACKET
+array_expr ::= LBRACKET (expression (COMMA expression)* COMMA?)? RBRACKET
 
-object_expr ::= LBRACE (object_field (COMMA object_field)*)? RBRACE
+object_expr ::= LBRACE (object_field (COMMA object_field)* COMMA?)? RBRACE
 
 object_field ::= (IDENTIFIER | STRING) COLON expression
 

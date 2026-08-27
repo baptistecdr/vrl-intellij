@@ -13,8 +13,23 @@
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-description -->
     <description><![CDATA[
-        VRL is a plugin for the IntelliJ IDEA platform that provides syntax highlighting, code completion, and other features for the VRL (Vector Remap Language) programming language.
-        This is an unofficial plugin and is not affiliated with the official VRL project.
+        <p>
+            Language support for <a href="https://vector.dev/docs/reference/vrl/">VRL (Vector Remap Language)</a>,
+            the observability data transformation language from <a href="https://vector.dev">Vector</a>.
+        </p>
+        <ul>
+            <li>Syntax highlighting for all VRL literal kinds (strings, raw strings, regexes, timestamps, string interpolation) with a customizable color scheme page</li>
+            <li>Code completion for functions, in-scope variables, and named argument names</li>
+            <li>Quick documentation on hover for every VRL function</li>
+            <li>Go to Declaration, Find Usages, and Rename for variables and closure parameters</li>
+            <li>Reformat Code support for blocks, objects, arrays, and operator spacing</li>
+            <li>Code folding, brace/bracket/quote matching, and line commenting</li>
+            <li>Inline type hints on assignments, including VRL's error-destructuring form (<code>value, err = fallible_call()</code>)</li>
+            <li>Inspections for unknown function names, invalid RFC 3339 timestamp literals, and unhandled fallible function calls</li>
+        </ul>
+        <p>
+            This is an unofficial plugin and is not affiliated with the official VRL project.
+        </p>
     ]]></description>
 
     <!-- Product and plugin compatibility requirements.

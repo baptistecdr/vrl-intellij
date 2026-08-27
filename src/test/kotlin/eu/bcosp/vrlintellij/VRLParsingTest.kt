@@ -75,4 +75,16 @@ class VRLParsingTest : ParsingTestCase("", "vrl", VRLParserDefinition()) {
     fun testArgumentListIsNotSwallowedByMultiTargetAssignment() {
         assertParsesWithoutErrors("split(\"a,b\", pattern: \",\")\n")
     }
+
+    fun testTrailingCommaInObjectLiteralParses() {
+        assertParsesWithoutErrors(". = {\n    \"message\": \"Hello World\",\n    \"old_dot\": .,\n}\n")
+    }
+
+    fun testTrailingCommaInArrayLiteralParses() {
+        assertParsesWithoutErrors("x = [1, 2, 3,]\n")
+    }
+
+    fun testTrailingCommaInArgumentListParses() {
+        assertParsesWithoutErrors("split(\"a,b\", pattern: \",\",)\n")
+    }
 }
