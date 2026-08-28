@@ -9,10 +9,11 @@ import com.intellij.formatting.SpacingBuilder
 import com.intellij.formatting.Wrap
 import com.intellij.formatting.WrapType
 import com.intellij.lang.ASTNode
-import com.intellij.psi.TokenType
 import com.intellij.psi.formatter.common.AbstractBlock
 import com.intellij.psi.tree.IElementType
 import eu.bcosp.vrlintellij.psi.VRLElementTypes
+import eu.bcosp.vrlintellij.psi.collapsePassThroughWrappers
+import eu.bcosp.vrlintellij.psi.isWhitespace
 
 class VRLBlock(
     node: ASTNode,
@@ -26,7 +27,7 @@ class VRLBlock(
         val blocks = mutableListOf<Block>()
         var child = node.firstChildNode
         while (child != null) {
-            if (child.elementType != TokenType.WHITE_SPACE && child.textRange.length > 0) {
+            if (!isWhitespace(child.elementType) && child.textRange.length > 0) {
                 blocks.add(
                     VRLBlock(
                         collapsePassThroughWrappers(child),
@@ -72,33 +73,6 @@ class VRLBlock(
             } else {
                 Indent.getNormalIndent()
             }
-        }
-
-        private fun significantChildren(node: ASTNode): List<ASTNode> {
-            val result = mutableListOf<ASTNode>()
-            var c = node.firstChildNode
-            while (c != null) {
-                if (c.elementType != TokenType.WHITE_SPACE && c.textRange.length > 0) result.add(c)
-                c = c.treeNext
-            }
-            return result
-        }
-
-        // VRL's expression grammar is a long precedence chain (assignment -> or -> and ->
-        // ... -> primary) where most rules are pass-through wrappers around a single child
-        // whenever their operator isn't actually used. Left uncollapsed, a single literal ends
-        // up wrapped in a dozen same-position Block levels, which confuses the platform's indent
-        // accumulation (each "None"-indent level along that chain still counts as an anchor,
-        // compounding the container's indent by the number of wrapper levels rather than by the
-        // number of Normal-indent hops). Skipping straight to the first node that either has no
-        // children (a leaf) or more than one significant child (an actual construct) keeps the
-        // block tree - and therefore the indent math - shallow and correct. This never affects
-        // spacing rules keyed on parent composite types (aroundInside(...)), since those only
-        // match parents that truly have multiple children (an operator being present) and are
-        // therefore never collapsed away.
-        private tailrec fun collapsePassThroughWrappers(node: ASTNode): ASTNode {
-            val children = significantChildren(node)
-            return if (children.size == 1) collapsePassThroughWrappers(children[0]) else node
         }
     }
 }

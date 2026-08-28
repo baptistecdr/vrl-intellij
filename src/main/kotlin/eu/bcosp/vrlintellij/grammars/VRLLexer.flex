@@ -5,6 +5,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.lexer.FlexLexer;
 
 import static eu.bcosp.vrlintellij.psi.VRLElementTypes.*;
+import static eu.bcosp.vrlintellij.psi.ElementTypesKt.NEWLINE;
 
 %%
 
@@ -31,7 +32,12 @@ TIMESTAMP_LITERAL=t\'([^\'\\]|\\.)*\'
 %%
 
 <YYINITIAL> {
-    {WHITE_SPACE}          { return TokenType.WHITE_SPACE; }
+    // A whitespace run containing a newline is tagged distinctly from plain horizontal
+    // whitespace: both stay auto-skipped everywhere by default (see
+    // VRLParserDefinition.getWhitespaceTokens), but the grammar's <<newlineBefore>> predicate
+    // can tell them apart via PsiBuilder.rawLookup to stop a value from continuing across a
+    // line break, per VRL's "expressions can be separated by newline or semicolon" rule.
+    {WHITE_SPACE}          { return yytext().toString().indexOf('\n') >= 0 ? NEWLINE : TokenType.WHITE_SPACE; }
     {LINE_COMMENT}         { return COMMENT; }
 
     // Keywords

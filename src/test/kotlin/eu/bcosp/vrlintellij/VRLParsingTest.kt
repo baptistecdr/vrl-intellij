@@ -6,7 +6,9 @@ import com.intellij.psi.PsiRecursiveElementWalkingVisitor
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.testFramework.ParsingTestCase
 import eu.bcosp.vrlintellij.psi.VRLArrayExpr
+import eu.bcosp.vrlintellij.psi.VRLBlockExpr
 import eu.bcosp.vrlintellij.psi.VRLParserDefinition
+import eu.bcosp.vrlintellij.psi.VRLStatement
 
 class VRLParsingTest : ParsingTestCase("", "vrl", VRLParserDefinition()) {
     override fun getTestDataPath(): String = "src/test/testData"
@@ -86,5 +88,74 @@ class VRLParsingTest : ParsingTestCase("", "vrl", VRLParserDefinition()) {
 
     fun testTrailingCommaInArgumentListParses() {
         assertParsesWithoutErrors("split(\"a,b\", pattern: \",\",)\n")
+    }
+
+    private fun topLevelStatementTexts(text: String): List<String> {
+        val file = createPsiFile("t", text)
+        return PsiTreeUtil.getChildrenOfType(file, VRLStatement::class.java)?.map { it.text } ?: emptyList()
+    }
+
+    // Regression coverage for a real, previously-silent bug: a bare newline (no `;`) is supposed
+    // to separate statements per the VRL reference ("expressions can be separated by newline or
+    // semicolon in any combination"), but a value followed by a newline then `.`/`[`/`?`/`(` used
+    // to be swallowed as a postfix continuation of that value instead - e.g. `x = 1\n.foo = 2`
+    // parsed as one statement `x = (1.foo = 2)`. See VRL.bnf's `<<newlineBefore>>` guards.
+    fun testNewlineSeparatesTwoAssignmentsWhereFirstValueCouldTakeADotContinuation() {
+        assertEquals(listOf("x = 1", ".foo = 2"), topLevelStatementTexts("x = 1\n.foo = 2\n"))
+    }
+
+    fun testNewlineSeparatesStatementsAcrossABracketPostfixContinuation() {
+        assertEquals(listOf("x = y", "[0] = 1"), topLevelStatementTexts("x = y\n[0] = 1\n"))
+    }
+
+    fun testNewlineBlocksAQuestionContinuation() {
+        // A bare `?` can't start a fresh statement on its own (it's only a postfix suffix), so
+        // this input is expected to still report a parse error for the dangling `?` - what this
+        // actually checks is that `y` didn't get silently extended into `y?` in the first place.
+        assertEquals("x = y", topLevelStatementTexts("x = y\n?\n").first())
+    }
+
+    fun testNewlineSeparatesStatementsAcrossACallContinuation() {
+        assertEquals(listOf("x = y", "upcase(\"a\")"), topLevelStatementTexts("x = y\nupcase(\"a\")\n"))
+    }
+
+    fun testNewlineBlocksABinaryOperatorContinuation() {
+        // `*` can't start a fresh statement either, so `* 2` is expected to dangle as a parse
+        // error - this checks that `1` wasn't first silently extended into `1 * 2`.
+        assertEquals("x = 1", topLevelStatementTexts("x = 1\n* 2\n").first())
+    }
+
+    fun testSameLinePostfixContinuationStillWorks() {
+        assertParsesWithoutErrors("x = .foo.bar\n")
+        assertEquals(listOf("x = .foo.bar"), topLevelStatementTexts("x = .foo.bar\n"))
+    }
+
+    fun testSameLineBinaryOperatorContinuationStillWorks() {
+        assertEquals(listOf("x = 1 + 2"), topLevelStatementTexts("x = 1 + 2\n"))
+    }
+
+    fun testNewlineWithinBlockStatementsAreSeparateStatements() {
+        // The exact promo.vrl style: several statements inside a block, one per line, no `;`.
+        val text = "if err != null {\n.parse_error = true\n.raw = .message\nabort\n}\n"
+        assertParsesWithoutErrors(text)
+        val file = createPsiFile("t", text)
+        val block = PsiTreeUtil.findChildOfType(file, VRLBlockExpr::class.java)!!
+        assertEquals(listOf(".parse_error = true", ".raw = .message", "abort"), block.statementList.map { it.text })
+    }
+
+    fun testMultiLineArrayLiteralWithoutTrailingCommaStillParses() {
+        assertParsesWithoutErrors("x = [\n1,\n2\n]\n")
+    }
+
+    fun testMultiLineObjectLiteralWithoutTrailingCommaStillParses() {
+        assertParsesWithoutErrors("x = {\n\"a\": 1,\n\"b\": 2\n}\n")
+    }
+
+    fun testMultiLineArgumentListWithoutTrailingCommaStillParses() {
+        assertParsesWithoutErrors("split(\n\"a,b\",\npattern: \",\"\n)\n")
+    }
+
+    fun testElseOnItsOwnLineStillParses() {
+        assertParsesWithoutErrors("if true {\nx = 1\n}\nelse {\nx = 2\n}\n")
     }
 }
