@@ -20,13 +20,14 @@
         <ul>
             <li>Syntax highlighting for all VRL literal kinds (strings, raw strings, regexes, timestamps, string interpolation) with a customizable color scheme page</li>
             <li>Code completion for functions, in-scope variables, and named argument names</li>
+            <li>Parameter info showing a function's signature while typing a call</li>
             <li>Quick documentation on hover for every VRL function</li>
             <li>Go to Declaration, Find Usages, and Rename for variables and closure parameters</li>
             <li>Reformat Code support for blocks, objects, arrays, and operator spacing</li>
             <li>Language injection into string, raw string, and regex literals</li>
             <li>Code folding, brace/bracket/quote matching, and line commenting</li>
             <li>Inline type hints on assignments, including VRL's error-destructuring form (<code>value, err = fallible_call()</code>)</li>
-            <li>Inspections for unknown function names, invalid RFC 3339 timestamp literals, and unhandled fallible function calls</li>
+            <li>Inspections for unknown function names, invalid RFC 3339 timestamp literals, unhandled fallible function calls, and invalid function-call arguments</li>
         </ul>
         <p>
             This is an unofficial plugin and is not affiliated with the official VRL project.
@@ -127,6 +128,19 @@
                 enabledByDefault="true"
                 level="ERROR"
                 implementationClass="eu.bcosp.vrlintellij.inspections.VRLUnhandledFallibleCallInspection"/>
+
+        <localInspection
+                language="VRL"
+                shortName="VRLFunctionArguments"
+                displayName="Invalid function-call arguments"
+                groupName="VRL"
+                enabledByDefault="true"
+                level="ERROR"
+                implementationClass="eu.bcosp.vrlintellij.inspections.VRLFunctionArgumentsInspection"/>
+
+        <codeInsight.parameterInfo
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.parameterInfo.VRLParameterInfoHandler"/>
 
         <codeInsight.declarativeInlayProvider
                 language="VRL"
