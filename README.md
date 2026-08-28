@@ -24,6 +24,7 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
 - Syntax highlighting for all VRL literal kinds (strings, raw strings, regexes, timestamps, string
   interpolation) and a customizable color scheme page
 - Code completion for functions, in-scope variables, and named argument names
+- Parameter info (Ctrl+P) showing a function's signature while typing a call
 - Quick documentation on hover for every VRL function
 - Go to Declaration, Find Usages, and Rename for variables and closure parameters
 - Code folding, brace/bracket/quote matching, line commenting (`#`)
@@ -36,6 +37,8 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
     - Unknown function name, with a "did you mean" quick fix
     - Invalid RFC 3339 timestamp literals
     - Unhandled fallible function calls, mirroring VRL's own compile errors
+    - Invalid function-call arguments (unknown/duplicate named arguments, wrong argument count,
+      missing required arguments)
 
 ## Quick start
 
