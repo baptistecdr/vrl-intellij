@@ -4,12 +4,12 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor
-import com.intellij.psi.TokenType
 import com.intellij.psi.util.PsiTreeUtil
 import eu.bcosp.vrlintellij.psi.VRLAssignmentExpr
 import eu.bcosp.vrlintellij.psi.VRLClosureExpr
 import eu.bcosp.vrlintellij.psi.VRLElementTypes
 import eu.bcosp.vrlintellij.psi.VRLPrimaryExpr
+import eu.bcosp.vrlintellij.psi.isWhitespaceOrComment
 
 /**
  * VRL has no `let`/declaration keyword: `x = ...` both declares and reassigns `x`, and closures
@@ -108,21 +108,15 @@ object VRLVariableResolver {
     }
 
     private fun onlySignificantChild(node: ASTNode): ASTNode? {
-        val children = node.getChildren(null).filterNot {
-            it.elementType == TokenType.WHITE_SPACE || it.elementType == VRLElementTypes.COMMENT
-        }
+        val children = node.getChildren(null).filterNot { isWhitespaceOrComment(it.elementType) }
         return children.singleOrNull()
     }
 
     private fun firstSignificantChild(node: ASTNode): ASTNode? {
-        return node.getChildren(null).firstOrNull {
-            it.elementType != TokenType.WHITE_SPACE && it.elementType != VRLElementTypes.COMMENT
-        }
+        return node.getChildren(null).firstOrNull { !isWhitespaceOrComment(it.elementType) }
     }
 
     private fun significantChildren(node: ASTNode): List<ASTNode> {
-        return node.getChildren(null).filterNot {
-            it.elementType == TokenType.WHITE_SPACE || it.elementType == VRLElementTypes.COMMENT
-        }
+        return node.getChildren(null).filterNot { isWhitespaceOrComment(it.elementType) }
     }
 }

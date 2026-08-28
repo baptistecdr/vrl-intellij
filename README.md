@@ -27,10 +27,16 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
 - Parameter info (Ctrl+P) showing a function's signature while typing a call
 - Quick documentation on hover for every VRL function
 - Go to Declaration, Find Usages, and Rename for variables and closure parameters
+- Introduce Variable refactoring: select an expression and extract it to a new variable
+- Structure view (⌘7 / Ctrl+F12) listing a script's statements, including nested if/for/while/loop
+  and closure bodies
 - Code folding, brace/bracket/quote matching, line commenting (`#`)
 - Reformat Code support (indentation and spacing for blocks, objects, arrays, and operators)
 - Language injection into string, raw string, and regex literals (*Alt+Enter → Inject language or
   reference*)
+- Postfix templates: `expr.iferr` expands to VRL's error-destructuring pattern
+  (`target, err = expr; if err != null { }`), and `expr.raise` inserts the `!` raise-on-error
+  suffix
 - Inline type hints on assignments, e.g. `x: string = parse_json(...)`, including VRL's
   error-destructuring form (`value, err = fallible_call()`)
 - Inspections:

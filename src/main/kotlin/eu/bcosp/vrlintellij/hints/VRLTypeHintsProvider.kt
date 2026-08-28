@@ -10,12 +10,12 @@ import com.intellij.lang.ASTNode
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.intellij.psi.TokenType
 import eu.bcosp.vrlintellij.functions.VRLFunction
 import eu.bcosp.vrlintellij.functions.allFunctions
 import eu.bcosp.vrlintellij.psi.VRLAssignmentExpr
 import eu.bcosp.vrlintellij.psi.VRLElementTypes
 import eu.bcosp.vrlintellij.psi.VRLMultiAssignmentExpr
+import eu.bcosp.vrlintellij.psi.isWhitespaceOrComment
 
 /**
  * Shows the return type of a directly-assigned function call inline, e.g. `x: string = parse_json(...)`,
@@ -88,8 +88,7 @@ class VRLTypeHintsProvider : InlayHintsProvider {
 
         private fun onlySignificantChild(node: ASTNode): ASTNode? = significantChildren(node).singleOrNull()
 
-        private fun significantChildren(node: ASTNode): List<ASTNode> = node.getChildren(null).filterNot {
-            it.elementType == TokenType.WHITE_SPACE || it.elementType == VRLElementTypes.COMMENT
-        }
+        private fun significantChildren(node: ASTNode): List<ASTNode> =
+            node.getChildren(null).filterNot { isWhitespaceOrComment(it.elementType) }
     }
 }

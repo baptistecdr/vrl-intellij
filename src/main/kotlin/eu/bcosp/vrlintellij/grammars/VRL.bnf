@@ -1,5 +1,6 @@
 {
     parserClass="eu.bcosp.vrlintellij.parser.VRLParser"
+    parserUtilClass="eu.bcosp.vrlintellij.parser.VRLParserUtil"
     extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
     psiClassPrefix="VRL"
@@ -12,7 +13,9 @@
     tokenTypeClass="eu.bcosp.vrlintellij.psi.VRLTokenType"
 
     tokens=[
-        // Whitespace and comments
+        // Whitespace and comments. NEWLINE isn't declared here: Grammar-Kit doesn't emit a
+        // VRLElementTypes constant for a token whose pattern matches only whitespace characters
+        // (same as WHITE_SPACE itself) - see eu.bcosp.vrlintellij.psi.NEWLINE.
         WHITE_SPACE='regexp:\s+'
         COMMENT='regexp:#[^\r\n]*'
 
@@ -85,7 +88,15 @@ statement ::= multi_assignment_expr (SEMICOLON | &RBRACE)?
 
 expression ::= assignment_expr
 
-assignment_expr ::= or_expr ((ASSIGN | MERGE_ASSIGN | NULL_COALESCE_ASSIGN) assignment_expr)?
+// Every continuation point below (an operator or postfix suffix that would extend the previous
+// value) is gated by `!<<newlineBefore>>`: a value followed by a raw newline is a complete
+// statement per VRL's "expressions can be separated by newline or semicolon" rule, so a line
+// break blocks the continuation the same way a semicolon inside `statement` would - without it,
+// e.g. `x = 1\n.foo = 2` silently parses as one statement `x = (1.foo = 2)` instead of two.
+// Purely additive positions (LPAREN/LBRACKET/LBRACE bodies, `multi_assignment_expr`'s own
+// required comma) are left unguarded since a failed predicate there would fail the whole rule
+// rather than just stop a repetition, and multi-line calls/arrays/objects must keep working.
+assignment_expr ::= or_expr (!<<newlineBefore>> (ASSIGN | MERGE_ASSIGN | NULL_COALESCE_ASSIGN) assignment_expr)?
 
 // `value, err = fallible_call()` is VRL's standard error-destructuring assignment form, used
 // alongside the `!` raise-on-error suffix. Kept separate from `assignment_expr` (rather than an
@@ -95,21 +106,21 @@ assignment_expr ::= or_expr ((ASSIGN | MERGE_ASSIGN | NULL_COALESCE_ASSIGN) assi
 // it: only as a standalone statement, never nested inside another expression.
 multi_assignment_expr ::= or_expr COMMA or_expr (ASSIGN | MERGE_ASSIGN | NULL_COALESCE_ASSIGN) assignment_expr
 
-or_expr ::= and_expr (OR and_expr)*
+or_expr ::= and_expr (!<<newlineBefore>> OR and_expr)*
 
-and_expr ::= null_coalesce_expr (AND null_coalesce_expr)*
+and_expr ::= null_coalesce_expr (!<<newlineBefore>> AND null_coalesce_expr)*
 
-null_coalesce_expr ::= comparison_expr (NULL_COALESCE comparison_expr)*
+null_coalesce_expr ::= comparison_expr (!<<newlineBefore>> NULL_COALESCE comparison_expr)*
 
-comparison_expr ::= additive_expr ((EQ | NE | GT | GE | LT | LE) additive_expr)?
+comparison_expr ::= additive_expr (!<<newlineBefore>> (EQ | NE | GT | GE | LT | LE) additive_expr)?
 
-additive_expr ::= multiplicative_expr ((PLUS | MINUS) multiplicative_expr)*
+additive_expr ::= multiplicative_expr (!<<newlineBefore>> (PLUS | MINUS) multiplicative_expr)*
 
-multiplicative_expr ::= unary_expr ((STAR | SLASH | PERCENT) unary_expr)*
+multiplicative_expr ::= unary_expr (!<<newlineBefore>> (STAR | SLASH | PERCENT) unary_expr)*
 
 unary_expr ::= (NOT | MINUS)* postfix_expr
 
-postfix_expr ::= primary_expr postfix_suffix*
+postfix_expr ::= primary_expr (!<<newlineBefore>> postfix_suffix)*
 
 postfix_suffix ::= call_suffix
                  | LBRACKET expression RBRACKET

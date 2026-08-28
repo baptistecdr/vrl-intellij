@@ -10,11 +10,11 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
-import com.intellij.psi.TokenType
 import eu.bcosp.vrlintellij.functions.allFunctions
 import eu.bcosp.vrlintellij.psi.VRLElementTypes
 import eu.bcosp.vrlintellij.psi.VRLPostfixExpr
 import eu.bcosp.vrlintellij.psi.VRLPrimaryExpr
+import eu.bcosp.vrlintellij.psi.isWhitespaceOrComment
 
 /**
  * VRL's compiler rejects any fallible call whose error isn't handled (its own compile errors 100
@@ -69,9 +69,7 @@ class VRLUnhandledFallibleCallInspection : LocalInspectionTool() {
     }
 
     private fun onlySignificantChild(node: ASTNode): ASTNode? {
-        val children = node.getChildren(null).filterNot {
-            it.elementType == TokenType.WHITE_SPACE || it.elementType == VRLElementTypes.COMMENT
-        }
+        val children = node.getChildren(null).filterNot { isWhitespaceOrComment(it.elementType) }
         return children.singleOrNull()
     }
 

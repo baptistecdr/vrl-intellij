@@ -23,8 +23,11 @@
             <li>Parameter info showing a function's signature while typing a call</li>
             <li>Quick documentation on hover for every VRL function</li>
             <li>Go to Declaration, Find Usages, and Rename for variables and closure parameters</li>
+            <li>Introduce Variable refactoring</li>
+            <li>Structure view listing a script's statements, including nested blocks</li>
             <li>Reformat Code support for blocks, objects, arrays, and operator spacing</li>
             <li>Language injection into string, raw string, and regex literals</li>
+            <li>Postfix templates: <code>expr.iferr</code> and <code>expr.raise</code> for VRL's error-handling forms</li>
             <li>Code folding, brace/bracket/quote matching, and line commenting</li>
             <li>Inline type hints on assignments, including VRL's error-destructuring form (<code>value, err = fallible_call()</code>)</li>
             <li>Inspections for unknown function names, invalid RFC 3339 timestamp literals, unhandled fallible function calls, and invalid function-call arguments</li>
@@ -98,6 +101,18 @@
         <lang.findUsagesProvider
                 language="VRL"
                 implementationClass="eu.bcosp.vrlintellij.references.VRLFindUsagesProvider"/>
+
+        <lang.psiStructureViewFactory
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.structureView.VRLStructureViewFactory"/>
+
+        <codeInsight.template.postfixTemplateProvider
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.postfix.VRLPostfixTemplateProvider"/>
+
+        <lang.refactoringSupport
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.refactoring.VRLRefactoringSupportProvider"/>
 
         <referencesSearch
                 implementation="eu.bcosp.vrlintellij.references.VRLReferencesSearcher"/>
