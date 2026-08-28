@@ -1,12 +1,12 @@
-import org.jetbrains.grammarkit.tasks.GenerateLexerTask
-import org.jetbrains.grammarkit.tasks.GenerateParserTask
+import org.jetbrains.intellij.platform.gradle.tasks.GenerateLexerTask
+import org.jetbrains.intellij.platform.gradle.tasks.GenerateParserTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "2.4.10"
     id("org.jetbrains.intellij.platform") version "2.18.1"
-    id("org.jetbrains.grammarkit") version "2023.3.0.4"
+    id("org.jetbrains.intellij.platform.grammarkit") version "2.18.1"
 }
 
 group = "eu.bcosp"
@@ -81,7 +81,8 @@ val genOutputDir = file("src/main/gen")
 val generateSyntaxLexer = tasks.register<GenerateLexerTask>("generateSyntaxLexer") {
     sourceFile.set(file("src/main/kotlin/eu/bcosp/vrlintellij/grammars/VRLLexer.flex"))
 
-    targetOutputDir.set(file("$genOutputDir/eu/bcosp/vrlintellij/grammars"))
+    targetRootOutputDir.set(genOutputDir)
+    pathToClass.set("eu/bcosp/vrlintellij/grammars/VRLLexer.java")
 
     purgeOldFiles.set(true)
 }
@@ -90,8 +91,8 @@ val generateSyntaxParser = tasks.register<GenerateParserTask>("generateSyntaxPar
     sourceFile.set(file("src/main/kotlin/eu/bcosp/vrlintellij/grammars/VRL.bnf"))
 
     targetRootOutputDir.set(genOutputDir)
-    pathToParser.set("$genOutputDir/eu/bcosp/vrlintellij/parser/VRLParser.java")
-    pathToPsiRoot.set("$genOutputDir/eu/bcosp/vrlintellij/psi")
+    pathToParser.set("eu/bcosp/vrlintellij/parser/VRLParser.java")
+    pathToPsiRoot.set("eu/bcosp/vrlintellij/psi")
 
     purgeOldFiles.set(true)
 }
@@ -99,11 +100,8 @@ val generateSyntaxParser = tasks.register<GenerateParserTask>("generateSyntaxPar
 val generateStringTemplateLexer = tasks.register<GenerateLexerTask>("generateStringTemplateLexer") {
     sourceFile.set(file("src/main/kotlin/eu/bcosp/vrlintellij/highlighting/template/VRLStringTemplateLexer.flex"))
 
-    // Must NOT be nested under generateSyntaxLexer's targetOutputDir (.../grammars): its own
-    // purgeOldFiles recursively purges that whole subtree, including subdirectories owned by
-    // other tasks, whenever it runs a fresh (non-cached) generation - it doesn't just remove
-    // stale output that used to be its own.
-    targetOutputDir.set(file("$genOutputDir/eu/bcosp/vrlintellij/highlighting/template"))
+    targetRootOutputDir.set(genOutputDir)
+    pathToClass.set("eu/bcosp/vrlintellij/highlighting/template/VRLStringTemplateLexer.java")
 
     purgeOldFiles.set(true)
 }
