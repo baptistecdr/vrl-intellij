@@ -30,7 +30,7 @@
             <li>Postfix templates: <code>expr.iferr</code> and <code>expr.raise</code> for VRL's error-handling forms</li>
             <li>Code folding, brace/bracket/quote matching, and line commenting</li>
             <li>Inline type hints on assignments, including VRL's error-destructuring form (<code>value, err = fallible_call()</code>)</li>
-            <li>Inspections for unknown function names, invalid RFC 3339 timestamp literals, unhandled fallible function calls, and invalid function-call arguments</li>
+            <li>Inspections for unknown function names, invalid RFC 3339 timestamp literals, unhandled fallible function calls, invalid function-call arguments, and unused variables</li>
         </ul>
         <p>
             This is an unofficial plugin and is not affiliated with the official VRL project.
@@ -152,6 +152,15 @@
                 enabledByDefault="true"
                 level="ERROR"
                 implementationClass="eu.bcosp.vrlintellij.inspections.VRLFunctionArgumentsInspection"/>
+
+        <localInspection
+                language="VRL"
+                shortName="VRLUnusedVariable"
+                displayName="Unused variable"
+                groupName="VRL"
+                enabledByDefault="true"
+                level="WARNING"
+                implementationClass="eu.bcosp.vrlintellij.inspections.VRLUnusedVariableInspection"/>
 
         <codeInsight.parameterInfo
                 language="VRL"
