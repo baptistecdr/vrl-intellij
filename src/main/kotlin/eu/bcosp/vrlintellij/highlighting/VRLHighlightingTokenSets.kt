@@ -68,7 +68,6 @@ object VRLHighlightingTokenSets {
     val OPERATOR: TokenSet = TokenSet.create(
         VRLElementTypes.ASSIGN,
         VRLElementTypes.MERGE_ASSIGN,
-        VRLElementTypes.NULL_COALESCE_ASSIGN,
         VRLElementTypes.EQ,
         VRLElementTypes.NE,
         VRLElementTypes.GE,

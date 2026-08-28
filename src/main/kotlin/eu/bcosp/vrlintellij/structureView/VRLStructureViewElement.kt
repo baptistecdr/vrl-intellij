@@ -9,17 +9,14 @@ import eu.bcosp.vrlintellij.psi.VRLAssignmentExpr
 import eu.bcosp.vrlintellij.psi.VRLBlockExpr
 import eu.bcosp.vrlintellij.psi.VRLElementTypes
 import eu.bcosp.vrlintellij.psi.VRLFile
-import eu.bcosp.vrlintellij.psi.VRLForExpr
 import eu.bcosp.vrlintellij.psi.VRLIfExpr
-import eu.bcosp.vrlintellij.psi.VRLLoopExpr
 import eu.bcosp.vrlintellij.psi.VRLReturnExpr
 import eu.bcosp.vrlintellij.psi.VRLStatement
-import eu.bcosp.vrlintellij.psi.VRLWhileExpr
 import eu.bcosp.vrlintellij.psi.collapsePassThroughWrappers
 
 /**
  * A node's children are the statements of every [VRLBlockExpr] reachable from it without passing
- * through another statement first (an if/for/while/loop's own block(s), or a closure body) - this
+ * through another statement first (an if's own block(s), or a closure body) - this
  * naturally mirrors real nesting: a block found one level down contributes its statements as this
  * node's children, while a block found two levels down (inside one of those) becomes a grandchild
  * on the next recursive call instead of being flattened in here.
@@ -65,7 +62,6 @@ class VRLStructureViewElement(element: PsiElement) : PsiTreeElementBase<PsiEleme
 
     private fun operatorSymbol(assignment: VRLAssignmentExpr): String = when {
         assignment.node.findChildByType(VRLElementTypes.MERGE_ASSIGN) != null -> "|="
-        assignment.node.findChildByType(VRLElementTypes.NULL_COALESCE_ASSIGN) != null -> "??="
         else -> "="
     }
 
@@ -75,9 +71,6 @@ class VRLStructureViewElement(element: PsiElement) : PsiTreeElementBase<PsiEleme
         val primary = collapsePassThroughWrappers(orExpr.node).psi
         return when (primary) {
             is VRLIfExpr -> textBefore(primary, primary.blockExprList.first())
-            is VRLForExpr -> textBefore(primary, primary.blockExpr)
-            is VRLWhileExpr -> textBefore(primary, primary.blockExpr)
-            is VRLLoopExpr -> textBefore(primary, primary.blockExpr)
             is VRLAbortExpr, is VRLReturnExpr -> truncate(primary.text)
             else -> null
         }

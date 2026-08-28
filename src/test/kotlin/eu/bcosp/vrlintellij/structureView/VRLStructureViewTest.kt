@@ -30,9 +30,9 @@ class VRLStructureViewTest : BasePlatformTestCase() {
         assertEquals(listOf("x =", ".foo ="), children.map { it.presentableText })
     }
 
-    fun testMergeAndNullCoalesceAssignOperatorsAreShown() {
-        val children = rootChildren(". |= {}\nx ??= 1\n")
-        assertEquals(listOf(". |=", "x ??="), children.map { it.presentableText })
+    fun testMergeAssignOperatorIsShown() {
+        val children = rootChildren(". |= {}\n")
+        assertEquals(listOf(". |="), children.map { it.presentableText })
     }
 
     fun testMultiTargetErrorAssignmentIsLabeledByBothTargets() {
@@ -49,12 +49,6 @@ class VRLStructureViewTest : BasePlatformTestCase() {
         val children = rootChildren("if true {\ny = 3\n} else {\nz = 4\n}\n")
         assertEquals(1, children.size)
         assertEquals(listOf("y =", "z ="), childrenOf(children[0]))
-    }
-
-    fun testForLoopIsLabeledByItsHeaderAndNestsItsBody() {
-        val children = rootChildren("for k, v in .items {\nupcase(k)\n}\n")
-        assertEquals(listOf("for k, v in .items"), children.map { it.presentableText })
-        assertEquals(listOf("upcase(k)"), childrenOf(children[0]))
     }
 
     fun testClosureBodyStatementsAreNestedUnderTheCallStatement() {

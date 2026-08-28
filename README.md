@@ -28,7 +28,7 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
 - Quick documentation on hover for every VRL function
 - Go to Declaration, Find Usages, and Rename for variables and closure parameters
 - Introduce Variable refactoring: select an expression and extract it to a new variable
-- Structure view (⌘7 / Ctrl+F12) listing a script's statements, including nested if/for/while/loop
+- Structure view (⌘7 / Ctrl+F12) listing a script's statements, including nested if statements
   and closure bodies
 - Code folding, brace/bracket/quote matching, line commenting (`#`)
 - Reformat Code support (indentation and spacing for blocks, objects, arrays, and operators)

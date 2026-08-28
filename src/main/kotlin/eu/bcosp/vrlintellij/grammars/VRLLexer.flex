@@ -58,7 +58,6 @@ TIMESTAMP_LITERAL=t\'([^\'\\]|\\.)*\'
     // Operators
     "="                    { return ASSIGN; }
     "|="                   { return MERGE_ASSIGN; }
-    "??="                  { return NULL_COALESCE_ASSIGN; }
     "=="                   { return EQ; }
     "!="                   { return NE; }
     ">="                   { return GE; }

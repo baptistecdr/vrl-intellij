@@ -48,8 +48,6 @@ class VRLFormattingModelBuilder : FormattingModelBuilder {
             // Keywords
             .after(VRLElementTypes.IF).spaces(1)
             .after(VRLElementTypes.ELSE).spaces(1)
-            .after(VRLElementTypes.FOR).spaces(1)
-            .after(VRLElementTypes.WHILE).spaces(1)
             .after(VRLElementTypes.RETURN).spaces(1)
             .after(VRLElementTypes.ABORT).spaces(1)
             .before(VRLElementTypes.IN).spaces(1)
@@ -61,10 +59,8 @@ class VRLFormattingModelBuilder : FormattingModelBuilder {
             // Assignment operators
             .aroundInside(VRLElementTypes.ASSIGN, VRLElementTypes.ASSIGNMENT_EXPR).spaces(1)
             .aroundInside(VRLElementTypes.MERGE_ASSIGN, VRLElementTypes.ASSIGNMENT_EXPR).spaces(1)
-            .aroundInside(VRLElementTypes.NULL_COALESCE_ASSIGN, VRLElementTypes.ASSIGNMENT_EXPR).spaces(1)
             .aroundInside(VRLElementTypes.ASSIGN, VRLElementTypes.MULTI_ASSIGNMENT_EXPR).spaces(1)
             .aroundInside(VRLElementTypes.MERGE_ASSIGN, VRLElementTypes.MULTI_ASSIGNMENT_EXPR).spaces(1)
-            .aroundInside(VRLElementTypes.NULL_COALESCE_ASSIGN, VRLElementTypes.MULTI_ASSIGNMENT_EXPR).spaces(1)
 
             // Binary operators - scoped to their precedence level's node so unary `!`/`-` (which
             // share tokens with NOT/MINUS here) are left untouched.

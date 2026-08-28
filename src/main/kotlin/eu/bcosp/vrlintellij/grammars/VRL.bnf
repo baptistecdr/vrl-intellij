@@ -37,7 +37,6 @@
         // Operators
         ASSIGN='='
         MERGE_ASSIGN='|='
-        NULL_COALESCE_ASSIGN='??='
         EQ='=='
         NE='!='
         GE='>='
@@ -96,7 +95,7 @@ expression ::= assignment_expr
 // Purely additive positions (LPAREN/LBRACKET/LBRACE bodies, `multi_assignment_expr`'s own
 // required comma) are left unguarded since a failed predicate there would fail the whole rule
 // rather than just stop a repetition, and multi-line calls/arrays/objects must keep working.
-assignment_expr ::= or_expr (!<<newlineBefore>> (ASSIGN | MERGE_ASSIGN | NULL_COALESCE_ASSIGN) assignment_expr)?
+assignment_expr ::= or_expr (!<<newlineBefore>> (ASSIGN | MERGE_ASSIGN) assignment_expr)?
 
 // `value, err = fallible_call()` is VRL's standard error-destructuring assignment form, used
 // alongside the `!` raise-on-error suffix. Kept separate from `assignment_expr` (rather than an
@@ -104,7 +103,7 @@ assignment_expr ::= or_expr (!<<newlineBefore>> (ASSIGN | MERGE_ASSIGN | NULL_CO
 // `, <expr>` - breaking argument lists and array/object literals, which also route through
 // `assignment_expr` via `expression`. Scoping this to `statement` matches how VRL actually uses
 // it: only as a standalone statement, never nested inside another expression.
-multi_assignment_expr ::= or_expr COMMA or_expr (ASSIGN | MERGE_ASSIGN | NULL_COALESCE_ASSIGN) assignment_expr
+multi_assignment_expr ::= or_expr COMMA or_expr (ASSIGN | MERGE_ASSIGN) assignment_expr
 
 or_expr ::= and_expr (!<<newlineBefore>> OR and_expr)*
 
@@ -141,9 +140,6 @@ primary_expr ::= literal
                | FUNCTION_CALL
                | block_expr
                | if_expr
-               | for_expr
-               | while_expr
-               | loop_expr
                | abort_expr
                | return_expr
                | LPAREN expression RPAREN
@@ -178,12 +174,6 @@ path_segment ::= IDENTIFIER | STRING | LBRACKET (INTEGER_LITERAL | STRING) RBRAC
 block_expr ::= LBRACE statement* RBRACE
 
 if_expr ::= IF expression block_expr (ELSE (if_expr | block_expr))?
-
-for_expr ::= FOR IDENTIFIER (COMMA IDENTIFIER)? IN expression block_expr
-
-while_expr ::= WHILE expression block_expr
-
-loop_expr ::= LOOP block_expr
 
 abort_expr ::= ABORT expression?
 

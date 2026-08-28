@@ -44,8 +44,20 @@ class VRLParsingTest : ParsingTestCase("", "vrl", VRLParserDefinition()) {
         assertParsesWithoutErrors("split(\"a,b\", pattern: \",\")\n")
     }
 
-    fun testForInLoopParses() {
-        assertParsesWithoutErrors("for x in y { }\n")
+    fun testForWhileLoopAreNotRealVrlSyntaxAndFailToParse() {
+        // `for`/`while`/`loop`/`break`/`continue` are reserved keywords in real VRL (it's
+        // deliberately not Turing complete - see vector.dev's VRL reference) but have no actual
+        // expression grammar; iteration only happens via functions + closures (`for_each(...) ->
+        // |k, v| { }`). Confirm these keywords are rejected rather than silently accepted as loops.
+        val file = createPsiFile("t", "for x in y { }\n")
+        val errors = mutableListOf<PsiErrorElement>()
+        file.accept(object : PsiRecursiveElementWalkingVisitor() {
+            override fun visitElement(element: PsiElement) {
+                if (element is PsiErrorElement) errors.add(element)
+                super.visitElement(element)
+            }
+        })
+        assertTrue("expected a parse error for `for x in y { }`", errors.isNotEmpty())
     }
 
     fun testMetadataPathParses() {
