@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: VRL language reference
+    url: https://vector.dev/docs/reference/vrl/
+    about: Check the official VRL documentation if you're unsure whether something is a plugin bug or expected VRL behavior.

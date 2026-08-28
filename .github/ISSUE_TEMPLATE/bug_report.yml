@@ -1,0 +1,80 @@
+name: Bug report
+description: Report a problem with the VRL plugin
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the sections below so it can be reproduced and fixed.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug.
+      placeholder: |
+        e.g. Declaring a key that starts with `@` reports a parse error even though it looks valid.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: VRL snippet to reproduce
+      description: The smallest VRL code that reproduces the issue.
+      render: vrl
+      placeholder: |
+        .@metadata.hello = "world"
+    validations:
+      required: false
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen instead?
+    validations:
+      required: true
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      description: Found in Settings > Plugins, or Help > About.
+      placeholder: 1.2.3
+    validations:
+      required: true
+
+  - type: input
+    id: ide-version
+    attributes:
+      label: IDE and version
+      description: e.g. IntelliJ IDEA 2024.2.1 (Ultimate/Community)
+      placeholder: IntelliJ IDEA 2024.2.1 Ultimate
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: macOS 15.5 / Windows 11 / Ubuntu 24.04
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or stack trace
+      description: If the IDE showed an error notification, paste the stack trace here (Help > Show Log in Finder/Explorer, or copy it from the error balloon).
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Anything else that might help (screenshots, when it started happening, etc.)
+    validations:
+      required: false

@@ -1,0 +1,51 @@
+name: Feature request
+description: Suggest a new feature or improvement for the VRL plugin
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement! Please describe it below.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: What are you trying to do that the plugin doesn't currently support well?
+      placeholder: |
+        e.g. There's no quick way to extract a repeated sub-expression into a variable.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What would you like the plugin to do? Mention specific IntelliJ features if relevant (inspection, intention, refactoring, structure view, postfix template, etc.).
+    validations:
+      required: true
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Example
+      description: A VRL snippet and/or before/after showing the feature in action.
+      render: vrl
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any workarounds you're currently using, or other approaches you considered.
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Links to VRL documentation, similar features in other IDEs/plugins, screenshots, etc.
+    validations:
+      required: false
