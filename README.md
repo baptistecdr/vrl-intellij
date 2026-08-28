@@ -28,6 +28,8 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
 - Go to Declaration, Find Usages, and Rename for variables and closure parameters
 - Code folding, brace/bracket/quote matching, line commenting (`#`)
 - Reformat Code support (indentation and spacing for blocks, objects, arrays, and operators)
+- Language injection into string, raw string, and regex literals (*Alt+Enter → Inject language or
+  reference*)
 - Inline type hints on assignments, e.g. `x: string = parse_json(...)`, including VRL's
   error-destructuring form (`value, err = fallible_call()`)
 - Inspections:
