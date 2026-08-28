@@ -152,6 +152,9 @@ literal ::= FLOAT_LITERAL
           | NULL
           | REGEX
           | TIMESTAMP
+{
+  mixin="eu.bcosp.vrlintellij.psi.impl.VRLLiteralMixin"
+}
 
 path_expr ::= DOT path_segment*
 
