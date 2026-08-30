@@ -46,6 +46,8 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
     - Invalid function-call arguments (unknown/duplicate named arguments, wrong argument count,
       missing required arguments)
     - Unused variables, with a "Rename to `_`" quick fix
+    - Unresolved variables, with a "did you mean" quick fix
+    - Empty blocks (VRL disallows `{ }` with no statements)
 
 ## Quick start
 
