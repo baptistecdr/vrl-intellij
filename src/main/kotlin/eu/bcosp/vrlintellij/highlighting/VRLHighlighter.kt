@@ -24,6 +24,7 @@ class VRLHighlighter: SyntaxHighlighterBase() {
         in VRLHighlightingTokenSets.FUNCTION_CALL -> VRLColor.FUNCTION_CALL
         in VRLHighlightingTokenSets.COMMENT -> VRLColor.LINE_COMMENT
         in VRLHighlightingTokenSets.KEYWORD -> VRLColor.KEYWORD
+        in VRLHighlightingTokenSets.CONSTANT -> VRLColor.CONSTANT
         in VRLHighlightingTokenSets.OPERATOR -> VRLColor.OPERATOR
         in VRLHighlightingTokenSets.PARENTHESES -> VRLColor.PARENTHESES
         in VRLHighlightingTokenSets.BRACES -> VRLColor.BRACES

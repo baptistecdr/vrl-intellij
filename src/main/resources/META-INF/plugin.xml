@@ -66,6 +66,10 @@
                 language="VRL"
                 implementationClass="eu.bcosp.vrlintellij.annotators.VRLPathAnnotator"/>
 
+        <annotator
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.annotators.VRLClosureParameterAnnotator"/>
+
         <completion.contributor
                 language="VRL"
                 implementationClass="eu.bcosp.vrlintellij.contributors.VRLCompletionContributor"/>

@@ -59,10 +59,13 @@ object VRLHighlightingTokenSets {
         VRLElementTypes.CONTINUE,
         VRLElementTypes.RETURN,
         VRLElementTypes.ABORT,
+        VRLElementTypes.IN,
+    )
+
+    val CONSTANT = TokenSet.create(
         VRLElementTypes.TRUE,
         VRLElementTypes.FALSE,
         VRLElementTypes.NULL,
-        VRLElementTypes.IN,
     )
 
     val OPERATOR: TokenSet = TokenSet.create(

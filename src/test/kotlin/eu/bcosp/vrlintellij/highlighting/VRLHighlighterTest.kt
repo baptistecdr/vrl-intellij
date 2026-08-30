@@ -37,4 +37,11 @@ class VRLHighlighterTest : TestCase() {
     fun testArrowHasItsOwnColor() {
         assertEquals(listOf(VRLColor.ARROW.textAttributesKey), colorFor(VRLElementTypes.ARROW))
     }
+
+    fun testBooleanAndNullLiteralsAreConstantsDistinctFromKeyword() {
+        assertEquals(listOf(VRLColor.CONSTANT.textAttributesKey), colorFor(VRLElementTypes.TRUE))
+        assertEquals(listOf(VRLColor.CONSTANT.textAttributesKey), colorFor(VRLElementTypes.FALSE))
+        assertEquals(listOf(VRLColor.CONSTANT.textAttributesKey), colorFor(VRLElementTypes.NULL))
+        assertTrue(VRLColor.CONSTANT.textAttributesKey != VRLColor.KEYWORD.textAttributesKey)
+    }
 }

@@ -7,9 +7,11 @@ import com.intellij.openapi.editor.DefaultLanguageHighlighterColors as Default
 enum class VRLColor(humanName: String, val default: TextAttributesKey) {
     LINE_COMMENT("Comments//Line Comment", Default.LINE_COMMENT),
 
-    IDENTIFIER("Comments//Identifier", Default.IDENTIFIER),
+    IDENTIFIER("Variable//Identifier", Default.IDENTIFIER),
+    CLOSURE_PARAMETER("Variable//Closure parameter", Default.PARAMETER),
 
     KEYWORD("Keyword", Default.KEYWORD),
+    CONSTANT("Keyword//Constant", Default.KEYWORD),
     NUMBER("Number", Default.NUMBER),
 
     STRING("String//String Literal", Default.STRING),

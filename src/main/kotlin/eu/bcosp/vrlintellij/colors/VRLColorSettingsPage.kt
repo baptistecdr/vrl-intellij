@@ -36,6 +36,11 @@ class VRLColorSettingsPage: ColorSettingsPage {
             http_status_code = parse_int!(.<PATH>http_status</PATH>)
             del(.<PATH>http_status</PATH>)
 
+            # Booleans and null
+            enabled = true
+            disabled = false
+            missing = null
+
             # Add status
             if http_status_code >= 200 && http_status_code <= 299 {
                 .<PATH>status</PATH> = "success"
@@ -56,13 +61,13 @@ class VRLColorSettingsPage: ColorSettingsPage {
             t'2021-02-11T10:32:50.553-04:00'
             split("hello, world!", <NAMED_ARGUMENTS>pattern</NAMED_ARGUMENTS>: ", ")
             tally = {}
-            for_each(array!(.<PATH>tags</PATH>)) -> |_index, value| {
+            for_each(array!(.<PATH>tags</PATH>)) -> |<CLOSURE_PARAMETER>_index</CLOSURE_PARAMETER>, <CLOSURE_PARAMETER>value</CLOSURE_PARAMETER>| {
                 # Get the current tally for the `value`, or
                 # set to `0`.
-                count = int(get!(tally, [value])) ?? 0
+                count = int(get!(tally, [<CLOSURE_PARAMETER>value</CLOSURE_PARAMETER>])) ?? 0
 
                 # Increment the tally for the value by `1`.
-                tally = set!(tally, [value], count + 1)
+                tally = set!(tally, [<CLOSURE_PARAMETER>value</CLOSURE_PARAMETER>], count + 1)
             }
         """.trimIndent()
     }
