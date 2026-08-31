@@ -26,7 +26,7 @@
             <li>Introduce Variable refactoring</li>
             <li>Structure view listing a script's statements, including nested blocks</li>
             <li>Reformat Code support for blocks, objects, arrays, and operator spacing</li>
-            <li>Language injection into string, raw string, and regex literals</li>
+            <li>Language injection into string, raw string, and regex literals, plus automatic RegExp support (syntax highlighting, "Check RegExp") inside every regex literal</li>
             <li>Postfix templates: <code>expr.iferr</code> and <code>expr.raise</code> for VRL's error-handling forms</li>
             <li>Code folding, brace/bracket/quote matching, and line commenting</li>
             <li>Inline type hints on assignments, including VRL's error-destructuring form (<code>value, err = fallible_call()</code>)</li>
@@ -120,6 +120,9 @@
 
         <referencesSearch
                 implementation="eu.bcosp.vrlintellij.references.VRLReferencesSearcher"/>
+
+        <multiHostInjector
+                implementation="eu.bcosp.vrlintellij.injection.VRLRegexInjector"/>
 
         <localInspection
                 language="VRL"

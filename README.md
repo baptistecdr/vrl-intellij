@@ -33,7 +33,8 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
 - Code folding, brace/bracket/quote matching, line commenting (`#`)
 - Reformat Code support (indentation and spacing for blocks, objects, arrays, and operators)
 - Language injection into string, raw string, and regex literals (*Alt+Enter → Inject language or
-  reference*)
+  reference*), plus automatic RegExp support (syntax highlighting and the "Check RegExp" intention)
+  inside every `r'...'` regex literal
 - Postfix templates: `expr.iferr` expands to VRL's error-destructuring pattern
   (`target, err = expr; if err != null { }`), and `expr.raise` inserts the `!` raise-on-error
   suffix
