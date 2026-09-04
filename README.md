@@ -54,6 +54,8 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
     - Unhandled fallible function calls, mirroring VRL's own compile errors
     - Invalid function-call arguments (unknown/duplicate named arguments, wrong argument count,
       missing required arguments)
+    - Argument type mismatches, for arguments whose value is an unambiguous literal (e.g. passing
+      a number where a function expects a string)
     - Unused variables, with a "Rename to `_`" quick fix
     - Unresolved variables, with a "did you mean" quick fix
     - Empty blocks (VRL disallows `{ }` with no statements)
