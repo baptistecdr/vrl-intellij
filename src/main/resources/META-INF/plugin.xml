@@ -23,7 +23,7 @@
             <li>Parameter info showing a function's signature while typing a call</li>
             <li>Quick documentation on hover for every VRL function, with a link to its page on vector.dev</li>
             <li>Go to Declaration, Find Usages, and Rename for variables and closure parameters</li>
-            <li>Introduce Variable refactoring</li>
+            <li>Introduce Variable and Inline Variable refactorings</li>
             <li>Structure view listing a script's statements, including nested blocks</li>
             <li>Reformat Code support for blocks, objects, arrays, and operator spacing</li>
             <li>Language injection into string, raw string, and regex literals, plus automatic RegExp support (syntax highlighting, "Check RegExp") inside every regex literal</li>
@@ -120,6 +120,9 @@
         <lang.refactoringSupport
                 language="VRL"
                 implementationClass="eu.bcosp.vrlintellij.refactoring.VRLRefactoringSupportProvider"/>
+
+        <inlineActionHandler
+                implementation="eu.bcosp.vrlintellij.refactoring.VRLInlineVariableHandler"/>
 
         <referencesSearch
                 implementation="eu.bcosp.vrlintellij.references.VRLReferencesSearcher"/>

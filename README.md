@@ -29,6 +29,8 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
   vector.dev (*Shift+F1*, or the browser icon in the Quick Documentation popup)
 - Go to Declaration, Find Usages, and Rename for variables and closure parameters
 - Introduce Variable refactoring: select an expression and extract it to a new variable
+- Inline Variable refactoring: replace every usage of a variable with its value and remove the
+  declaration (*Ctrl+Alt+N* / *⌥⌘N*)
 - Structure view (⌘7 / Ctrl+F12) listing a script's statements, including nested if statements
   and closure bodies
 - Code folding, brace/bracket/quote matching, line commenting (`#`)
