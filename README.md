@@ -81,6 +81,12 @@ You can also build it from source (see below) and install it manually via
 - Run `./gradlew test` to run the test suite
 - Run `./gradlew runIde` to launch a sandbox IDE with the plugin installed
 - Run `./gradlew build` to build and test everything
+- The VRL function metadata (`src/main/kotlin/eu/bcosp/vrlintellij/functions/*Functions.kt`) is
+  generated, not hand-maintained - a monthly [GitHub Actions workflow](.github/workflows/refresh-vrl-functions.yml)
+  re-derives it from vector.dev's own [function reference](https://vector.dev/docs/reference/vrl/functions/)
+  and opens a PR with any changes for review. Run it manually with
+  `node scripts/refresh-vrl-functions.mjs`, or trigger the workflow via *Actions → Refresh VRL
+  functions → Run workflow*.
 
 ## Bugs and feature requests
 
