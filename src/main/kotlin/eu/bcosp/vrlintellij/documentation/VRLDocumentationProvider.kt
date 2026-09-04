@@ -33,6 +33,16 @@ class VRLDocumentationProvider : AbstractDocumentationProvider() {
         return "${function.name}(${function.signature()}) -> ${function.returnTypes.joinToString("|")}"
     }
 
+    // Every VRL function lives on one combined reference page, addressed by an anchor matching
+    // its exact name (e.g. https://vector.dev/docs/reference/vrl/functions/#parse_json) - this is
+    // what wires up the Quick Documentation popup's "open in browser" icon and the platform's
+    // External Documentation action (Shift+F1) for free, with no custom action of our own needed.
+    override fun getUrlFor(element: PsiElement, originalElement: PsiElement?): List<String>? {
+        if (!element.isFunctionCallToken()) return null
+        val function = allFunctions[element.text] ?: return null
+        return listOf("https://vector.dev/docs/reference/vrl/functions/#${function.name}")
+    }
+
     private fun PsiElement.isFunctionCallToken(): Boolean {
         return node.elementType == VRLElementTypes.FUNCTION_CALL
     }

@@ -41,4 +41,29 @@ class VRLDocumentationProviderTest : BasePlatformTestCase() {
         assertNotNull(info)
         assertTrue(info!!.startsWith("upcase("))
     }
+
+    fun testUrlForKnownFunctionCallPointsAtTheFunctionsReferenceAnchor() {
+        myFixture.configureByText("t.vrl", "upcase(\"x\")")
+        val offset = myFixture.file.text.indexOf("upcase") + 2
+        val element = myFixture.file.findElementAt(offset)!!
+        val provider = VRLDocumentationProvider()
+        val urls = provider.getUrlFor(element, element)
+        assertEquals(listOf("https://vector.dev/docs/reference/vrl/functions/#upcase"), urls)
+    }
+
+    fun testNoUrlForUnknownFunctionName() {
+        myFixture.configureByText("t.vrl", "totallymadeup(\"x\")")
+        val offset = myFixture.file.text.indexOf("totallymadeup") + 2
+        val element = myFixture.file.findElementAt(offset)!!
+        val provider = VRLDocumentationProvider()
+        assertNull(provider.getUrlFor(element, element))
+    }
+
+    fun testNoUrlForPlainVariable() {
+        myFixture.configureByText("t.vrl", "x = 1;\ny = x;")
+        val offset = myFixture.file.text.lastIndexOf("x") + 1
+        val element = myFixture.file.findElementAt(offset)!!
+        val provider = VRLDocumentationProvider()
+        assertNull(provider.getUrlFor(element, element))
+    }
 }

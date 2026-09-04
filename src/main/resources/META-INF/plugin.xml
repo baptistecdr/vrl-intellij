@@ -21,7 +21,7 @@
             <li>Syntax highlighting for all VRL literal kinds (strings, raw strings, regexes, timestamps, string interpolation) with a customizable color scheme page</li>
             <li>Code completion for functions, in-scope variables, and named argument names</li>
             <li>Parameter info showing a function's signature while typing a call</li>
-            <li>Quick documentation on hover for every VRL function</li>
+            <li>Quick documentation on hover for every VRL function, with a link to its page on vector.dev</li>
             <li>Go to Declaration, Find Usages, and Rename for variables and closure parameters</li>
             <li>Introduce Variable refactoring</li>
             <li>Structure view listing a script's statements, including nested blocks</li>
