@@ -35,6 +35,11 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
 - Language injection into string, raw string, and regex literals (*Alt+Enter → Inject language or
   reference*), plus automatic RegExp support (syntax highlighting and the "Check RegExp" intention)
   inside every `r'...'` regex literal
+- Automatic VRL injection into Vector's own TOML/YAML pipeline configs - `source` under a
+  `type = "remap"` transform, any plain-string `condition`, and `source` under a `vrl` codec
+  (`decoding.vrl.source` / `encoding.vrl.source`) - so a `.vrl` script written inline in
+  `vector.toml`/`vector.yaml` gets full editor support with no manual setup (needs the bundled
+  TOML and/or YAML plugin)
 - Postfix templates: `expr.iferr` expands to VRL's error-destructuring pattern
   (`target, err = expr; if err != null { }`), and `expr.raise` inserts the `!` raise-on-error
   suffix

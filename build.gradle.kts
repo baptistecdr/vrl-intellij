@@ -23,6 +23,8 @@ repositories {
 dependencies {
     intellijPlatform {
         intellijIdea("2025.2.6.2")
+        bundledPlugin("org.toml.lang")
+        bundledPlugin("org.jetbrains.plugins.yaml")
         testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
     }
     testImplementation("junit:junit:4.13.2")

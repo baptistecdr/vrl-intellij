@@ -27,6 +27,7 @@
             <li>Structure view listing a script's statements, including nested blocks</li>
             <li>Reformat Code support for blocks, objects, arrays, and operator spacing</li>
             <li>Language injection into string, raw string, and regex literals, plus automatic RegExp support (syntax highlighting, "Check RegExp") inside every regex literal</li>
+            <li>Automatic VRL injection into Vector's own TOML/YAML pipeline configs (the <code>source</code> of a <code>remap</code> transform, any plain-string <code>condition</code>, and <code>source</code> under a <code>vrl</code> codec)</li>
             <li>Postfix templates: <code>expr.iferr</code> and <code>expr.raise</code> for VRL's error-handling forms</li>
             <li>Code folding, brace/bracket/quote matching, and line commenting</li>
             <li>Inline type hints on assignments, including VRL's error-destructuring form (<code>value, err = fallible_call()</code>)</li>
@@ -40,6 +41,8 @@
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
+    <depends optional="true" config-file="vrl-toml.xml">org.toml.lang</depends>
+    <depends optional="true" config-file="vrl-yaml.xml">org.jetbrains.plugins.yaml</depends>
 
     <!-- Extensions defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
