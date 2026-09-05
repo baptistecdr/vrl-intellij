@@ -54,6 +54,8 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
   suffix
 - Inline type hints on assignments, e.g. `x: string = parse_json(...)`, including VRL's
   error-destructuring form (`value, err = fallible_call()`)
+- Inline parameter name hints on positional arguments for functions with more than one parameter,
+  e.g. `slice(., start: 0, end: 5)`
 - Inspections:
     - Unknown function name, with a "did you mean" quick fix
     - Invalid RFC 3339 timestamp literals

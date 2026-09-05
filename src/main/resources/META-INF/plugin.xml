@@ -232,6 +232,16 @@
                 nameKey="inlay.hints.type.name"
                 descriptionKey="inlay.hints.type.description"/>
 
+        <codeInsight.declarativeInlayProvider
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.hints.VRLParameterNameHintsProvider"
+                group="PARAMETERS_GROUP"
+                providerId="eu.bcosp.vrlintellij.parameterNameHints"
+                isEnabledByDefault="true"
+                bundle="messages.VRLBundle"
+                nameKey="inlay.hints.parameterNames.name"
+                descriptionKey="inlay.hints.parameterNames.description"/>
+
         <applicationService serviceImplementation="eu.bcosp.vrlintellij.playground.VRLPlaygroundSettings"/>
 
         <projectService serviceImplementation="eu.bcosp.vrlintellij.playground.VRLPlaygroundState"/>
