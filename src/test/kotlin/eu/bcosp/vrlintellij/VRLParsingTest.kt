@@ -44,6 +44,41 @@ class VRLParsingTest : ParsingTestCase("", "vrl", VRLParserDefinition()) {
         assertParsesWithoutErrors("split(\"a,b\", pattern: \",\")\n")
     }
 
+    private fun assertParseErrors(text: String): List<PsiErrorElement> {
+        val file = createPsiFile("t", text)
+        val errors = mutableListOf<PsiErrorElement>()
+        file.accept(object : PsiRecursiveElementWalkingVisitor() {
+            override fun visitElement(element: PsiElement) {
+                if (element is PsiErrorElement) errors.add(element)
+                super.visitElement(element)
+            }
+        })
+        return errors
+    }
+
+    fun testBracketIntegerIndexParses() {
+        assertParsesWithoutErrors(".x = .items[0]\n")
+    }
+
+    // Regression coverage for a real bug: VRL's bracket indexing is integer-literal only - there's
+    // no dynamic/computed indexing by a string or variable (confirmed against the vrl CLI, which
+    // rejects both with "expected: integer literal"). The grammar used to accept a STRING inside
+    // brackets as an alternative to a dotted string segment (`.foo["bar"]` alongside the correct
+    // `.foo."bar"`), silently letting the IDE accept code the real compiler rejects outright.
+    fun testBracketStringIndexIsRejected() {
+        assertTrue(
+            "expected a parse error for `.x = .request[\"remote_addr\"]`",
+            assertParseErrors(".x = .request[\"remote_addr\"]\n").isNotEmpty(),
+        )
+    }
+
+    fun testBracketVariableIndexIsRejected() {
+        assertTrue(
+            "expected a parse error for `.x = .items[i]`",
+            assertParseErrors("i = 0\n.x = .items[i]\n").isNotEmpty(),
+        )
+    }
+
     fun testForWhileLoopAreNotRealVrlSyntaxAndFailToParse() {
         // `for`/`while`/`loop`/`break`/`continue` are reserved keywords in real VRL (it's
         // deliberately not Turing complete - see vector.dev's VRL reference) but have no actual

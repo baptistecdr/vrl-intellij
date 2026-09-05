@@ -121,10 +121,20 @@ unary_expr ::= (NOT | MINUS)* postfix_expr
 
 postfix_expr ::= primary_expr (!<<newlineBefore>> postfix_suffix)*
 
+// Bracket indexing is integer-literal only in VRL - there's no dynamic/computed indexing by a
+// variable or arbitrary expression (confirmed against the vrl CLI: `.x[i]` and `.x["key"]` are
+// both syntax errors, only `.x[0]` is valid).
 postfix_suffix ::= call_suffix
-                 | LBRACKET expression RBRACKET
+                 | bracket_index
                  | DOT (IDENTIFIER | STRING)
                  | QUESTION
+
+// Pinned so `.foo[not-an-integer]` reports a real "integer literal expected" error at the bad
+// token. Without the pin, a failed match here would just make postfix_expr's repetition stop
+// silently (zero-or-more), letting the leftover `[...]` get reparsed as an unrelated new
+// statement (e.g. `.x = .foo["bar"]` silently splitting into `.x = .foo` plus a disconnected,
+// no-op `["bar"]` array-literal statement) instead of surfacing the mistake.
+private bracket_index ::= LBRACKET INTEGER_LITERAL RBRACKET {pin=1}
 
 call_suffix ::= raise_flag? LPAREN argument_list? RPAREN (ARROW closure_expr)?
 
@@ -169,7 +179,10 @@ path_expr ::= DOT path_segment*
 // otherwise it follows the same segment syntax as a `.` event path.
 metadata_path_expr ::= PERCENT path_segment*
 
-path_segment ::= IDENTIFIER | STRING | LBRACKET (INTEGER_LITERAL | STRING) RBRACKET
+// Brackets are array-index only (`.items[0]`) - a quoted object key uses the dot-string form
+// instead (`.headers."User-Agent"`), never brackets (`.headers["User-Agent"]` is a syntax error
+// in real VRL, confirmed against the vrl CLI).
+path_segment ::= IDENTIFIER | STRING | LBRACKET INTEGER_LITERAL RBRACKET
 
 block_expr ::= LBRACE statement* RBRACE
 
