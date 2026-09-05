@@ -106,6 +106,9 @@
                 language="VRL"
                 implementationClass="eu.bcosp.vrlintellij.formatting.VRLFormattingModelBuilder"/>
 
+        <langCodeStyleSettingsProvider
+                implementation="eu.bcosp.vrlintellij.formatting.VRLLanguageCodeStyleSettingsProvider"/>
+
         <lang.findUsagesProvider
                 language="VRL"
                 implementationClass="eu.bcosp.vrlintellij.references.VRLFindUsagesProvider"/>

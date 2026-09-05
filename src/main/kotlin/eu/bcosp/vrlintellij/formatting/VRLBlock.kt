@@ -21,6 +21,7 @@ class VRLBlock(
     alignment: Alignment?,
     private val indent: Indent,
     private val spacingBuilder: SpacingBuilder,
+    private val keepBlankLines: Int,
 ) : AbstractBlock(node, wrap, alignment) {
 
     override fun buildChildren(): List<Block> {
@@ -35,6 +36,7 @@ class VRLBlock(
                         null,
                         childIndent(node.elementType, child.elementType),
                         spacingBuilder,
+                        keepBlankLines,
                     )
                 )
             }
@@ -45,7 +47,14 @@ class VRLBlock(
 
     override fun getIndent(): Indent = indent
 
-    override fun getSpacing(child1: Block?, child2: Block): Spacing? = spacingBuilder.getSpacing(this, child1, child2)
+    // Falls back to a permissive default (force nothing, just cap consecutive blank lines at the
+    // user's "Keep Blank Lines" setting) for every pair spacingBuilder has no explicit rule for -
+    // e.g. statement-to-statement inside a block, or element-to-element in an array/object -
+    // which without this would leave blank lines completely unbounded instead of honoring that
+    // setting.
+    override fun getSpacing(child1: Block?, child2: Block): Spacing? =
+        spacingBuilder.getSpacing(this, child1, child2)
+            ?: Spacing.createSpacing(0, Int.MAX_VALUE, 0, true, keepBlankLines)
 
     override fun isLeaf(): Boolean = node.firstChildNode == null
 

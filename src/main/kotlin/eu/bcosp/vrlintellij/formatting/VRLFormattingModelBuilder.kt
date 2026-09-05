@@ -22,11 +22,13 @@ class VRLFormattingModelBuilder : FormattingModelBuilder {
             Alignment.createAlignment(),
             Indent.getNoneIndent(),
             createSpacingBuilder(settings),
+            settings.getCommonSettings(VRL).KEEP_BLANK_LINES_IN_CODE,
         )
         return FormattingModelProvider.createFormattingModelForPsiFile(formattingContext.containingFile, rootBlock, settings)
     }
 
     private fun createSpacingBuilder(settings: CodeStyleSettings): SpacingBuilder {
+        val common = settings.getCommonSettings(VRL)
         return SpacingBuilder(settings, VRL)
             // Punctuation
             .after(VRLElementTypes.LPAREN).spaces(0)
@@ -34,8 +36,8 @@ class VRLFormattingModelBuilder : FormattingModelBuilder {
             .after(VRLElementTypes.LBRACKET).spaces(0)
             .before(VRLElementTypes.RBRACKET).spaces(0)
             .before(VRLElementTypes.LBRACE).spaces(1)
-            .before(VRLElementTypes.COMMA).spaces(0)
-            .after(VRLElementTypes.COMMA).spaces(1)
+            .before(VRLElementTypes.COMMA).spaces(if (common.SPACE_BEFORE_COMMA) 1 else 0)
+            .after(VRLElementTypes.COMMA).spaces(if (common.SPACE_AFTER_COMMA) 1 else 0)
             .before(VRLElementTypes.SEMICOLON).spaces(0)
             .before(VRLElementTypes.COLON).spaces(0)
             .after(VRLElementTypes.COLON).spaces(1)
