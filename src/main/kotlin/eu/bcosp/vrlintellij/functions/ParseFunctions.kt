@@ -18,7 +18,8 @@ val parseFunctions = mapOf(
                 "format",
                 setOf("string"),
                 "The format to use for parsing the log.",
-                true
+                true,
+                enumValues = listOf("common", "combined", "error")
             ),
             VRLFunctionArgument(
                 "timestamp_format",
@@ -172,7 +173,8 @@ val parseFunctions = mapOf(
                 "unit",
                 setOf("string"),
                 "The output units for the byte.",
-                true
+                true,
+                enumValues = listOf("B", "kiB", "MiB", "GiB", "TiB", "PiB", "EiB", "kB", "MB", "GB", "TB", "PB", "EB")
             ),
             VRLFunctionArgument(
                 "base",
@@ -466,7 +468,8 @@ val parseFunctions = mapOf(
                 "unit",
                 setOf("string"),
                 "The output units for the duration.",
-                true
+                true,
+                enumValues = listOf("ns", "us", "µs", "ms", "cs", "ds", "s", "m", "h", "d")
             )
         ),
         returnTypes = setOf("float", "error"),
@@ -825,7 +828,8 @@ val parseFunctions = mapOf(
                 setOf("string"),
                 "Defines the acceptance of unnecessary whitespace surrounding the configured <code>key_value_delimiter</code>.",
                 false,
-                defaultValue = "lenient"
+                defaultValue = "lenient",
+                enumValues = listOf("lenient", "strict")
             ),
             VRLFunctionArgument(
                 "accept_standalone_key",
@@ -972,7 +976,8 @@ val parseFunctions = mapOf(
                 "format",
                 setOf("string"),
                 "The format to use for parsing the log.",
-                true
+                true,
+                enumValues = listOf("combined", "error", "ingress_upstreaminfo", "main")
             ),
             VRLFunctionArgument(
                 "timestamp_format",
@@ -1357,7 +1362,8 @@ val parseFunctions = mapOf(
                 setOf("string"),
                 "Determines performance and reliability characteristics.",
                 false,
-                defaultValue = "fast"
+                defaultValue = "fast",
+                enumValues = listOf("fast", "reliable", "enriched")
             )
         ),
         returnTypes = setOf("object"),

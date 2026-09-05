@@ -23,7 +23,9 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
 
 - Syntax highlighting for all VRL literal kinds (strings, raw strings, regexes, timestamps, string
   interpolation) and a customizable color scheme page
-- Code completion for functions, in-scope variables, and named argument names
+- Code completion for functions, in-scope variables, and named argument names, plus the accepted
+  values inside a string literal for arguments with a fixed set of them (e.g. `encode_base64`'s
+  `charset: "standard"` or `"url_safe"`)
 - Parameter info (Ctrl+P) showing a function's signature while typing a call
 - Quick documentation on hover for every VRL function, including vector.dev's own usage examples
   (source + return value/raised error), with a link to open its page on vector.dev (*Shift+F1*, or
@@ -73,6 +75,9 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
       missing required arguments)
     - Argument type mismatches, for arguments whose value is an unambiguous literal (e.g. passing
       a number where a function expects a string)
+    - Invalid enum argument values, for arguments with a fixed set of accepted strings (e.g.
+      `encode_base64`'s `charset`) - sourced from vrl's own stdlib source, not vector.dev's docs,
+      which rarely spell these out
     - Unused variables, with a "Rename to `_`" quick fix
     - Unresolved variables, with a "did you mean" quick fix
     - Empty blocks (VRL disallows `{ }` with no statements)

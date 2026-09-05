@@ -36,7 +36,8 @@ val mapFunctions = mapOf(
                 "measurement_unit",
                 setOf("string"),
                 "Measurement system to use for resulting distance.",
-                false
+                false,
+                enumValues = listOf("kilometers", "miles")
             )
         ),
         returnTypes = setOf("object"),

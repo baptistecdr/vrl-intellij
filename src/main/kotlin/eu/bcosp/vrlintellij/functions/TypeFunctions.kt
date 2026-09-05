@@ -363,7 +363,8 @@ val typeFunctions = mapOf(
                 "variant",
                 setOf("string"),
                 "The variant of the JSON type to explicitly check for.",
-                false
+                false,
+                enumValues = listOf("object", "array", "string", "number", "bool", "null")
             )
         ),
         returnTypes = setOf("boolean"),

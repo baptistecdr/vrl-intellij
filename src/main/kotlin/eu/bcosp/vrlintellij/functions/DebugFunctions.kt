@@ -107,7 +107,8 @@ val debugFunctions = mapOf(
                 setOf("string"),
                 "The log level.",
                 false,
-                defaultValue = "info"
+                defaultValue = "info",
+                enumValues = listOf("trace", "debug", "info", "warn", "error")
             ),
             VRLFunctionArgument(
                 "rate_limit_secs",

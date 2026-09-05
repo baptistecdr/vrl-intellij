@@ -59,7 +59,8 @@ val stringFunctions = mapOf(
                 "original_case",
                 setOf("string"),
                 "Optional hint on the original case type. Must be one of: kebab-case, camelCase, PascalCase, SCREAMING_SNAKE, snake_case",
-                false
+                false,
+                enumValues = listOf("kebab-case", "camelCase", "PascalCase", "SCREAMING_SNAKE", "snake_case")
             )
         ),
         returnTypes = setOf("string"),
@@ -479,7 +480,8 @@ val stringFunctions = mapOf(
                 "original_case",
                 setOf("string"),
                 "Optional hint on the original case type. Must be one of: kebab-case, camelCase, PascalCase, SCREAMING_SNAKE, snake_case",
-                false
+                false,
+                enumValues = listOf("kebab-case", "camelCase", "PascalCase", "SCREAMING_SNAKE", "snake_case")
             )
         ),
         returnTypes = setOf("string"),
@@ -625,7 +627,8 @@ val stringFunctions = mapOf(
                 "original_case",
                 setOf("string"),
                 "Optional hint on the original case type. Must be one of: kebab-case, camelCase, PascalCase, SCREAMING_SNAKE, snake_case",
-                false
+                false,
+                enumValues = listOf("kebab-case", "camelCase", "PascalCase", "SCREAMING_SNAKE", "snake_case")
             )
         ),
         returnTypes = setOf("string"),
@@ -863,7 +866,8 @@ val stringFunctions = mapOf(
                 "original_case",
                 setOf("string"),
                 "Optional hint on the original case type. Must be one of: kebab-case, camelCase, PascalCase, SCREAMING_SNAKE, snake_case",
-                false
+                false,
+                enumValues = listOf("kebab-case", "camelCase", "PascalCase", "SCREAMING_SNAKE", "snake_case")
             )
         ),
         returnTypes = setOf("string"),
@@ -905,7 +909,8 @@ val stringFunctions = mapOf(
                 setOf("string"),
                 "<p>Defines how to split the string to calculate entropy, based on occurrences of segments.</p><p>Byte segmentation is the fastest, but it might give undesired results when handling UTF-8 strings, while grapheme segmentation is the slowest, but most correct in these cases.</p>",
                 false,
-                defaultValue = "byte"
+                defaultValue = "byte",
+                enumValues = listOf("byte", "codepoint", "grapheme")
             )
         ),
         returnTypes = setOf("float"),
@@ -1059,7 +1064,8 @@ val stringFunctions = mapOf(
                 "original_case",
                 setOf("string"),
                 "Optional hint on the original case type. Must be one of: kebab-case, camelCase, PascalCase, SCREAMING_SNAKE, snake_case",
-                false
+                false,
+                enumValues = listOf("kebab-case", "camelCase", "PascalCase", "SCREAMING_SNAKE", "snake_case")
             ),
             VRLFunctionArgument(
                 "excluded_boundaries",

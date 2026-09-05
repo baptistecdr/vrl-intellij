@@ -19,7 +19,8 @@ val convertFunctions = mapOf(
                 setOf("string"),
                 "The time unit.",
                 false,
-                defaultValue = "seconds"
+                defaultValue = "seconds",
+                enumValues = listOf("seconds", "milliseconds", "nanoseconds", "microseconds")
             )
         ),
         returnTypes = setOf("timestamp"),
@@ -183,7 +184,8 @@ val convertFunctions = mapOf(
                 setOf("string"),
                 "The time unit.",
                 false,
-                defaultValue = "seconds"
+                defaultValue = "seconds",
+                enumValues = listOf("seconds", "milliseconds", "nanoseconds")
             )
         ),
         returnTypes = setOf("integer", "error"),

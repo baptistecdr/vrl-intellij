@@ -9,7 +9,9 @@ import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.PsiTreeUtil
 import eu.bcosp.vrlintellij.VRL
 import eu.bcosp.vrlintellij.functions.VRLFunction
+import eu.bcosp.vrlintellij.functions.VRLFunctionArgument
 import eu.bcosp.vrlintellij.functions.allFunctions
+import eu.bcosp.vrlintellij.psi.VRLArgument
 import eu.bcosp.vrlintellij.psi.VRLArgumentList
 import eu.bcosp.vrlintellij.psi.VRLCallSuffix
 import eu.bcosp.vrlintellij.psi.VRLElementTypes
@@ -31,6 +33,16 @@ class VRLCompletionContributor : CompletionContributor() {
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
         val position = parameters.position
         if (position.language != VRL) return
+
+        // A string literal is otherwise excluded from completion entirely (see NON_COMPLETABLE
+        // below) - this is the one exception, and only when it's the value of an argument with a
+        // known fixed set of accepted strings (e.g. encode_base64's charset: "standard").
+        // Anything else about a string's contents (a path, a variable name, ...) isn't something
+        // this plugin has a way to suggest.
+        if (position.node?.elementType == VRLElementTypes.STRING) {
+            completeEnumValue(position, parameters.offset, result)
+            return
+        }
         if (position.node?.elementType in NON_COMPLETABLE) return
 
         // Right after `.` (an event field path, or `x.field` access) there's nothing this
@@ -53,6 +65,48 @@ class VRLCompletionContributor : CompletionContributor() {
         val argumentList = PsiTreeUtil.getParentOfType(position, VRLArgumentList::class.java) ?: return null
         return argumentList.parent as? VRLCallSuffix
     }
+
+    private fun completeEnumValue(position: PsiElement, offset: Int, result: CompletionResultSet) {
+        val call = enclosingCall(position) ?: return
+        val argument = PsiTreeUtil.getParentOfType(position, VRLArgument::class.java) ?: return
+        val declared = declaredArgumentFor(call, argument) ?: return
+        if (declared.enumValues.isEmpty()) return
+
+        // The prefix is whatever the user already typed between the opening quote and the caret -
+        // position.containingFile is the completion copy with the dummy identifier inserted right
+        // at the caret, so this substring stops short of it rather than including it.
+        val stringStart = position.textRange.startOffset
+        val prefixEnd = offset.coerceIn(stringStart + 1, position.textRange.endOffset)
+        val prefix = position.containingFile.text.substring(stringStart + 1, prefixEnd)
+
+        // Filtered explicitly rather than relying solely on the prefix matcher below to narrow
+        // what's shown - that matcher still governs correctly replacing the typed prefix on
+        // accept (and highlighting the matched portion), but isn't a hard filter on its own.
+        val withPrefix = result.withPrefixMatcher(prefix)
+        declared.enumValues
+            .filter { it.startsWith(prefix, ignoreCase = true) }
+            .forEach { value -> withPrefix.addElement(LookupElementBuilder.create(value).withIcon(AllIcons.Nodes.Enum)) }
+    }
+
+    private fun declaredArgumentFor(call: VRLCallSuffix, argument: VRLArgument): VRLFunctionArgument? {
+        val postfixExpr = PsiTreeUtil.getParentOfType(call, VRLPostfixExpr::class.java) ?: return null
+        val functionName = postfixExpr.primaryExpr.functionCall?.text ?: return null
+        val function = allFunctions[functionName] ?: return null
+
+        if (argument.isNamed()) {
+            return function.arguments.find { it.name == argument.identifier?.text }
+        }
+
+        val positional = call.argumentList?.argumentList?.filter { !it.isNamed() } ?: return null
+        val positionalIndex = positional.indexOf(argument)
+        if (positionalIndex < 0) return null
+        return function.arguments.getOrNull(positionalIndex)
+    }
+
+    // A named argument is `IDENTIFIER COLON expression`; a bare identifier used positionally
+    // (`assignment_expr`) also has a non-null `identifier`, so the COLON must be checked too.
+    private fun VRLArgument.isNamed(): Boolean =
+        identifier != null && node.findChildByType(VRLElementTypes.COLON) != null
 
     private fun completeArgumentNames(call: VRLCallSuffix, result: CompletionResultSet) {
         val postfixExpr = PsiTreeUtil.getParentOfType(call, VRLPostfixExpr::class.java) ?: return

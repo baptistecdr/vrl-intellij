@@ -19,7 +19,7 @@
         </p>
         <ul>
             <li>Syntax highlighting for all VRL literal kinds (strings, raw strings, regexes, timestamps, string interpolation) with a customizable color scheme page</li>
-            <li>Code completion for functions, in-scope variables, and named argument names</li>
+            <li>Code completion for functions, in-scope variables, named argument names, and accepted values inside enum-valued string arguments</li>
             <li>Parameter info showing a function's signature while typing a call</li>
             <li>Quick documentation on hover for every VRL function, with a link to its page on vector.dev</li>
             <li>Go to Declaration, Find Usages, and Rename for variables and closure parameters</li>
@@ -31,7 +31,7 @@
             <li>Postfix templates: <code>expr.iferr</code> and <code>expr.raise</code> for VRL's error-handling forms</li>
             <li>Code folding, brace/bracket/quote matching, and line commenting</li>
             <li>Inline type hints on assignments, including VRL's error-destructuring form (<code>value, err = fallible_call()</code>)</li>
-            <li>Inspections for unknown function names, invalid RFC 3339 timestamp literals, unhandled fallible function calls, invalid function-call arguments, argument type mismatches, unused variables, unresolved variables, and empty blocks</li>
+            <li>Inspections for unknown function names, invalid RFC 3339 timestamp literals, unhandled fallible function calls, invalid function-call arguments, argument type mismatches, invalid enum argument values, unused variables, unresolved variables, and empty blocks</li>
             <li>Real compiler diagnostics (opt-in): cross-checks the script against Vector's own <code>vector vrl</code> compiler in the background and marks whatever it reports as errors, on top of this plugin's own inspections</li>
             <li>VRL Playground tool window: run the current script against a sample event using Vector's own <code>vector vrl</code> subcommand, showing the resulting expression value and the mutated event</li>
         </ul>
@@ -195,6 +195,15 @@
                 enabledByDefault="true"
                 level="ERROR"
                 implementationClass="eu.bcosp.vrlintellij.inspections.VRLArgumentTypeMismatchInspection"/>
+
+        <localInspection
+                language="VRL"
+                shortName="VRLInvalidEnumValue"
+                displayName="Invalid enum argument value"
+                groupName="VRL"
+                enabledByDefault="true"
+                level="ERROR"
+                implementationClass="eu.bcosp.vrlintellij.inspections.VRLInvalidEnumValueInspection"/>
 
         <localInspection
                 language="VRL"

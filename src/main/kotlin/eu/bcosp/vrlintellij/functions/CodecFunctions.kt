@@ -48,7 +48,8 @@ val codecFunctions = mapOf(
                 setOf("string"),
                 "The character set to use when decoding the data.",
                 false,
-                defaultValue = "standard"
+                defaultValue = "standard",
+                enumValues = listOf("standard", "url_safe")
             )
         ),
         returnTypes = setOf("string", "error"),
@@ -390,7 +391,8 @@ val codecFunctions = mapOf(
                 setOf("string"),
                 "The character set to use when encoding the data.",
                 false,
-                defaultValue = "standard"
+                defaultValue = "standard",
+                enumValues = listOf("standard", "url_safe")
             )
         ),
         returnTypes = setOf("string"),
@@ -746,7 +748,8 @@ val codecFunctions = mapOf(
                 setOf("string"),
                 "The ASCII set to use when encoding the data.",
                 false,
-                defaultValue = "NON_ALPHANUMERIC"
+                defaultValue = "NON_ALPHANUMERIC",
+                enumValues = listOf("NON_ALPHANUMERIC", "CONTROLS", "FRAGMENT", "QUERY", "SPECIAL", "PATH", "USERINFO", "COMPONENT", "WWW_FORM_URLENCODED")
             )
         ),
         returnTypes = setOf("string"),

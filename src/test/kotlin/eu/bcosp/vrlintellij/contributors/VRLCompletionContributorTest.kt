@@ -81,4 +81,46 @@ class VRLCompletionContributorTest : BasePlatformTestCase() {
         val elements = myFixture.completeBasic()
         assertTrue(elements == null || elements.none { it.lookupString == "upcase" })
     }
+
+    // encode_base64(value: string, padding?: boolean, charset?: string), whose charset only
+    // accepts "standard" or "url_safe" - a real, stable enum-valued argument.
+    fun testSuggestsEnumValuesInsideANamedArgumentString() {
+        myFixture.configureByText("t.vrl", "x = encode_base64(\"hi\", charset: \"<caret>\")")
+        val lookupStrings = myFixture.completeBasic()?.map { it.lookupString } ?: emptyList()
+        assertTrue(lookupStrings.containsAll(listOf("standard", "url_safe")))
+    }
+
+    fun testSuggestsEnumValuesInsideAPositionalArgumentString() {
+        myFixture.configureByText("t.vrl", "x = encode_base64(\"hi\", true, \"<caret>\")")
+        val lookupStrings = myFixture.completeBasic()?.map { it.lookupString } ?: emptyList()
+        assertTrue(lookupStrings.containsAll(listOf("standard", "url_safe")))
+    }
+
+    fun testEnumValueCompletionRespectsAlreadyTypedPrefix() {
+        // "url" only leaves one enum value ("url_safe") matching, so completeBasic() auto-inserts
+        // it rather than leaving a lookup open - checking the resulting text (rather than the
+        // lookup list, which would be null here) still proves the prefix correctly excluded
+        // "standard" from being offered.
+        myFixture.configureByText("t.vrl", "x = encode_base64(\"hi\", charset: \"url<caret>\")")
+        myFixture.completeBasic()
+        assertTrue(myFixture.file.text.contains("charset: \"url_safe\""))
+    }
+
+    fun testAcceptingAnEnumValueReplacesTheStringContents() {
+        myFixture.configureByText("t.vrl", "x = encode_base64(\"hi\", charset: \"<caret>\")")
+        completeAndAccept("standard")
+        assertTrue(myFixture.file.text.contains("charset: \"standard\""))
+    }
+
+    fun testNoEnumSuggestionsForAnArgumentWithoutEnumValues() {
+        myFixture.configureByText("t.vrl", "x = encode_base64(\"<caret>\")")
+        val elements = myFixture.completeBasic()
+        assertTrue(elements == null || elements.isEmpty())
+    }
+
+    fun testNoEnumSuggestionsOutsideAnyCall() {
+        myFixture.configureByText("t.vrl", "x = \"<caret>\"")
+        val elements = myFixture.completeBasic()
+        assertTrue(elements == null || elements.isEmpty())
+    }
 }

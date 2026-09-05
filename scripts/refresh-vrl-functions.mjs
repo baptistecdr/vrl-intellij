@@ -21,6 +21,14 @@ import { fileURLToPath } from "node:url";
 const DOCS_URL = "https://vector.dev/docs/reference/vrl/functions/";
 const FUNCTIONS_DIR = fileURLToPath(new URL("../src/main/kotlin/eu/bcosp/vrlintellij/functions/", import.meta.url));
 
+// vector.dev's own function reference (scraped above) almost never spells out an argument's valid
+// enum values in prose - a handful of case-conversion functions are the only exception. The real,
+// authoritative list lives in vrl's own Rust stdlib source, as `Parameter::optional(...)`'s
+// `.enum_variants(...)` builder call, so enum values are fetched from there instead - see
+// fetchEnumVariantsByFunction below.
+const VRL_REPO_TREE_URL = "https://api.github.com/repos/vectordotdev/vrl/git/trees/main?recursive=1";
+const VRL_RAW_BASE = "https://raw.githubusercontent.com/vectordotdev/vrl/main/";
+
 // category id (from the page's <h2 id=...>) -> the Kotlin file/variable this plugin already uses
 // for it. Deliberately an explicit table rather than a derived PascalCase/camelCase transform,
 // both because "IP" isn't a plain capitalization of "ip" and so a new category vector.dev adds in
@@ -51,7 +59,7 @@ const CATEGORIES = {
 };
 
 async function main() {
-    const response = await fetch(DOCS_URL);
+    const [response, enumVariantsByFunction] = await Promise.all([fetch(DOCS_URL), fetchEnumVariantsByFunction()]);
     if (!response.ok) throw new Error(`Failed to fetch ${DOCS_URL}: HTTP ${response.status}`);
     const html = await response.text();
 
@@ -63,7 +71,7 @@ async function main() {
                     "Add it to CATEGORIES in this script and create the matching Kotlin file first.",
             );
         }
-        byCategory.set(categoryId, parseFunctions(sectionHtml));
+        byCategory.set(categoryId, parseFunctions(sectionHtml, enumVariantsByFunction));
     }
 
     let changedCount = 0;
@@ -98,7 +106,7 @@ function splitByCategory(html) {
 }
 
 /** Slices a category chunk into one HTML block per `<h3 id="{name}">` function. */
-function parseFunctions(sectionHtml) {
+function parseFunctions(sectionHtml, enumVariantsByFunction) {
     const heading = /<h3\s+x-data="\{ show: false \}"[^>]*\sid=([a-z_0-9]+)\s[^>]*><a href=#\1>\1<\/a><\/h3>/g;
     const matches = [...sectionHtml.matchAll(heading)];
     const functions = [];
@@ -107,7 +115,7 @@ function parseFunctions(sectionHtml) {
         const start = matches[i].index;
         const end = i + 1 < matches.length ? matches[i + 1].index : sectionHtml.length;
         try {
-            functions.push(parseFunction(name, sectionHtml.slice(start, end)));
+            functions.push(parseFunction(name, sectionHtml.slice(start, end), enumVariantsByFunction.get(name) ?? {}));
         } catch (e) {
             // A single function's markup not matching the expected shape (an exotic
             // sub-parameter table, say) shouldn't block every other function in the run - it's
@@ -119,7 +127,7 @@ function parseFunctions(sectionHtml) {
     return functions.sort((a, b) => a.name.localeCompare(b.name));
 }
 
-function parseFunction(name, block) {
+function parseFunction(name, block, enumsForFunction) {
     const badges = block.match(/rounded[^>]*>(fallible|infallible)\s*<\/span>[\s\S]*?rounded[^>]*>(pure|impure)\s*<\/span>/);
     if (!badges) throw new Error("fallible/pure badges not found");
 
@@ -131,7 +139,7 @@ function parseFunction(name, block) {
         isFallible: badges[1] === "fallible",
         isPure: badges[2] === "pure",
         description: cleanDescription(descriptionMatch[1]),
-        arguments: parseArguments(block),
+        arguments: parseArguments(block, enumsForFunction),
         returnTypes: parseReturnTypes(name, block),
         examples: parseExamples(name, block),
     };
@@ -207,7 +215,7 @@ function cleanDescription(html) {
     return cleanHtml(html).replace(/<\/p><p>/g, "</p>\n\n<p>");
 }
 
-function parseArguments(block) {
+function parseArguments(block, enumsForFunction) {
     const table = block.match(/<table class=table-fixed>[\s\S]*?<tbody>([\s\S]*?)<\/tbody>/);
     if (!table) return []; // a zero-argument function, e.g. now()
 
@@ -218,12 +226,14 @@ function parseArguments(block) {
 
         const types = new Set(cleanText(cells[1]).split(/\s+/).filter(Boolean));
         const defaultCell = cells[3].match(/<code>([\s\S]*?)<\/code>/);
+        const name = cleanText(cells[0]);
         args.push({
-            name: cleanText(cells[0]),
+            name,
             types,
             description: cleanHtml(cells[2]),
             isRequired: cleanText(cells[4]).toLowerCase() === "yes",
             defaultValue: defaultCell ? defaultLiteral(cleanText(defaultCell[1]), types) : null,
+            enumValues: enumsForFunction[name] ?? [],
         });
     }
     return args;
@@ -258,6 +268,127 @@ function parseReturnTypes(name, block) {
     }
     if (types.size === 0) throw new Error("no return types parsed");
     return types;
+}
+
+/** Fetches every enum-valued string argument the VRL stdlib actually validates against, keyed by
+ * function identifier then argument name (e.g. `{ encode_base64: { charset: ["standard",
+ * "url_safe"] } }`). See the VRL_REPO_TREE_URL/VRL_RAW_BASE comment above for why this reads vrl's
+ * own Rust source rather than vector.dev's docs.
+ *
+ * Two passes over the fetched files: casing/mod.rs's `ORIGINAL_CASE` is a `Parameter` shared by
+ * five sibling files (camelcase.rs, kebabcase.rs, pascalcase.rs, screamingsnakecase.rs,
+ * snakecase.rs), each of which lists it in their own `parameters()` array by bare name rather
+ * than declaring their own `Parameter::optional("original_case", ...)` call - so those files have
+ * nothing for [parseParameterEnumVariants] to find directly, and resolving `ORIGINAL_CASE` must
+ * wait until casing/mod.rs itself has been parsed first (there's no ordering guarantee that it's
+ * fetched/processed before the files that reference it, since fetches run concurrently).
+ *
+ * Deliberately BYTES-only (a plain string argument, e.g. `unit: "seconds"`): the one enum-valued
+ * ARRAY argument in the stdlib (snakecase's `excluded_boundaries`, whose *elements* are drawn from
+ * an enum) needs array-literal-aware completion/inspection this plugin doesn't have yet, so it's
+ * skipped rather than attached to the wrong argument shape.
+ */
+async function fetchEnumVariantsByFunction() {
+    const treeResponse = await fetch(VRL_REPO_TREE_URL);
+    if (!treeResponse.ok) throw new Error(`Failed to fetch the VRL stdlib file tree: HTTP ${treeResponse.status}`);
+    const tree = await treeResponse.json();
+    const rustFiles = tree.tree.map((entry) => entry.path).filter((path) => path.startsWith("src/stdlib/") && path.endsWith(".rs"));
+    if (rustFiles.length === 0) throw new Error("found no .rs files under src/stdlib/ - the VRL repo layout may have changed");
+
+    const files = await mapWithConcurrency(rustFiles, 20, async (path) => {
+        const response = await fetch(`${VRL_RAW_BASE}${path}`);
+        if (!response.ok) throw new Error(`Failed to fetch ${path}: HTTP ${response.status}`);
+        return { path, text: await response.text() };
+    });
+
+    const casingModule = files.find((f) => f.path === "src/stdlib/casing/mod.rs");
+    if (!casingModule) throw new Error("expected src/stdlib/casing/mod.rs, but it's gone from the VRL repo");
+    const sharedOriginalCase = parseParameterEnumVariants(casingModule.text, parseLocalEnumConstants(casingModule.text))["original_case"];
+    if (!sharedOriginalCase) throw new Error("casing/mod.rs no longer defines ORIGINAL_CASE the expected way");
+
+    const byFunction = new Map();
+    for (const { path, text } of files) {
+        const identifiers = [...text.matchAll(/fn identifier\(&self\) -> &'static str\s*\{\s*"([a-z_0-9]+)"/g)].map((m) => m[1]);
+        if (identifiers.length === 0) continue;
+
+        const argumentEnums = parseParameterEnumVariants(text, parseLocalEnumConstants(text));
+        // camelcase.rs/kebabcase.rs/pascalcase.rs/screamingsnakecase.rs/snakecase.rs each list
+        // ORIGINAL_CASE by bare name in their own parameters() array instead of declaring their
+        // own Parameter for it - resolve those against casing/mod.rs's constant (found above).
+        // The `in` guard is a no-op everywhere except casing/mod.rs itself, which already found
+        // its own "original_case" directly and shouldn't have it clobbered.
+        if (!("original_case" in argumentEnums) && /\bORIGINAL_CASE\s*,/.test(text)) {
+            argumentEnums["original_case"] = sharedOriginalCase;
+        }
+
+        for (const identifier of identifiers) {
+            byFunction.set(identifier, { ...(byFunction.get(identifier) ?? {}), ...argumentEnums });
+        }
+    }
+    return byFunction;
+}
+
+/** Named `static`/`const NAME: &[EnumVariant] = &[...]` declarations in one stdlib source file,
+ * e.g. hmac.rs's `static ALGORITHM_ENUM: &[EnumVariant] = &[...]` - `.enum_variants(...)` calls
+ * reference these by name instead of repeating the list inline whenever it's used more than once
+ * or is long enough to warrant pulling out. Keyed by the constant's name. */
+function parseLocalEnumConstants(text) {
+    const constants = {};
+    for (const m of text.matchAll(/(?:static|const)\s+(\w+):\s*&\[EnumVariant]\s*=\s*&\[(.*?)];/gs)) {
+        constants[m[1]] = extractEnumValues(m[2]);
+    }
+    return constants;
+}
+
+/** Finds every `Parameter::(optional|required)("name", kind::BYTES, "...")` in a stdlib source
+ * file and, for each one whose builder chain includes `.enum_variants(...)`, resolves the values -
+ * either an inline `&[EnumVariant { value: "...", ... }, ...]` literal, or a reference to a
+ * same-file constant from [localEnums]. A `Parameter::...(...)` call's own trailing `.method(...)`
+ * chain isn't delimited by anything specific to a single parameter (they're just array elements
+ * separated by commas), so each parameter's search range is bounded by the *next* parameter's
+ * `Parameter::(optional|required)(` instead of any fixed terminator. */
+function parseParameterEnumVariants(text, localEnums) {
+    const starts = [...text.matchAll(/Parameter::(?:optional|required)\(\s*"([a-zA-Z_0-9]+)"\s*,\s*(kind::\w+)\s*,/g)];
+    const result = {};
+    for (let i = 0; i < starts.length; i++) {
+        const [full, argName, kind] = starts[i];
+        if (kind !== "kind::BYTES") continue;
+
+        const segmentStart = starts[i].index + full.length;
+        const segmentEnd = i + 1 < starts.length ? starts[i + 1].index : text.length;
+        const segment = text.slice(segmentStart, segmentEnd);
+
+        const inline = segment.match(/\.enum_variants\(&\[(.*?)]\)/s);
+        if (inline) {
+            result[argName] = extractEnumValues(inline[1]);
+            continue;
+        }
+        const ref = segment.match(/\.enum_variants\(\s*(\w+)\s*\)/);
+        if (ref && localEnums[ref[1]]) {
+            result[argName] = localEnums[ref[1]];
+        }
+    }
+    return result;
+}
+
+function extractEnumValues(body) {
+    return [...body.matchAll(/value:\s*"((?:[^"\\]|\\.)*)"/g)].map((m) => m[1]);
+}
+
+/** Runs `fn` over `items` with at most `concurrency` calls in flight at once - 213 individual
+ * raw.githubusercontent.com fetches at full concurrency is a lot of simultaneous connections to
+ * open for no real benefit, and this is a small, generic enough shape to not warrant a dependency. */
+async function mapWithConcurrency(items, concurrency, fn) {
+    const results = new Array(items.length);
+    let nextIndex = 0;
+    async function worker() {
+        while (nextIndex < items.length) {
+            const current = nextIndex++;
+            results[current] = await fn(items[current]);
+        }
+    }
+    await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, worker));
+    return results;
 }
 
 // Descriptions (function and argument) use exactly this set of tags on the live page - checked
@@ -370,13 +501,16 @@ function renderFunction(fn) {
 }
 
 function renderArgument(arg) {
-    const defaultLine = arg.defaultValue != null ? `,\n                defaultValue = ${arg.defaultValue}` : "";
+    const namedParams = [];
+    if (arg.defaultValue != null) namedParams.push(`defaultValue = ${arg.defaultValue}`);
+    if (arg.enumValues.length > 0) namedParams.push(`enumValues = ${renderStringList(arg.enumValues)}`);
+    const trailing = namedParams.length > 0 ? `,\n                ${namedParams.join(",\n                ")}` : "";
     return (
         "            VRLFunctionArgument(\n" +
         `                ${kotlinString(arg.name)},\n` +
         `                ${renderStringSet(arg.types)},\n` +
         `                ${kotlinString(arg.description)},\n` +
-        `                ${arg.isRequired}${defaultLine}\n` +
+        `                ${arg.isRequired}${trailing}\n` +
         "            )"
     );
 }
@@ -404,6 +538,13 @@ function renderStringSet(values, { errorLast = false } = {}) {
         ? [...ordered.filter((v) => v !== "error"), "error"]
         : ordered;
     return `setOf(${result.map(kotlinString).join(", ")})`;
+}
+
+// Enum values keep the source's declaration order (a completion list matching how the stdlib
+// itself lists variants), unlike renderStringSet's types/returnTypes which have no such ordering
+// to preserve.
+function renderStringList(values) {
+    return `listOf(${values.map(kotlinString).join(", ")})`;
 }
 
 main().catch((e) => {
