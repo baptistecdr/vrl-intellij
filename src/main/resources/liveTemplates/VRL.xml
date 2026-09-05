@@ -1,0 +1,24 @@
+<templateSet group="VRL">
+  <template name="if" value="if $COND$ {&#10;    $END$&#10;}" description="if statement" toReformat="true" toShortenFQNames="true">
+    <variable name="COND" expression="" defaultValue="&quot;true&quot;" alwaysStopAt="true" />
+    <context>
+      <option name="VRL" value="true" />
+    </context>
+  </template>
+  <template name="ifel" value="if $COND$ {&#10;    $IF$&#10;} else {&#10;    $ELSE$&#10;}" description="if/else statement" toReformat="true" toShortenFQNames="true">
+    <variable name="COND" expression="" defaultValue="&quot;true&quot;" alwaysStopAt="true" />
+    <variable name="IF" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="ELSE" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="VRL" value="true" />
+    </context>
+  </template>
+  <template name="foreach" value="for_each($ARRAY$) -&gt; |$KEY$, $VALUE$| {&#10;    $END$&#10;}" description="for_each closure over an array or object" toReformat="true" toShortenFQNames="true">
+    <variable name="ARRAY" expression="" defaultValue="&quot;.&quot;" alwaysStopAt="true" />
+    <variable name="KEY" expression="" defaultValue="&quot;key&quot;" alwaysStopAt="true" />
+    <variable name="VALUE" expression="" defaultValue="&quot;value&quot;" alwaysStopAt="true" />
+    <context>
+      <option name="VRL" value="true" />
+    </context>
+  </template>
+</templateSet>

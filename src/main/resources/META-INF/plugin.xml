@@ -259,6 +259,10 @@
                 icon="/icons/vrl.svg"/>
 
         <internalFileTemplate name="VRL File"/>
+
+        <liveTemplateContext contextId="VRL" implementation="eu.bcosp.vrlintellij.templates.VRLTemplateContextType"/>
+
+        <defaultLiveTemplatesProvider implementation="eu.bcosp.vrlintellij.templates.VRLDefaultLiveTemplatesProvider"/>
     </extensions>
 
     <actions>

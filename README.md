@@ -52,6 +52,8 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
 - Postfix templates: `expr.iferr` expands to VRL's error-destructuring pattern
   (`target, err = expr; if err != null { }`), and `expr.raise` inserts the `!` raise-on-error
   suffix
+- Live templates (type the abbreviation, then Tab): `if`, `ifel` (if/else), and `foreach`
+  (a `for_each(...) -> |key, value| { }` closure)
 - Inline type hints on assignments, e.g. `x: string = parse_json(...)`, including VRL's
   error-destructuring form (`value, err = fallible_call()`)
 - Inline parameter name hints on positional arguments for functions with more than one parameter,
