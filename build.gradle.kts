@@ -25,6 +25,7 @@ dependencies {
         intellijIdea("2025.2.6.2")
         bundledPlugin("org.toml.lang")
         bundledPlugin("org.jetbrains.plugins.yaml")
+        bundledModule("intellij.spellchecker")
         testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
     }
     testImplementation("junit:junit:4.13.2")

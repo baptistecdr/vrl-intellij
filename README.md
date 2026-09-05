@@ -36,6 +36,7 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
   and closure bodies
 - Code folding, brace/bracket/quote matching, line commenting (`#`)
 - `# TODO`-style comments show up in the TODO tool window and "Search for TODOs"
+- Spellchecking inside string literals and comments
 - Reformat Code support (indentation and spacing for blocks, objects, arrays, and operators)
 - Language injection into string, raw string, and regex literals (*Alt+Enter → Inject language or
   reference*), plus automatic RegExp support (syntax highlighting and the "Check RegExp" intention)

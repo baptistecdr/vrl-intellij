@@ -128,6 +128,10 @@
 
         <indexPatternBuilder implementation="eu.bcosp.vrlintellij.todo.VRLIndexPatternBuilder"/>
 
+        <spellchecker.support
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.spellchecking.VRLSpellcheckingStrategy"/>
+
         <inlineActionHandler
                 implementation="eu.bcosp.vrlintellij.refactoring.VRLInlineVariableHandler"/>
 
