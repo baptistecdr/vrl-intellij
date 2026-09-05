@@ -58,6 +58,8 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
   `if <condition> { }`, caret inside
 - Surround With (*Ctrl+Alt+T* / *⌘⌥T*) wraps the selected statement(s), or the one at the caret,
   in `if` or `if`/`else`
+- Move Statement Up/Down (*Ctrl+Shift+Up/Down* / *⌘⇧↑/↓*) moves the statement at the caret as one
+  atomic unit, so a multi-line `if` block moves with its whole body instead of tearing apart
 - Inline type hints on assignments, e.g. `x: string = parse_json(...)`, including VRL's
   error-destructuring form (`value, err = fallible_call()`)
 - Inline parameter name hints on positional arguments for functions with more than one parameter,

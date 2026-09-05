@@ -271,6 +271,11 @@
         <lang.surroundDescriptor
                 language="VRL"
                 implementationClass="eu.bcosp.vrlintellij.surround.VRLStatementsSurroundDescriptor"/>
+
+        <statementUpDownMover
+                implementation="eu.bcosp.vrlintellij.moveUpDown.VRLStatementUpDownMover"
+                id="vrlStatement"
+                order="before line"/>
     </extensions>
 
     <actions>
