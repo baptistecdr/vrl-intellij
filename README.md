@@ -34,6 +34,8 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
   declaration (*Ctrl+Alt+N* / *⌥⌘N*)
 - Structure view (⌘7 / Ctrl+F12) listing a script's statements, including nested if statements
   and closure bodies
+- Breadcrumbs showing the enclosing `if` condition(s) and closure parameters at the editor's
+  bottom bar
 - Code folding, brace/bracket/quote matching, line commenting (`#`)
 - `# TODO`-style comments show up in the TODO tool window and "Search for TODOs"
 - Spellchecking inside string literals and comments

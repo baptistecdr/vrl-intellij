@@ -135,6 +135,8 @@
                 language="VRL"
                 implementationClass="eu.bcosp.vrlintellij.spellchecking.VRLSpellcheckingStrategy"/>
 
+        <breadcrumbsInfoProvider implementation="eu.bcosp.vrlintellij.breadcrumbs.VRLBreadcrumbsProvider"/>
+
         <inlineActionHandler
                 implementation="eu.bcosp.vrlintellij.refactoring.VRLInlineVariableHandler"/>
 
