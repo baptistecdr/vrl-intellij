@@ -27,13 +27,15 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
 - Parameter info (Ctrl+P) showing a function's signature while typing a call
 - Quick documentation on hover for every VRL function, with a link to open its page on
   vector.dev (*Shift+F1*, or the browser icon in the Quick Documentation popup)
-- Go to Declaration, Find Usages, and Rename for variables and closure parameters
+- Go to Declaration, Find Usages, and Rename for variables and closure parameters, with new-name
+  validation against VRL's actual identifier rules
 - Introduce Variable refactoring: select an expression and extract it to a new variable
 - Inline Variable refactoring: replace every usage of a variable with its value and remove the
   declaration (*Ctrl+Alt+N* / *⌥⌘N*)
 - Structure view (⌘7 / Ctrl+F12) listing a script's statements, including nested if statements
   and closure bodies
 - Code folding, brace/bracket/quote matching, line commenting (`#`)
+- `# TODO`-style comments show up in the TODO tool window and "Search for TODOs"
 - Reformat Code support (indentation and spacing for blocks, objects, arrays, and operators)
 - Language injection into string, raw string, and regex literals (*Alt+Enter → Inject language or
   reference*), plus automatic RegExp support (syntax highlighting and the "Check RegExp" intention)
