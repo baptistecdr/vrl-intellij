@@ -267,6 +267,10 @@
         <lang.smartEnterProcessor
                 language="VRL"
                 implementationClass="eu.bcosp.vrlintellij.smartenter.VRLSmartEnterProcessor"/>
+
+        <lang.surroundDescriptor
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.surround.VRLStatementsSurroundDescriptor"/>
     </extensions>
 
     <actions>
