@@ -11,7 +11,7 @@ if err != null {
     abort
 }
 
-. = merge(., parsed)
+. = merge!(., parsed)
 
 # Metadata set by upstream sources (e.g. Datadog API key) lives under `%`.
 .api_key = %datadog_api_key
@@ -20,19 +20,27 @@ if err != null {
 .timestamp = parse_timestamp!(.timestamp, format: "%Y-%m-%dT%H:%M:%S%.fZ")
 .status_code = to_int!(.status)
 
-# `??` falls back to a default instead of raising.
-.user_agent = .headers."User-Agent" ?? "unknown"
+# `??` only catches raised errors, not null - plain path access never raises, so a missing field
+# needs an explicit null check instead.
+.user_agent = .headers."User-Agent"
+if .user_agent == null {
+    .user_agent = "unknown"
+}
 
-# Path indexing and quoted segments.
-.client_ip = .request["remote_addr"]
+# Path indexing uses dotted string segments, not brackets - brackets are for array indices only.
+.client_ip = .request."remote_addr"
 
-# Regex + raw string literals.
+# Regex + raw string literals. Coerce first: match() and friends need an exact `string`, and a
+# merged-in field's type can't be inferred that precisely.
+.path = string!(.path)
 if match(.path, r'^/api/v[0-9]+/') {
     .api_version = replace(.path, r'^/api/(v[0-9]+)/.*', "$1")
 }
 
 # Redact sensitive query params via a closure.
+.query_params = object!(.query_params)
 .query_params = map_values(.query_params) -> |value| {
+    value = string!(value)
     if match(value, r'(?i)(token|password|secret)') {
         "***REDACTED***"
     } else {
@@ -42,6 +50,7 @@ if match(.path, r'^/api/v[0-9]+/') {
 
 # Tag slow requests.
 .tags = []
+.duration_ms = to_float!(.duration_ms)
 if .duration_ms > 1000 {
     .tags = push(.tags, "slow")
 }
