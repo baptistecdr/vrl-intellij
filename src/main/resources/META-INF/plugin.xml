@@ -126,6 +126,8 @@
                 language="VRL"
                 implementationClass="eu.bcosp.vrlintellij.refactoring.VRLNamesValidator"/>
 
+        <indexPatternBuilder implementation="eu.bcosp.vrlintellij.todo.VRLIndexPatternBuilder"/>
+
         <inlineActionHandler
                 implementation="eu.bcosp.vrlintellij.refactoring.VRLInlineVariableHandler"/>
 
