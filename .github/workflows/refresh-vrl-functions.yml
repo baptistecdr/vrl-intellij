@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v7.0.0
         with:
-          node-version: 24
+          node-version: 24.20.0
 
       - name: Refresh function metadata from vector.dev
         run: node scripts/refresh-vrl-functions.mjs
