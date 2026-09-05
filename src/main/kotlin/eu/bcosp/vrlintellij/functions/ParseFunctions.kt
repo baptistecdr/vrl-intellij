@@ -28,7 +28,27 @@ val parseFunctions = mapOf(
                 defaultValue = "%d/%b/%Y:%T %z"
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse using Apache log format (common)",
+                "parse_apache_log!(s'127.0.0.1 bob frank [10/Oct/2000:13:55:36 -0700] \"GET /apache_pb.gif HTTP/1.0\" 200 2326', format: \"common\")",
+                "{\n  \"host\": \"127.0.0.1\",\n  \"identity\": \"bob\",\n  \"message\": \"GET /apache_pb.gif HTTP/1.0\",\n  \"method\": \"GET\",\n  \"path\": \"/apache_pb.gif\",\n  \"protocol\": \"HTTP/1.0\",\n  \"size\": 2326,\n  \"status\": 200,\n  \"timestamp\": \"2000-10-10T20:55:36Z\",\n  \"user\": \"frank\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse using Apache log format (combined)",
+                "parse_apache_log!(\n    s'127.0.0.1 bob frank [10/Oct/2000:13:55:36 -0700] \"GET /apache_pb.gif HTTP/1.0\" 200 2326 \"http://www.seniorinfomediaries.com/vertical/channels/front-end/bandwidth\" \"Mozilla/5.0 (X11; Linux i686; rv:5.0) Gecko/1945-10-12 Firefox/37.0\"',\n    \"combined\",\n)",
+                "{\n  \"agent\": \"Mozilla/5.0 (X11; Linux i686; rv:5.0) Gecko/1945-10-12 Firefox/37.0\",\n  \"host\": \"127.0.0.1\",\n  \"identity\": \"bob\",\n  \"message\": \"GET /apache_pb.gif HTTP/1.0\",\n  \"method\": \"GET\",\n  \"path\": \"/apache_pb.gif\",\n  \"protocol\": \"HTTP/1.0\",\n  \"referrer\": \"http://www.seniorinfomediaries.com/vertical/channels/front-end/bandwidth\",\n  \"size\": 2326,\n  \"status\": 200,\n  \"timestamp\": \"2000-10-10T20:55:36Z\",\n  \"user\": \"frank\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse using Apache log format (error)",
+                "parse_apache_log!(\n    s'[01/Mar/2021:12:00:19 +0000] [ab:alert] [pid 4803:tid 3814] [client 147.159.108.175:24259] I will bypass the haptic COM bandwidth, that should matrix the CSS driver!',\n    \"error\"\n)",
+                "{\n  \"client\": \"147.159.108.175\",\n  \"message\": \"I will bypass the haptic COM bandwidth, that should matrix the CSS driver!\",\n  \"module\": \"ab\",\n  \"pid\": 4803,\n  \"port\": 24259,\n  \"severity\": \"alert\",\n  \"thread\": \"3814\",\n  \"timestamp\": \"2021-03-01T12:00:19Z\"\n}",
+                false
+            )
+        )
     ),
     "parse_aws_alb_log" to VRLFunction(
         name = "parse_aws_alb_log",
@@ -50,7 +70,21 @@ val parseFunctions = mapOf(
                 defaultValue = true
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse AWS ALB log",
+                "parse_aws_alb_log!(\n    \"http 2018-11-30T22:23:00.186641Z app/my-loadbalancer/50dc6c495c0c9188 192.168.131.39:2817 - 0.000 0.001 0.000 200 200 34 366 \\\"GET http://www.example.com:80/ HTTP/1.1\\\" \\\"curl/7.46.0\\\" - - arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067 \\\"Root=1-58337364-23a8c76965a2ef7629b185e3\\\" \\\"-\\\" \\\"-\\\" 0 2018-11-30T22:22:48.364000Z \\\"forward\\\" \\\"-\\\" \\\"-\\\" \\\"-\\\" \\\"-\\\" \\\"-\\\" \\\"-\\\"\"\n)",
+                "{\n  \"actions_executed\": \"forward\",\n  \"chosen_cert_arn\": null,\n  \"classification\": null,\n  \"classification_reason\": null,\n  \"client_host\": \"192.168.131.39:2817\",\n  \"domain_name\": null,\n  \"elb\": \"app/my-loadbalancer/50dc6c495c0c9188\",\n  \"elb_status_code\": \"200\",\n  \"error_reason\": null,\n  \"matched_rule_priority\": \"0\",\n  \"received_bytes\": 34,\n  \"redirect_url\": null,\n  \"request_creation_time\": \"2018-11-30T22:22:48.364000Z\",\n  \"request_method\": \"GET\",\n  \"request_processing_time\": 0,\n  \"request_protocol\": \"HTTP/1.1\",\n  \"request_url\": \"http://www.example.com:80/\",\n  \"response_processing_time\": 0,\n  \"sent_bytes\": 366,\n  \"ssl_cipher\": null,\n  \"ssl_protocol\": null,\n  \"target_group_arn\": \"arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067\",\n  \"target_host\": null,\n  \"target_port_list\": [],\n  \"target_processing_time\": 0.001,\n  \"target_status_code\": \"200\",\n  \"target_status_code_list\": [],\n  \"timestamp\": \"2018-11-30T22:23:00.186641Z\",\n  \"trace_id\": \"Root=1-58337364-23a8c76965a2ef7629b185e3\",\n  \"traceability_id\": null,\n  \"type\": \"http\",\n  \"user_agent\": \"curl/7.46.0\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse AWS ALB log with trailing fields (non-strict mode)",
+                "parse_aws_alb_log!(\n    \"http 2018-11-30T22:23:00.186641Z app/my-loadbalancer/50dc6c495c0c9188 192.168.131.39:2817 - 0.000 0.001 0.000 200 200 34 366 \\\"GET http://www.example.com:80/ HTTP/1.1\\\" \\\"curl/7.46.0\\\" - - arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067 \\\"Root=1-58337364-23a8c76965a2ef7629b185e3\\\" \\\"-\\\" \\\"-\\\" 0 2018-11-30T22:22:48.364000Z \\\"forward\\\" \\\"-\\\" \\\"-\\\" \\\"-\\\" \\\"-\\\" \\\"-\\\" \\\"-\\\" TID_12345 \\\"-\\\" \\\"-\\\" \\\"-\\\"\",\n    strict_mode: false\n)",
+                "{\n  \"actions_executed\": \"forward\",\n  \"chosen_cert_arn\": null,\n  \"classification\": null,\n  \"classification_reason\": null,\n  \"client_host\": \"192.168.131.39:2817\",\n  \"domain_name\": null,\n  \"elb\": \"app/my-loadbalancer/50dc6c495c0c9188\",\n  \"elb_status_code\": \"200\",\n  \"error_reason\": null,\n  \"matched_rule_priority\": \"0\",\n  \"received_bytes\": 34,\n  \"redirect_url\": null,\n  \"request_creation_time\": \"2018-11-30T22:22:48.364000Z\",\n  \"request_method\": \"GET\",\n  \"request_processing_time\": 0,\n  \"request_protocol\": \"HTTP/1.1\",\n  \"request_url\": \"http://www.example.com:80/\",\n  \"response_processing_time\": 0,\n  \"sent_bytes\": 366,\n  \"ssl_cipher\": null,\n  \"ssl_protocol\": null,\n  \"target_group_arn\": \"arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067\",\n  \"target_host\": null,\n  \"target_port_list\": [],\n  \"target_processing_time\": 0.001,\n  \"target_status_code\": \"200\",\n  \"target_status_code_list\": [],\n  \"timestamp\": \"2018-11-30T22:23:00.186641Z\",\n  \"trace_id\": \"Root=1-58337364-23a8c76965a2ef7629b185e3\",\n  \"traceability_id\": \"TID_12345\",\n  \"type\": \"http\",\n  \"user_agent\": \"curl/7.46.0\"\n}",
+                false
+            )
+        )
     ),
     "parse_aws_cloudwatch_log_subscription_message" to VRLFunction(
         name = "parse_aws_cloudwatch_log_subscription_message",
@@ -65,7 +99,15 @@ val parseFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse AWS Cloudwatch Log subscription message",
+                "parse_aws_cloudwatch_log_subscription_message!(s'{\n    \"messageType\": \"DATA_MESSAGE\",\n    \"owner\": \"111111111111\",\n    \"logGroup\": \"test\",\n    \"logStream\": \"test\",\n    \"subscriptionFilters\": [\n        \"Destination\"\n    ],\n    \"logEvents\": [\n        {\n            \"id\": \"35683658089614582423604394983260738922885519999578275840\",\n            \"timestamp\": 1600110569039,\n            \"message\": \"{\\\"bytes\\\":26780,\\\"datetime\\\":\\\"14/Sep/2020:11:45:41-0400\\\",\\\"host\\\":\\\"157.130.216.193\\\",\\\"method\\\":\\\"PUT\\\",\\\"protocol\\\":\\\"HTTP/1.0\\\",\\\"referer\\\":\\\"https://www.principalcross-platform.io/markets/ubiquitous\\\",\\\"request\\\":\\\"/expedite/convergence\\\",\\\"source_type\\\":\\\"stdin\\\",\\\"status\\\":301,\\\"user-identifier\\\":\\\"-\\\"}\"\n        }\n    ]\n}')",
+                "{\n  \"log_events\": [\n    {\n      \"id\": \"35683658089614582423604394983260738922885519999578275840\",\n      \"message\": \"{\\\"bytes\\\":26780,\\\"datetime\\\":\\\"14/Sep/2020:11:45:41-0400\\\",\\\"host\\\":\\\"157.130.216.193\\\",\\\"method\\\":\\\"PUT\\\",\\\"protocol\\\":\\\"HTTP/1.0\\\",\\\"referer\\\":\\\"https://www.principalcross-platform.io/markets/ubiquitous\\\",\\\"request\\\":\\\"/expedite/convergence\\\",\\\"source_type\\\":\\\"stdin\\\",\\\"status\\\":301,\\\"user-identifier\\\":\\\"-\\\"}\",\n      \"timestamp\": \"2020-09-14T19:09:29.039Z\"\n    }\n  ],\n  \"log_group\": \"test\",\n  \"log_stream\": \"test\",\n  \"message_type\": \"DATA_MESSAGE\",\n  \"owner\": \"111111111111\",\n  \"subscription_filters\": [\n    \"Destination\"\n  ]\n}",
+                false
+            )
+        )
     ),
     "parse_aws_vpc_flow_log" to VRLFunction(
         name = "parse_aws_vpc_flow_log",
@@ -86,7 +128,33 @@ val parseFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse AWS VPC Flow log (default format)",
+                "parse_aws_vpc_flow_log!(\"2 123456789010 eni-1235b8ca123456789 - - - - - - - 1431280876 1431280934 - NODATA\")",
+                "{\n  \"account_id\": \"123456789010\",\n  \"action\": null,\n  \"bytes\": null,\n  \"dstaddr\": null,\n  \"dstport\": null,\n  \"end\": 1431280934,\n  \"interface_id\": \"eni-1235b8ca123456789\",\n  \"log_status\": \"NODATA\",\n  \"packets\": null,\n  \"protocol\": null,\n  \"srcaddr\": null,\n  \"srcport\": null,\n  \"start\": 1431280876,\n  \"version\": 2\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse AWS VPC Flow log (custom format)",
+                "parse_aws_vpc_flow_log!(\n    \"- eni-1235b8ca123456789 10.0.1.5 10.0.0.220 10.0.1.5 203.0.113.5\",\n    \"instance_id interface_id srcaddr dstaddr pkt_srcaddr pkt_dstaddr\"\n)",
+                "{\n  \"dstaddr\": \"10.0.0.220\",\n  \"instance_id\": null,\n  \"interface_id\": \"eni-1235b8ca123456789\",\n  \"pkt_dstaddr\": \"203.0.113.5\",\n  \"pkt_srcaddr\": \"10.0.1.5\",\n  \"srcaddr\": \"10.0.1.5\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse AWS VPC Flow log including v5 fields",
+                "parse_aws_vpc_flow_log!(\n    \"5 52.95.128.179 10.0.0.71 80 34210 6 1616729292 1616729349 IPv4 14 15044 123456789012 vpc-abcdefab012345678 subnet-aaaaaaaa012345678 i-0c50d5961bcb2d47b eni-1235b8ca123456789 ap-southeast-2 apse2-az3 - - ACCEPT 19 52.95.128.179 10.0.0.71 S3 - - ingress OK\",\n    format: \"version srcaddr dstaddr srcport dstport protocol start end type packets bytes account_id vpc_id subnet_id instance_id interface_id region az_id sublocation_type sublocation_id action tcp_flags pkt_srcaddr pkt_dstaddr pkt_src_aws_service pkt_dst_aws_service traffic_path flow_direction log_status\"\n)",
+                "{\n  \"account_id\": \"123456789012\",\n  \"action\": \"ACCEPT\",\n  \"az_id\": \"apse2-az3\",\n  \"bytes\": 15044,\n  \"dstaddr\": \"10.0.0.71\",\n  \"dstport\": 34210,\n  \"end\": 1616729349,\n  \"flow_direction\": \"ingress\",\n  \"instance_id\": \"i-0c50d5961bcb2d47b\",\n  \"interface_id\": \"eni-1235b8ca123456789\",\n  \"log_status\": \"OK\",\n  \"packets\": 14,\n  \"pkt_dst_aws_service\": null,\n  \"pkt_dstaddr\": \"10.0.0.71\",\n  \"pkt_src_aws_service\": \"S3\",\n  \"pkt_srcaddr\": \"52.95.128.179\",\n  \"protocol\": 6,\n  \"region\": \"ap-southeast-2\",\n  \"srcaddr\": \"52.95.128.179\",\n  \"srcport\": 80,\n  \"start\": 1616729292,\n  \"sublocation_id\": null,\n  \"sublocation_type\": null,\n  \"subnet_id\": \"subnet-aaaaaaaa012345678\",\n  \"tcp_flags\": 19,\n  \"traffic_path\": null,\n  \"type\": \"IPv4\",\n  \"version\": 5,\n  \"vpc_id\": \"vpc-abcdefab012345678\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse AWS VPC Flow log including v11 fields",
+                "parse_aws_vpc_flow_log!(\n    \"11 10.0.0.71 52.95.128.179 34210 80 6 1616729292 1616729349 REJECT OK BPA nat-0c50d5961bcb2d47b 1 nat_gateway\",\n    format: \"version srcaddr dstaddr srcport dstport protocol start end action log_status reject_reason resource_id encryption_status interface_type\"\n)",
+                "{\n  \"action\": \"REJECT\",\n  \"dstaddr\": \"52.95.128.179\",\n  \"dstport\": 80,\n  \"encryption_status\": 1,\n  \"end\": 1616729349,\n  \"interface_type\": \"nat_gateway\",\n  \"log_status\": \"OK\",\n  \"protocol\": 6,\n  \"reject_reason\": \"BPA\",\n  \"resource_id\": \"nat-0c50d5961bcb2d47b\",\n  \"srcaddr\": \"10.0.0.71\",\n  \"srcport\": 34210,\n  \"start\": 1616729292,\n  \"version\": 11\n}",
+                false
+            )
+        )
     ),
     "parse_bytes" to VRLFunction(
         name = "parse_bytes",
@@ -114,7 +182,45 @@ val parseFunctions = mapOf(
                 defaultValue = "2"
             )
         ),
-        returnTypes = setOf("float", "error")
+        returnTypes = setOf("float", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse bytes (kilobytes)",
+                "parse_bytes!(\"1024KiB\", unit: \"MiB\")",
+                "1",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse kilobytes in default binary units",
+                "parse_bytes!(\"1KiB\", unit: \"B\")",
+                "1024",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse bytes in SI unit (terabytes)",
+                "parse_bytes!(\"4TB\", unit: \"MB\", base: \"10\")",
+                "4000000",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse gigabytes in decimal units",
+                "parse_bytes!(\"1GB\", unit: \"B\", base: \"10\")",
+                "1000000000",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse bytes in ambiguous unit (gigabytes)",
+                "parse_bytes!(\"1GB\", unit: \"B\", base: \"2\")",
+                "1073741824",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse gigabytes in ambiguous decimal units",
+                "parse_bytes!(\"1GB\", unit: \"MB\", base: \"2\")",
+                "1024",
+                false
+            )
+        )
     ),
     "parse_cbor" to VRLFunction(
         name = "parse_cbor",
@@ -129,7 +235,45 @@ val parseFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "integer", "float", "boolean", "object", "array", "null", "error")
+        returnTypes = setOf("string", "integer", "float", "boolean", "object", "array", "null", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse CBOR",
+                "parse_cbor!(decode_base64!(\"oWVmaWVsZGV2YWx1ZQ==\"))",
+                "{\n  \"field\": \"value\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "array",
+                "parse_cbor!(decode_base64!(\"gvUA\"))",
+                "[true,0]",
+                false
+            ),
+            VRLFunctionExample(
+                "string",
+                "parse_cbor!(decode_base64!(\"ZWhlbGxv\"))",
+                "hello",
+                false
+            ),
+            VRLFunctionExample(
+                "integer",
+                "parse_cbor!(decode_base64!(\"GCo=\"))",
+                "42",
+                false
+            ),
+            VRLFunctionExample(
+                "float",
+                "parse_cbor!(decode_base64!(\"+0BFEKPXCj1x\"))",
+                "42.13",
+                false
+            ),
+            VRLFunctionExample(
+                "boolean",
+                "parse_cbor!(decode_base64!(\"9A==\"))",
+                "false",
+                false
+            )
+        )
     ),
     "parse_cef" to VRLFunction(
         name = "parse_cef",
@@ -158,7 +302,51 @@ val parseFunctions = mapOf(
                 defaultValue = true
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse output generated by PTA",
+                "parse_cef!(\n    \"CEF:0|CyberArk|PTA|12.6|1|Suspected credentials theft|8|suser=mike2@prod1.domain.com shost=prod1.domain.com src=1.1.1.1 duser=andy@dev1.domain.com dhost=dev1.domain.com dst=2.2.2.2 cs1Label=ExtraData cs1=None cs2Label=EventID cs2=52b06812ec3500ed864c461e deviceCustomDate1Label=detectionDate deviceCustomDate1=1388577900000 cs3Label=PTAlink cs3=https://1.1.1.1/incidents/52b06812ec3500ed864c461e cs4Label=ExternalLink cs4=None\"\n)",
+                "{\n  \"cefVersion\": \"0\",\n  \"cs1\": \"None\",\n  \"cs1Label\": \"ExtraData\",\n  \"cs2\": \"52b06812ec3500ed864c461e\",\n  \"cs2Label\": \"EventID\",\n  \"cs3\": \"https://1.1.1.1/incidents/52b06812ec3500ed864c461e\",\n  \"cs3Label\": \"PTAlink\",\n  \"cs4\": \"None\",\n  \"cs4Label\": \"ExternalLink\",\n  \"deviceCustomDate1\": \"1388577900000\",\n  \"deviceCustomDate1Label\": \"detectionDate\",\n  \"deviceEventClassId\": \"1\",\n  \"deviceProduct\": \"PTA\",\n  \"deviceVendor\": \"CyberArk\",\n  \"deviceVersion\": \"12.6\",\n  \"dhost\": \"dev1.domain.com\",\n  \"dst\": \"2.2.2.2\",\n  \"duser\": \"andy@dev1.domain.com\",\n  \"name\": \"Suspected credentials theft\",\n  \"severity\": \"8\",\n  \"shost\": \"prod1.domain.com\",\n  \"src\": \"1.1.1.1\",\n  \"suser\": \"mike2@prod1.domain.com\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Ignore syslog header",
+                "parse_cef!(\n    \"Sep 29 08:26:10 host CEF:1|Security|threatmanager|1.0|100|worm successfully stopped|10|src=10.0.0.1 dst=2.1.2.2 spt=1232\"\n)",
+                "{\n  \"cefVersion\": \"1\",\n  \"deviceEventClassId\": \"100\",\n  \"deviceProduct\": \"threatmanager\",\n  \"deviceVendor\": \"Security\",\n  \"deviceVersion\": \"1.0\",\n  \"dst\": \"2.1.2.2\",\n  \"name\": \"worm successfully stopped\",\n  \"severity\": \"10\",\n  \"spt\": \"1232\",\n  \"src\": \"10.0.0.1\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Translate custom fields",
+                "parse_cef!(\n    \"CEF:0|Dev|firewall|2.2|1|Connection denied|5|c6a1=2345:0425:2CA1:0000:0000:0567:5673:23b5 c6a1Label=Device IPv6 Address\",\n    translate_custom_fields: true\n)",
+                "{\n  \"Device IPv6 Address\": \"2345:0425:2CA1:0000:0000:0567:5673:23b5\",\n  \"cefVersion\": \"0\",\n  \"deviceEventClassId\": \"1\",\n  \"deviceProduct\": \"firewall\",\n  \"deviceVendor\": \"Dev\",\n  \"deviceVersion\": \"2.2\",\n  \"name\": \"Connection denied\",\n  \"severity\": \"5\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse CEF with only header",
+                "parse_cef!(\"CEF:1|Security|threatmanager|1.0|100|worm successfully stopped|10|\")",
+                "{\n  \"cefVersion\": \"1\",\n  \"deviceEventClassId\": \"100\",\n  \"deviceProduct\": \"threatmanager\",\n  \"deviceVendor\": \"Security\",\n  \"deviceVersion\": \"1.0\",\n  \"name\": \"worm successfully stopped\",\n  \"severity\": \"10\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse CEF with empty value",
+                "parse_cef!(\"CEF:0|CyberArk|PTA|12.6|1|Suspected credentials theft||suser=mike2@prod1.domain.com shost= src=1.1.1.1\")",
+                "{\n  \"cefVersion\": \"0\",\n  \"deviceEventClassId\": \"1\",\n  \"deviceProduct\": \"PTA\",\n  \"deviceVendor\": \"CyberArk\",\n  \"deviceVersion\": \"12.6\",\n  \"name\": \"Suspected credentials theft\",\n  \"severity\": \"\",\n  \"shost\": \"\",\n  \"src\": \"1.1.1.1\",\n  \"suser\": \"mike2@prod1.domain.com\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse CEF with escapes",
+                "parse_cef!(s'CEF:0|security|threatmanager|1.0|100|Detected a \\| in message. No action needed.|10|src=10.0.0.1 msg=Detected a threat.\\n No action needed act=blocked a \\= dst=1.1.1.1')",
+                "{\n  \"act\": \"blocked a =\",\n  \"cefVersion\": \"0\",\n  \"deviceEventClassId\": \"100\",\n  \"deviceProduct\": \"threatmanager\",\n  \"deviceVendor\": \"security\",\n  \"deviceVersion\": \"1.0\",\n  \"dst\": \"1.1.1.1\",\n  \"msg\": \"Detected a threat.\\n No action needed\",\n  \"name\": \"Detected a | in message. No action needed.\",\n  \"severity\": \"10\",\n  \"src\": \"10.0.0.1\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse non-compliant CEF with unescaped equals in values",
+                "parse_cef!(\n    \"CEF:0|Vendor|Product|1.0|100|Event|5|src=10.0.0.1 request=https://foo.com?id=foo&a=bar dst=2.2.2.2\",\n    strict: false\n)",
+                "{\n  \"cefVersion\": \"0\",\n  \"deviceEventClassId\": \"100\",\n  \"deviceProduct\": \"Product\",\n  \"deviceVendor\": \"Vendor\",\n  \"deviceVersion\": \"1.0\",\n  \"dst\": \"2.2.2.2\",\n  \"name\": \"Event\",\n  \"request\": \"https://foo.com?id=foo\\u0026a=bar\",\n  \"severity\": \"5\",\n  \"src\": \"10.0.0.1\"\n}",
+                false
+            )
+        )
     ),
     "parse_common_log" to VRLFunction(
         name = "parse_common_log",
@@ -180,7 +368,21 @@ val parseFunctions = mapOf(
                 defaultValue = "%d/%b/%Y:%T %z"
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse using Common Log Format (with default timestamp format)",
+                "parse_common_log!(s'127.0.0.1 bob frank [10/Oct/2000:13:55:36 -0700] \"GET /apache_pb.gif HTTP/1.0\" 200 2326')",
+                "{\n  \"host\": \"127.0.0.1\",\n  \"identity\": \"bob\",\n  \"message\": \"GET /apache_pb.gif HTTP/1.0\",\n  \"method\": \"GET\",\n  \"path\": \"/apache_pb.gif\",\n  \"protocol\": \"HTTP/1.0\",\n  \"size\": 2326,\n  \"status\": 200,\n  \"timestamp\": \"2000-10-10T20:55:36Z\",\n  \"user\": \"frank\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse using Common Log Format (with custom timestamp format)",
+                "parse_common_log!(\n    s'127.0.0.1 bob frank [2000-10-10T20:55:36Z] \"GET /apache_pb.gif HTTP/1.0\" 200 2326',\n    \"%+\"\n)",
+                "{\n  \"host\": \"127.0.0.1\",\n  \"identity\": \"bob\",\n  \"message\": \"GET /apache_pb.gif HTTP/1.0\",\n  \"method\": \"GET\",\n  \"path\": \"/apache_pb.gif\",\n  \"protocol\": \"HTTP/1.0\",\n  \"size\": 2326,\n  \"status\": 200,\n  \"timestamp\": \"2000-10-10T20:55:36Z\",\n  \"user\": \"frank\"\n}",
+                false
+            )
+        )
     ),
     "parse_csv" to VRLFunction(
         name = "parse_csv",
@@ -202,7 +404,21 @@ val parseFunctions = mapOf(
                 defaultValue = ","
             )
         ),
-        returnTypes = setOf("array", "error")
+        returnTypes = setOf("array", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse a single CSV formatted row",
+                "parse_csv!(s'foo,bar,\"foo \"\", bar\"')",
+                "[\"foo\",\"bar\",\"foo \\\", bar\"]",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse a single CSV formatted row with custom delimiter",
+                "parse_csv!(\"foo bar\", delimiter: \" \")",
+                "[\"foo\",\"bar\"]",
+                false
+            )
+        )
     ),
     "parse_dnstap" to VRLFunction(
         name = "parse_dnstap",
@@ -224,7 +440,15 @@ val parseFunctions = mapOf(
                 defaultValue = false
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse dnstap query message",
+                "parse_dnstap!(\"ChVqYW1lcy1WaXJ0dWFsLU1hY2hpbmUSC0JJTkQgOS4xNi4zGgBy5wEIAxACGAEiEAAAAAAAAAAAAAAAAAAAAAAqECABBQJwlAAAAAAAAAAAADAw8+0CODVA7+zq9wVNMU3WNlI2kwIAAAABAAAAAAABCWZhY2Vib29rMQNjb20AAAEAAQAAKQIAAACAAAAMAAoACOxjCAG9zVgzWgUDY29tAGAAbQAAAAByZLM4AAAAAQAAAAAAAQJoNQdleGFtcGxlA2NvbQAABgABAAApBNABAUAAADkADwA1AAlubyBTRVAgbWF0Y2hpbmcgdGhlIERTIGZvdW5kIGZvciBkbnNzZWMtZmFpbGVkLm9yZy54AQ==\")",
+                "{\n  \"dataType\": \"Message\",\n  \"dataTypeId\": 1,\n  \"extraInfo\": \"\",\n  \"messageType\": \"ResolverQuery\",\n  \"messageTypeId\": 3,\n  \"queryZone\": \"com.\",\n  \"requestData\": {\n    \"fullRcode\": 0,\n    \"header\": {\n      \"aa\": false,\n      \"ad\": false,\n      \"anCount\": 0,\n      \"arCount\": 1,\n      \"cd\": false,\n      \"id\": 37634,\n      \"nsCount\": 0,\n      \"opcode\": 0,\n      \"qdCount\": 1,\n      \"qr\": 0,\n      \"ra\": false,\n      \"rcode\": 0,\n      \"rd\": false,\n      \"tc\": false\n    },\n    \"opt\": {\n      \"do\": true,\n      \"ednsVersion\": 0,\n      \"extendedRcode\": 0,\n      \"options\": [\n        {\n          \"optCode\": 10,\n          \"optName\": \"Cookie\",\n          \"optValue\": \"7GMIAb3NWDM=\"\n        }\n      ],\n      \"udpPayloadSize\": 512\n    },\n    \"question\": [\n      {\n        \"class\": \"IN\",\n        \"domainName\": \"facebook1.com.\",\n        \"questionType\": \"A\",\n        \"questionTypeId\": 1\n      }\n    ],\n    \"rcodeName\": \"NoError\"\n  },\n  \"requestMessageSize\": 54,\n  \"responseAddress\": \"2001:502:7094::30\",\n  \"responseData\": {\n    \"fullRcode\": 16,\n    \"header\": {\n      \"aa\": false,\n      \"ad\": false,\n      \"anCount\": 0,\n      \"arCount\": 1,\n      \"cd\": false,\n      \"id\": 45880,\n      \"nsCount\": 0,\n      \"opcode\": 0,\n      \"qdCount\": 1,\n      \"qr\": 0,\n      \"ra\": false,\n      \"rcode\": 16,\n      \"rd\": false,\n      \"tc\": false\n    },\n    \"opt\": {\n      \"do\": false,\n      \"ede\": [\n        {\n          \"extraText\": \"no SEP matching the DS found for dnssec-failed.org.\",\n          \"infoCode\": 9,\n          \"purpose\": \"DNSKEY Missing\"\n        }\n      ],\n      \"ednsVersion\": 1,\n      \"extendedRcode\": 1,\n      \"udpPayloadSize\": 1232\n    },\n    \"question\": [\n      {\n        \"class\": \"IN\",\n        \"domainName\": \"h5.example.com.\",\n        \"questionType\": \"SOA\",\n        \"questionTypeId\": 6\n      }\n    ],\n    \"rcodeName\": \"BADVERS\"\n  },\n  \"responseMessageSize\": 100,\n  \"responsePort\": 53,\n  \"serverId\": \"james-Virtual-Machine\",\n  \"serverVersion\": \"BIND 9.16.3\",\n  \"socketFamily\": \"INET6\",\n  \"socketProtocol\": \"UDP\",\n  \"sourceAddress\": \"::\",\n  \"sourcePort\": 46835,\n  \"time\": 1593489007920014000,\n  \"timePrecision\": \"ns\",\n  \"timestamp\": \"2020-06-30T03:50:07.920014129Z\"\n}",
+                false
+            )
+        )
     ),
     "parse_duration" to VRLFunction(
         name = "parse_duration",
@@ -245,7 +469,21 @@ val parseFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("float", "error")
+        returnTypes = setOf("float", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse duration (milliseconds)",
+                "parse_duration!(\"1005ms\", unit: \"s\")",
+                "1.005",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse multiple durations (seconds & milliseconds)",
+                "parse_duration!(\"1s 1ms\", unit: \"ms\")",
+                "1001",
+                false
+            )
+        )
     ),
     "parse_etld" to VRLFunction(
         name = "parse_etld",
@@ -273,7 +511,33 @@ val parseFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse eTLD",
+                "parse_etld!(\"sub.sussex.ac.uk\")",
+                "{\n  \"etld\": \"ac.uk\",\n  \"etld_plus\": \"ac.uk\",\n  \"known_suffix\": true\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse eTLD+1",
+                "parse_etld!(\"sub.sussex.ac.uk\", plus_parts: 1)",
+                "{\n  \"etld\": \"ac.uk\",\n  \"etld_plus\": \"sussex.ac.uk\",\n  \"known_suffix\": true\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse eTLD with unknown suffix",
+                "parse_etld!(\"vector.acmecorp\")",
+                "{\n  \"etld\": \"acmecorp\",\n  \"etld_plus\": \"acmecorp\",\n  \"known_suffix\": false\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse eTLD with custom PSL",
+                "parse_etld!(\"vector.acmecorp\", psl: \"lib/tests/tests/functions/custom_public_suffix_list.dat\")",
+                "{\n  \"etld\": \"acmecorp\",\n  \"etld_plus\": \"acmecorp\",\n  \"known_suffix\": false\n}",
+                false
+            )
+        )
     ),
     "parse_glog" to VRLFunction(
         name = "parse_glog",
@@ -288,7 +552,15 @@ val parseFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse using glog",
+                "parse_glog!(\"I20210131 14:48:54.411655 15520 main.c++:9] Hello world!\")",
+                "{\n  \"file\": \"main.c++\",\n  \"id\": 15520,\n  \"level\": \"info\",\n  \"line\": 9,\n  \"message\": \"Hello world!\",\n  \"timestamp\": \"2021-01-31T14:48:54.411655Z\"\n}",
+                false
+            )
+        )
     ),
     "parse_grok" to VRLFunction(
         name = "parse_grok",
@@ -309,7 +581,15 @@ val parseFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse using Grok",
+                "value = \"2020-10-02T23:22:12.223222Z info Hello world\"\npattern = \"%{TIMESTAMP_ISO8601:timestamp} %{LOGLEVEL:level} %{GREEDYDATA:message}\"\n\nparse_grok!(value, pattern)",
+                "{\n  \"level\": \"info\",\n  \"message\": \"Hello world\",\n  \"timestamp\": \"2020-10-02T23:22:12.223222Z\"\n}",
+                false
+            )
+        )
     ),
     "parse_groks" to VRLFunction(
         name = "parse_groks",
@@ -344,7 +624,21 @@ val parseFunctions = mapOf(
                 defaultValue = "[]"
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse using multiple Grok patterns",
+                "parse_groks!(\n    \"2020-10-02T23:22:12.223222Z info Hello world\",\n    patterns: [\n        \"%{common_prefix} %{_status} %{_message}\",\n        \"%{common_prefix} %{_message}\",\n    ],\n    aliases: {\n        \"common_prefix\": \"%{_timestamp} %{_loglevel}\",\n        \"_timestamp\": \"%{TIMESTAMP_ISO8601:timestamp}\",\n        \"_loglevel\": \"%{LOGLEVEL:level}\",\n        \"_status\": \"%{POSINT:status}\",\n        \"_message\": \"%{GREEDYDATA:message}\"\n    }\n)",
+                "{\n  \"level\": \"info\",\n  \"message\": \"Hello world\",\n  \"timestamp\": \"2020-10-02T23:22:12.223222Z\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse using aliases from file",
+                "parse_groks!(\n  \"username=foo\",\n  patterns: [ \"%{PATTERN_A}\" ],\n  alias_sources: [ \"tests/data/grok/aliases.json\" ]\n)\n# aliases.json contents:\n# {\n#   \"PATTERN_A\": \"%{PATTERN_B}\",\n#   \"PATTERN_B\": \"username=%{USERNAME:username}\"\n# }",
+                "{\n  \"username\": \"foo\"\n}",
+                false
+            )
+        )
     ),
     "parse_influxdb" to VRLFunction(
         name = "parse_influxdb",
@@ -359,7 +653,15 @@ val parseFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("array", "error")
+        returnTypes = setOf("array", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse InfluxDB line protocol",
+                "parse_influxdb!(\"cpu,host=A,region=us-west usage_system=64i,usage_user=10u,temperature=50.5,on=true,sleep=false 1590488773254420000\")",
+                "[{\"gauge\":{\"value\":64},\"kind\":\"absolute\",\"name\":\"cpu_usage_system\",\"tags\":{\"host\":\"A\",\"region\":\"us-west\"},\"timestamp\":\"2020-05-26T10:26:13.254420Z\"},{\"gauge\":{\"value\":10},\"kind\":\"absolute\",\"name\":\"cpu_usage_user\",\"tags\":{\"host\":\"A\",\"region\":\"us-west\"},\"timestamp\":\"2020-05-26T10:26:13.254420Z\"},{\"gauge\":{\"value\":50.5},\"kind\":\"absolute\",\"name\":\"cpu_temperature\",\"tags\":{\"host\":\"A\",\"region\":\"us-west\"},\"timestamp\":\"2020-05-26T10:26:13.254420Z\"},{\"gauge\":{\"value\":1},\"kind\":\"absolute\",\"name\":\"cpu_on\",\"tags\":{\"host\":\"A\",\"region\":\"us-west\"},\"timestamp\":\"2020-05-26T10:26:13.254420Z\"},{\"gauge\":{\"value\":0},\"kind\":\"absolute\",\"name\":\"cpu_sleep\",\"tags\":{\"host\":\"A\",\"region\":\"us-west\"},\"timestamp\":\"2020-05-26T10:26:13.254420Z\"}]",
+                false
+            )
+        )
     ),
     "parse_int" to VRLFunction(
         name = "parse_int",
@@ -380,7 +682,39 @@ val parseFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("integer", "error")
+        returnTypes = setOf("integer", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse decimal",
+                "parse_int!(\"-42\")",
+                "-42",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse binary",
+                "parse_int!(\"0b1001\")",
+                "9",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse octal",
+                "parse_int!(\"0o42\")",
+                "34",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse hexadecimal",
+                "parse_int!(\"0x2a\")",
+                "42",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse explicit base",
+                "parse_int!(\"2a\", 17)",
+                "44",
+                false
+            )
+        )
     ),
     "parse_json" to VRLFunction(
         name = "parse_json",
@@ -408,7 +742,57 @@ val parseFunctions = mapOf(
                 defaultValue = true
             )
         ),
-        returnTypes = setOf("string", "integer", "float", "boolean", "object", "array", "null", "error")
+        returnTypes = setOf("string", "integer", "float", "boolean", "object", "array", "null", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse JSON",
+                "parse_json!(s'{\"key\": \"val\"}')",
+                "{\n  \"key\": \"val\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse JSON array",
+                "parse_json!(\"[true, 0]\")",
+                "[true,0]",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse JSON string",
+                "parse_json!(s'\"hello\"')",
+                "hello",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse JSON integer",
+                "parse_json!(\"42\")",
+                "42",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse JSON float",
+                "parse_json!(\"42.13\")",
+                "42.13",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse JSON boolean",
+                "parse_json!(\"false\")",
+                "false",
+                false
+            ),
+            VRLFunctionExample(
+                "Invalid JSON value",
+                "parse_json!(\"{ INVALID }\")",
+                "function call error for \"parse_json\" at (0:26): unable to parse json: key must be a string at line 1 column 3",
+                true
+            ),
+            VRLFunctionExample(
+                "Parse JSON with max_depth",
+                "parse_json!(s'{\"first_level\":{\"second_level\":\"finish\"}}', max_depth: 1)",
+                "{\n  \"first_level\": \"{\\\"second_level\\\":\\\"finish\\\"}\"\n}",
+                false
+            )
+        )
     ),
     "parse_key_value" to VRLFunction(
         name = "parse_key_value",
@@ -451,7 +835,45 @@ val parseFunctions = mapOf(
                 defaultValue = true
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse simple key value pairs",
+                "parse_key_value!(\"zork=zook zonk=nork\")",
+                "{\n  \"zonk\": \"nork\",\n  \"zork\": \"zook\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse logfmt log",
+                "parse_key_value!(\n    \"@timestamp=\\\"Sun Jan 10 16:47:39 EST 2021\\\" level=info msg=\\\"Stopping all fetchers\\\" tag#production=stopping_fetchers id=ConsumerFetcherManager-1382721708341 module=kafka.consumer.ConsumerFetcherManager\"\n)",
+                "{\n  \"@timestamp\": \"Sun Jan 10 16:47:39 EST 2021\",\n  \"id\": \"ConsumerFetcherManager-1382721708341\",\n  \"level\": \"info\",\n  \"module\": \"kafka.consumer.ConsumerFetcherManager\",\n  \"msg\": \"Stopping all fetchers\",\n  \"tag#production\": \"stopping_fetchers\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse comma delimited log",
+                "parse_key_value!(\n    \"path:\\\"/cart_link\\\", host:store.app.com, fwd: \\\"102.30.171.16\\\", dyno: web.1, connect:0ms, service:87ms, status:304, bytes:632, protocol:https\",\n    field_delimiter: \",\",\n    key_value_delimiter: \":\"\n)",
+                "{\n  \"bytes\": \"632\",\n  \"connect\": \"0ms\",\n  \"dyno\": \"web.1\",\n  \"fwd\": \"102.30.171.16\",\n  \"host\": \"store.app.com\",\n  \"path\": \"/cart_link\",\n  \"protocol\": \"https\",\n  \"service\": \"87ms\",\n  \"status\": \"304\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse comma delimited log with standalone keys",
+                "parse_key_value!(\n    \"env:prod,service:backend,region:eu-east1,beta\",\n    field_delimiter: \",\",\n    key_value_delimiter: \":\",\n)",
+                "{\n  \"beta\": true,\n  \"env\": \"prod\",\n  \"region\": \"eu-east1\",\n  \"service\": \"backend\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse duplicate keys",
+                "parse_key_value!(\n    \"at=info,method=GET,path=\\\"/index\\\",status=200,tags=dev,tags=dummy\",\n    field_delimiter: \",\",\n    key_value_delimiter: \"=\",\n)",
+                "{\n  \"at\": \"info\",\n  \"method\": \"GET\",\n  \"path\": \"/index\",\n  \"status\": \"200\",\n  \"tags\": [\n    \"dev\",\n    \"dummy\"\n  ]\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse with strict whitespace",
+                "parse_key_value!(s'app=my-app ip=1.2.3.4 user= msg=hello-world', whitespace: \"strict\")",
+                "{\n  \"app\": \"my-app\",\n  \"ip\": \"1.2.3.4\",\n  \"msg\": \"hello-world\",\n  \"user\": \"\"\n}",
+                false
+            )
+        )
     ),
     "parse_klog" to VRLFunction(
         name = "parse_klog",
@@ -466,7 +888,15 @@ val parseFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse using klog",
+                "parse_klog!(\"I0505 17:59:40.692994   28133 klog.go:70] hello from klog\")",
+                "{\n  \"file\": \"klog.go\",\n  \"id\": 28133,\n  \"level\": \"info\",\n  \"line\": 70,\n  \"message\": \"hello from klog\",\n  \"timestamp\": \"2026-05-05T17:59:40.692994Z\"\n}",
+                false
+            )
+        )
     ),
     "parse_linux_authorization" to VRLFunction(
         name = "parse_linux_authorization",
@@ -481,7 +911,15 @@ val parseFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse Linux authorization event",
+                "parse_linux_authorization!(\n    s'Mar 23 01:49:58 localhost sshd[1111]: Accepted publickey for eng from 10.1.1.1 port 8888 ssh2: RSA SHA256:foobar'\n)",
+                "{\n  \"appname\": \"sshd\",\n  \"hostname\": \"localhost\",\n  \"message\": \"Accepted publickey for eng from 10.1.1.1 port 8888 ssh2: RSA SHA256:foobar\",\n  \"procid\": 1111,\n  \"timestamp\": \"2026-03-23T01:49:58Z\"\n}",
+                false
+            )
+        )
     ),
     "parse_logfmt" to VRLFunction(
         name = "parse_logfmt",
@@ -496,7 +934,27 @@ val parseFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse simple logfmt log",
+                "parse_logfmt!(\"zork=zook zonk=nork\")",
+                "{\n  \"zonk\": \"nork\",\n  \"zork\": \"zook\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse logfmt log",
+                "parse_logfmt!(\n    \"@timestamp=\\\"Sun Jan 10 16:47:39 EST 2021\\\" level=info msg=\\\"Stopping all fetchers\\\" tag#production=stopping_fetchers id=ConsumerFetcherManager-1382721708341 module=kafka.consumer.ConsumerFetcherManager\"\n)",
+                "{\n  \"@timestamp\": \"Sun Jan 10 16:47:39 EST 2021\",\n  \"id\": \"ConsumerFetcherManager-1382721708341\",\n  \"level\": \"info\",\n  \"module\": \"kafka.consumer.ConsumerFetcherManager\",\n  \"msg\": \"Stopping all fetchers\",\n  \"tag#production\": \"stopping_fetchers\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse logfmt log with standalone key",
+                "parse_logfmt!(\"zork=zook plonk zonk=nork\")",
+                "{\n  \"plonk\": true,\n  \"zonk\": \"nork\",\n  \"zork\": \"zook\"\n}",
+                false
+            )
+        )
     ),
     "parse_nginx_log" to VRLFunction(
         name = "parse_nginx_log",
@@ -524,7 +982,33 @@ val parseFunctions = mapOf(
                 defaultValue = "%d/%b/%Y:%T %z"
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse via Nginx log format (combined)",
+                "parse_nginx_log!(\n    s'172.17.0.1 - alice [01/Apr/2021:12:02:31 +0000] \"POST /not-found HTTP/1.1\" 404 153 \"http://localhost/somewhere\" \"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36\" \"2.75\"',\n    \"combined\",\n)",
+                "{\n  \"agent\": \"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36\",\n  \"client\": \"172.17.0.1\",\n  \"compression\": \"2.75\",\n  \"referer\": \"http://localhost/somewhere\",\n  \"request\": \"POST /not-found HTTP/1.1\",\n  \"size\": 153,\n  \"status\": 404,\n  \"timestamp\": \"2021-04-01T12:02:31Z\",\n  \"user\": \"alice\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse via Nginx log format (error)",
+                "parse_nginx_log!(\n    s'2021/04/01 13:02:31 [error] 31#31: *1 open() \"/usr/share/nginx/html/not-found\" failed (2: No such file or directory), client: 172.17.0.1, server: localhost, request: \"POST /not-found HTTP/1.1\", host: \"localhost:8081\"',\n    \"error\"\n)",
+                "{\n  \"cid\": 1,\n  \"client\": \"172.17.0.1\",\n  \"host\": \"localhost:8081\",\n  \"message\": \"open() \\\"/usr/share/nginx/html/not-found\\\" failed (2: No such file or directory)\",\n  \"pid\": 31,\n  \"request\": \"POST /not-found HTTP/1.1\",\n  \"server\": \"localhost\",\n  \"severity\": \"error\",\n  \"tid\": 31,\n  \"timestamp\": \"2021-04-01T13:02:31Z\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse via Nginx log format (ingress_upstreaminfo)",
+                "parse_nginx_log!(\n    s'0.0.0.0 - bob [18/Mar/2023:15:00:00 +0000] \"GET /some/path HTTP/2.0\" 200 12312 \"https://10.0.0.1/some/referer\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36\" 462 0.050 [some-upstream-service-9000] [some-other-upstream-5000] 10.0.50.80:9000 19437 0.049 200 752178adb17130b291aefd8c386279e7',\n    \"ingress_upstreaminfo\"\n)",
+                "{\n  \"body_bytes_size\": 12312,\n  \"http_referer\": \"https://10.0.0.1/some/referer\",\n  \"http_user_agent\": \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36\",\n  \"proxy_alternative_upstream_name\": \"some-other-upstream-5000\",\n  \"proxy_upstream_name\": \"some-upstream-service-9000\",\n  \"remote_addr\": \"0.0.0.0\",\n  \"remote_user\": \"bob\",\n  \"req_id\": \"752178adb17130b291aefd8c386279e7\",\n  \"request\": \"GET /some/path HTTP/2.0\",\n  \"request_length\": 462,\n  \"request_time\": 0.05,\n  \"status\": 200,\n  \"timestamp\": \"2023-03-18T15:00:00Z\",\n  \"upstream_addr\": \"10.0.50.80:9000\",\n  \"upstream_response_length\": 19437,\n  \"upstream_response_time\": 0.049,\n  \"upstream_status\": 200\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse via Nginx log format (main)",
+                "parse_nginx_log!(\n    s'172.24.0.3 - alice [31/Dec/2024:17:32:06 +0000] \"GET / HTTP/1.1\" 200 615 \"https://domain.tld/path\" \"curl/8.11.1\" \"1.2.3.4, 10.10.1.1\"',\n    \"main\"\n)",
+                "{\n  \"body_bytes_size\": 615,\n  \"http_referer\": \"https://domain.tld/path\",\n  \"http_user_agent\": \"curl/8.11.1\",\n  \"http_x_forwarded_for\": \"1.2.3.4, 10.10.1.1\",\n  \"remote_addr\": \"172.24.0.3\",\n  \"remote_user\": \"alice\",\n  \"request\": \"GET / HTTP/1.1\",\n  \"status\": 200,\n  \"timestamp\": \"2024-12-31T17:32:06Z\"\n}",
+                false
+            )
+        )
     ),
     "parse_proto" to VRLFunction(
         name = "parse_proto",
@@ -551,7 +1035,15 @@ val parseFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse proto",
+                "parse_proto!(decode_base64!(\"Cgdzb21lb25lIggKBjEyMzQ1Ng==\"), \"tests/data/protobuf/test_protobuf/v1/test_protobuf.desc\", \"test_protobuf.v1.Person\")",
+                "{\n  \"name\": \"someone\",\n  \"phones\": [\n    {\n      \"number\": \"123456\"\n    }\n  ]\n}",
+                false
+            )
+        )
     ),
     "parse_query_string" to VRLFunction(
         name = "parse_query_string",
@@ -566,7 +1058,27 @@ val parseFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("object")
+        returnTypes = setOf("object"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse simple query string",
+                "parse_query_string(\"foo=1&bar=2\")",
+                "{\n  \"bar\": \"2\",\n  \"foo\": \"1\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse query string",
+                "parse_query_string(\"foo=%2B1&bar=2&bar=3&xyz\")",
+                "{\n  \"bar\": [\n    \"2\",\n    \"3\"\n  ],\n  \"foo\": \"+1\",\n  \"xyz\": \"\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse Ruby on Rails’ query string",
+                "parse_query_string(\"?foo%5b%5d=1&foo%5b%5d=2\")",
+                "{\n  \"foo[]\": [\n    \"1\",\n    \"2\"\n  ]\n}",
+                false
+            )
+        )
     ),
     "parse_regex" to VRLFunction(
         name = "parse_regex",
@@ -594,7 +1106,39 @@ val parseFunctions = mapOf(
                 defaultValue = false
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse using Regex (with capture groups)",
+                "parse_regex!(\"first group and second group.\", r'(?P<number>.*?) group')",
+                "{\n  \"number\": \"first\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse using Regex (without capture groups)",
+                "parse_regex!(\"first group and second group.\", r'(\\w+) group', numeric_groups: true)",
+                "{\n  \"0\": \"first group\",\n  \"1\": \"first\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse using Regex with simple match",
+                "parse_regex!(\"8.7.6.5 - zorp\", r'^(?P<host>[\\w\\.]+) - (?P<user>[\\w]+)')",
+                "{\n  \"host\": \"8.7.6.5\",\n  \"user\": \"zorp\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse using Regex with all numeric groups",
+                "parse_regex!(\"8.7.6.5 - zorp\", r'^(?P<host>[\\w\\.]+) - (?P<user>[\\w]+)', numeric_groups: true)",
+                "{\n  \"0\": \"8.7.6.5 - zorp\",\n  \"1\": \"8.7.6.5\",\n  \"2\": \"zorp\",\n  \"host\": \"8.7.6.5\",\n  \"user\": \"zorp\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse using Regex with variables",
+                "variable = r'^(?P<host>[\\w\\.]+) - (?P<user>[\\w]+)';\nparse_regex!(\"8.7.6.5 - zorp\", variable)",
+                "{\n  \"host\": \"8.7.6.5\",\n  \"user\": \"zorp\"\n}",
+                false
+            )
+        )
     ),
     "parse_regex_all" to VRLFunction(
         name = "parse_regex_all",
@@ -622,7 +1166,33 @@ val parseFunctions = mapOf(
                 defaultValue = false
             )
         ),
-        returnTypes = setOf("array", "error")
+        returnTypes = setOf("array", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse using Regex (all matches)",
+                "parse_regex_all!(\"first group and second group.\", r'(?P<number>\\w+) group', numeric_groups: true)",
+                "[{\"0\":\"first group\",\"1\":\"first\",\"number\":\"first\"},{\"0\":\"second group\",\"1\":\"second\",\"number\":\"second\"}]",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse using Regex (simple match)",
+                "parse_regex_all!(\"apples and carrots, peaches and peas\", r'(?P<fruit>[\\w\\.]+) and (?P<veg>[\\w]+)')",
+                "[{\"fruit\":\"apples\",\"veg\":\"carrots\"},{\"fruit\":\"peaches\",\"veg\":\"peas\"}]",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse using Regex (all numeric groups)",
+                "parse_regex_all!(\"apples and carrots, peaches and peas\", r'(?P<fruit>[\\w\\.]+) and (?P<veg>[\\w]+)', numeric_groups: true)",
+                "[{\"0\":\"apples and carrots\",\"1\":\"apples\",\"2\":\"carrots\",\"fruit\":\"apples\",\"veg\":\"carrots\"},{\"0\":\"peaches and peas\",\"1\":\"peaches\",\"2\":\"peas\",\"fruit\":\"peaches\",\"veg\":\"peas\"}]",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse using Regex with variables",
+                "variable = r'(?P<fruit>[\\w\\.]+) and (?P<veg>[\\w]+)';\nparse_regex_all!(\"apples and carrots, peaches and peas\", variable)",
+                "[{\"fruit\":\"apples\",\"veg\":\"carrots\"},{\"fruit\":\"peaches\",\"veg\":\"peas\"}]",
+                false
+            )
+        )
     ),
     "parse_ruby_hash" to VRLFunction(
         name = "parse_ruby_hash",
@@ -637,7 +1207,15 @@ val parseFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse ruby hash",
+                "parse_ruby_hash!(s'{ \"test\" => \"value\", \"testNum\" => 0.2, \"testObj\" => { \"testBool\" => true, \"testNull\" => nil } }')",
+                "{\n  \"test\": \"value\",\n  \"testNum\": 0.2,\n  \"testObj\": {\n    \"testBool\": true,\n    \"testNull\": null\n  }\n}",
+                false
+            )
+        )
     ),
     "parse_syslog" to VRLFunction(
         name = "parse_syslog",
@@ -652,7 +1230,15 @@ val parseFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse Syslog log (5424)",
+                "parse_syslog!(s'<13>1 2020-03-13T20:45:38.119Z dynamicwireless.name non 2426 ID931 [exampleSDID@32473 iut=\"3\" eventSource= \"Application\" eventID=\"1011\"] Try to override the THX port, maybe it will reboot the neural interface!')",
+                "{\n  \"appname\": \"non\",\n  \"exampleSDID@32473\": {\n    \"eventID\": \"1011\",\n    \"eventSource\": \"Application\",\n    \"iut\": \"3\"\n  },\n  \"facility\": \"user\",\n  \"hostname\": \"dynamicwireless.name\",\n  \"message\": \"Try to override the THX port, maybe it will reboot the neural interface!\",\n  \"msgid\": \"ID931\",\n  \"procid\": 2426,\n  \"severity\": \"notice\",\n  \"timestamp\": \"2020-03-13T20:45:38.119Z\",\n  \"version\": 1\n}",
+                false
+            )
+        )
     ),
     "parse_timestamp" to VRLFunction(
         name = "parse_timestamp",
@@ -679,7 +1265,21 @@ val parseFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("timestamp", "error")
+        returnTypes = setOf("timestamp", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse timestamp",
+                "parse_timestamp!(\"10-Oct-2020 16:00+00:00\", format: \"%v %R %:z\")",
+                "t'2020-10-10T16:00:00Z'",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse timestamp with timezone",
+                "parse_timestamp!(\"16/10/2019 12:00:00\", format: \"%d/%m/%Y %H:%M:%S\", timezone: \"Asia/Taipei\")",
+                "t'2019-10-16T04:00:00Z'",
+                false
+            )
+        )
     ),
     "parse_tokens" to VRLFunction(
         name = "parse_tokens",
@@ -694,7 +1294,15 @@ val parseFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("array", "error")
+        returnTypes = setOf("array", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse tokens",
+                "parse_tokens(s'A sentence \"with \\\"a\\\" sentence inside\" and [some brackets]')",
+                "[\"A\",\"sentence\",\"with \\\\\\\"a\\\\\\\" sentence inside\",\"and\",\"some brackets\"]",
+                false
+            )
+        )
     ),
     "parse_url" to VRLFunction(
         name = "parse_url",
@@ -716,7 +1324,21 @@ val parseFunctions = mapOf(
                 defaultValue = false
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse URL",
+                "parse_url!(\"ftp://foo:bar@example.com:4343/foobar?hello=world#123\")",
+                "{\n  \"fragment\": \"123\",\n  \"host\": \"example.com\",\n  \"password\": \"bar\",\n  \"path\": \"/foobar\",\n  \"port\": 4343,\n  \"query\": {\n    \"hello\": \"world\"\n  },\n  \"scheme\": \"ftp\",\n  \"username\": \"foo\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse URL with default port",
+                "parse_url!(\"https://example.com\", default_known_ports: true)",
+                "{\n  \"fragment\": null,\n  \"host\": \"example.com\",\n  \"password\": \"\",\n  \"path\": \"/\",\n  \"port\": 443,\n  \"query\": {},\n  \"scheme\": \"https\",\n  \"username\": \"\"\n}",
+                false
+            )
+        )
     ),
     "parse_user_agent" to VRLFunction(
         name = "parse_user_agent",
@@ -738,7 +1360,27 @@ val parseFunctions = mapOf(
                 defaultValue = "fast"
             )
         ),
-        returnTypes = setOf("object")
+        returnTypes = setOf("object"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Fast mode",
+                "parse_user_agent(\n    \"Mozilla Firefox 1.0.1 Mozilla/5.0 (X11; U; Linux i686; de-DE; rv:1.7.6) Gecko/20050223 Firefox/1.0.1\"\n)",
+                "{\n  \"browser\": {\n    \"family\": \"Firefox\",\n    \"version\": \"1.0.1\"\n  },\n  \"device\": {\n    \"category\": \"pc\"\n  },\n  \"os\": {\n    \"family\": \"Linux\",\n    \"version\": null\n  }\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Reliable mode",
+                "parse_user_agent(\n    \"Mozilla/4.0 (compatible; MSIE 7.66; Windows NT 5.1; SV1; .NET CLR 1.1.4322)\",\n    mode: \"reliable\")",
+                "{\n  \"browser\": {\n    \"family\": \"Internet Explorer\",\n    \"version\": \"7.66\"\n  },\n  \"device\": {\n    \"category\": \"pc\"\n  },\n  \"os\": {\n    \"family\": \"Windows XP\",\n    \"version\": \"NT 5.1\"\n  }\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Enriched mode",
+                "parse_user_agent(\n    \"Opera/9.80 (J2ME/MIDP; Opera Mini/4.3.24214; iPhone; CPU iPhone OS 4_2_1 like Mac OS X; AppleWebKit/24.783; U; en) Presto/2.5.25 Version/10.54\",\n    mode: \"enriched\"\n)",
+                "{\n  \"browser\": {\n    \"family\": \"Opera Mini\",\n    \"major\": \"4\",\n    \"minor\": \"3\",\n    \"patch\": \"24214\",\n    \"version\": \"10.54\"\n  },\n  \"device\": {\n    \"brand\": \"Apple\",\n    \"category\": \"smartphone\",\n    \"family\": \"iPhone\",\n    \"model\": \"iPhone\"\n  },\n  \"os\": {\n    \"family\": \"iOS\",\n    \"major\": \"4\",\n    \"minor\": \"2\",\n    \"patch\": \"1\",\n    \"patch_minor\": null,\n    \"version\": \"4.2.1\"\n  }\n}",
+                false
+            )
+        )
     ),
     "parse_xml" to VRLFunction(
         name = "parse_xml",
@@ -809,7 +1451,15 @@ val parseFunctions = mapOf(
                 defaultValue = true
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse XML",
+                "value = s'<book category=\"CHILDREN\"><title lang=\"en\">Harry Potter</title><author>J K. Rowling</author><year>2005</year></book>';\n\nparse_xml!(value, text_key: \"value\", parse_number: false)",
+                "{\n  \"book\": {\n    \"@category\": \"CHILDREN\",\n    \"author\": \"J K. Rowling\",\n    \"title\": {\n      \"@lang\": \"en\",\n      \"value\": \"Harry Potter\"\n    },\n    \"year\": \"2005\"\n  }\n}",
+                false
+            )
+        )
     ),
     "parse_yaml" to VRLFunction(
         name = "parse_yaml",
@@ -824,6 +1474,62 @@ val parseFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "integer", "float", "boolean", "object", "array", "null", "error")
+        returnTypes = setOf("string", "integer", "float", "boolean", "object", "array", "null", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse simple YAML",
+                "parse_yaml!(s'key: val')",
+                "{\n  \"key\": \"val\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse YAML",
+                "parse_yaml!(s'\n                    object:\n                        string: value\n                        number: 42\n                        boolean: false\n                        array:\n                        - hello\n                        - world\n                        json_array: [\"hello\", \"world\"]\n                ')",
+                "{\n  \"object\": {\n    \"array\": [\n      \"hello\",\n      \"world\"\n    ],\n    \"boolean\": false,\n    \"json_array\": [\n      \"hello\",\n      \"world\"\n    ],\n    \"number\": 42,\n    \"string\": \"value\"\n  }\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse YAML string",
+                "parse_yaml!(s'hello')",
+                "hello",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse YAML quoted string",
+                "parse_yaml!(s'\"hello\"')",
+                "hello",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse YAML integer",
+                "parse_yaml!(\"42\")",
+                "42",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse YAML float",
+                "parse_yaml!(\"42.13\")",
+                "42.13",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse YAML boolean",
+                "parse_yaml!(\"false\")",
+                "false",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse embedded JSON",
+                "parse_yaml!(s'{\"key\": \"val\"}')",
+                "{\n  \"key\": \"val\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse embedded JSON array",
+                "parse_yaml!(\"[true, 0]\")",
+                "[true,0]",
+                false
+            )
+        )
     )
 )

@@ -25,8 +25,9 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
   interpolation) and a customizable color scheme page
 - Code completion for functions, in-scope variables, and named argument names
 - Parameter info (Ctrl+P) showing a function's signature while typing a call
-- Quick documentation on hover for every VRL function, with a link to open its page on
-  vector.dev (*Shift+F1*, or the browser icon in the Quick Documentation popup)
+- Quick documentation on hover for every VRL function, including vector.dev's own usage examples
+  (source + return value/raised error), with a link to open its page on vector.dev (*Shift+F1*, or
+  the browser icon in the Quick Documentation popup)
 - Go to Declaration, Find Usages, and Rename for variables and closure parameters, with new-name
   validation against VRL's actual identifier rules
 - Introduce Variable refactoring: select an expression and extract it to a new variable

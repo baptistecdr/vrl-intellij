@@ -39,6 +39,20 @@ val mapFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("object")
+        returnTypes = setOf("object"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Haversine in kilometers",
+                "haversine(0.0, 0.0, 10.0, 10.0)",
+                "{\n  \"bearing\": 44.561,\n  \"distance\": 1568.5227233\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Haversine in miles",
+                "haversine(0.0, 0.0, 10.0, 10.0, measurement_unit: \"miles\")",
+                "{\n  \"bearing\": 44.561,\n  \"distance\": 974.6348468\n}",
+                false
+            )
+        )
     )
 )

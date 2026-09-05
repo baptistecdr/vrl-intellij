@@ -133,7 +133,63 @@ function parseFunction(name, block) {
         description: cleanDescription(descriptionMatch[1]),
         arguments: parseArguments(block),
         returnTypes: parseReturnTypes(name, block),
+        examples: parseExamples(name, block),
     };
+}
+
+/** Extracts the "Examples" section vector.dev renders per function (a series of named Source ->
+ * Return/Raises pairs) - every function has one except strip_ansi_escape_codes, which returns []
+ * here. A rare third "Input" block (an external-target JSON payload shown before Source on a
+ * handful of examples, e.g. get's "External target") is deliberately not captured: it's page
+ * context rather than something a Quick Doc popup needs, and skipping it keeps every example a
+ * plain (title, source, result) triple instead of an open-ended list of labeled blocks. */
+function parseExamples(name, block) {
+    const sectionIndex = block.indexOf(`id=${name}-examples `);
+    if (sectionIndex < 0) return [];
+    const sectionHtml = block.slice(sectionIndex);
+
+    // The title itself is usually plain text, but can contain inline markup (e.g. uuid_v7's
+    // "Create a UUIDv7 with explicit <code>now()</code>") - captured non-greedily up to the
+    // closing `</span></h5>` and run through cleanText rather than assumed tag-free.
+    const heading = /<h5\s+x-data="\{ show: false \}"[^>]*\sid=[a-z0-9_./+-]+\s[^>]*><span>([\s\S]*?)<\/span><\/h5>/g;
+    const matches = [...sectionHtml.matchAll(heading)];
+    return matches.map((m, i) => {
+        const title = cleanText(m[1]);
+        const start = m.index + m[0].length;
+        const end = i + 1 < matches.length ? matches[i + 1].index : sectionHtml.length;
+        const exampleHtml = sectionHtml.slice(start, end);
+
+        const source = extractLabeledCode(exampleHtml, "Source");
+        const returnCode = extractLabeledCode(exampleHtml, "Return");
+        const raisesCode = extractLabeledCode(exampleHtml, "Raises");
+        if (source == null) throw new Error(`example '${title}' has no Source block`);
+        if (returnCode == null && raisesCode == null) throw new Error(`example '${title}' has no Return or Raises block`);
+
+        return { title, source, result: returnCode ?? raisesCode, isError: raisesCode != null };
+    });
+}
+
+/** Finds `<span class=font-light>{label}</span>` (vector.dev's "Source"/"Return"/"Raises" caption)
+ * and pulls the plain-text code out of the `<pre><code>...</code></pre>` that immediately follows
+ * it - or null if this example has no block for that label (e.g. an infallible example has no
+ * "Raises"). */
+function extractLabeledCode(html, label) {
+    const markerIndex = html.indexOf(`<span class=font-light>${label}</span>`);
+    if (markerIndex < 0) return null;
+    const codeStart = html.indexOf("<code", markerIndex);
+    const codeOpenEnd = html.indexOf(">", codeStart) + 1;
+    const codeEnd = html.indexOf("</code>", codeOpenEnd);
+    if (codeStart < 0 || codeEnd < 0) throw new Error(`'${label}' block has no <code>...</code>`);
+    return extractCode(html.slice(codeOpenEnd, codeEnd));
+}
+
+/** Unlike [cleanText]/[cleanHtml] (which collapse all whitespace to single spaces), this keeps a
+ * code block's real newlines and indentation intact - chroma's syntax-highlighting spans wrap
+ * individual tokens on a line, with the line's actual newline character sitting in the text
+ * between them, so simply stripping every tag and decoding entities reconstructs the exact source
+ * VRL/JSON text vector.dev shows. */
+function extractCode(html) {
+    return decodeEntities(html.replace(/<[^>]+>/g, "")).trim();
 }
 
 /** [cleanHtml] applied to a whole function description, plus a blank line between adjacent
@@ -272,7 +328,7 @@ function decodeEntities(text) {
         .replace(/&lt;/g, "<")
         .replace(/&gt;/g, ">")
         .replace(/&quot;/g, '"')
-        .replace(/&#3[49];/g, '"')
+        .replace(/&#34;/g, '"')
         .replace(/&#39;/g, "'")
         .replace(/&#96;/g, "`")
         .replace(/&amp;/g, "&");
@@ -299,6 +355,7 @@ function renderKotlin(varName, functions) {
 
 function renderFunction(fn) {
     const args = fn.arguments.length === 0 ? "listOf()" : `listOf(\n${fn.arguments.map(renderArgument).join(",\n")}\n        )`;
+    const examples = fn.examples.length === 0 ? "listOf()" : `listOf(\n${fn.examples.map(renderExample).join(",\n")}\n        )`;
     return (
         `    ${kotlinString(fn.name)} to VRLFunction(\n` +
         `        name = ${kotlinString(fn.name)},\n` +
@@ -306,7 +363,8 @@ function renderFunction(fn) {
         `        isFallible = ${fn.isFallible},\n` +
         `        isPure = ${fn.isPure},\n` +
         `        arguments = ${args},\n` +
-        `        returnTypes = ${renderStringSet(fn.returnTypes, { errorLast: true })}\n` +
+        `        returnTypes = ${renderStringSet(fn.returnTypes, { errorLast: true })},\n` +
+        `        examples = ${examples}\n` +
         `    )`
     );
 }
@@ -319,6 +377,17 @@ function renderArgument(arg) {
         `                ${renderStringSet(arg.types)},\n` +
         `                ${kotlinString(arg.description)},\n` +
         `                ${arg.isRequired}${defaultLine}\n` +
+        "            )"
+    );
+}
+
+function renderExample(example) {
+    return (
+        "            VRLFunctionExample(\n" +
+        `                ${kotlinString(example.title)},\n` +
+        `                ${kotlinString(example.source)},\n` +
+        `                ${kotlinString(example.result)},\n` +
+        `                ${example.isError}\n` +
         "            )"
     );
 }

@@ -22,7 +22,21 @@ val checksumFunctions = mapOf(
                 defaultValue = "CRC_32_ISO_HDLC"
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Create CRC checksum using the default algorithm",
+                "crc(\"foo\")",
+                "2356372769",
+                false
+            ),
+            VRLFunctionExample(
+                "Create CRC checksum using the CRC_32_CKSUM algorithm",
+                "crc(\"foo\", algorithm: \"CRC_32_CKSUM\")",
+                "4271552933",
+                false
+            )
+        )
     ),
     "xxhash" to VRLFunction(
         name = "xxhash",
@@ -44,6 +58,38 @@ val checksumFunctions = mapOf(
                 defaultValue = "XXH32"
             )
         ),
-        returnTypes = setOf("string", "integer")
+        returnTypes = setOf("string", "integer"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Calculate a hash using the default (XXH32) algorithm",
+                "xxhash(\"foo\")",
+                "3792637401",
+                false
+            ),
+            VRLFunctionExample(
+                "Calculate a hash using the XXH32 algorithm",
+                "xxhash(\"foo\", \"XXH32\")",
+                "3792637401",
+                false
+            ),
+            VRLFunctionExample(
+                "Calculate a hash using the XXH64 algorithm",
+                "xxhash(\"foo\", \"XXH64\")",
+                "3728699739546630700",
+                false
+            ),
+            VRLFunctionExample(
+                "Calculate a hash using the XXH3-64 algorithm",
+                "xxhash(\"foo\", \"XXH3-64\")",
+                "-6093828362558604000",
+                false
+            ),
+            VRLFunctionExample(
+                "Calculate a hash using the XXH3-128 algorithm",
+                "xxhash(\"foo\", \"XXH3-128\")",
+                "161745101148472925293886522910304009610",
+                false
+            )
+        )
     )
 )

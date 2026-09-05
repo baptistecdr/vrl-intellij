@@ -15,7 +15,21 @@ val objectFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("object")
+        returnTypes = setOf("object"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Manipulate empty array",
+                "from_entries([])",
+                "{}",
+                false
+            ),
+            VRLFunctionExample(
+                "Manipulate array",
+                "from_entries([{ \"key\": \"foo\", \"value\": \"bar\" }])",
+                "{\n  \"foo\": \"bar\"\n}",
+                false
+            )
+        )
     ),
     "match_datadog_query" to VRLFunction(
         name = "match_datadog_query",
@@ -36,7 +50,33 @@ val objectFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean")
+        returnTypes = setOf("boolean"),
+        examples = listOf(
+            VRLFunctionExample(
+                "OR query",
+                "match_datadog_query({\"message\": \"contains this and that\"}, \"this OR that\")",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "AND query",
+                "match_datadog_query({\"message\": \"contains only this\"}, \"this AND that\")",
+                "false",
+                false
+            ),
+            VRLFunctionExample(
+                "Attribute wildcard",
+                "match_datadog_query({\"name\": \"foobar\"}, \"@name:foo*\")",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "Tag range",
+                "match_datadog_query({\"tags\": [\"a:x\", \"b:y\", \"c:z\"]}, s'b:[\"x\" TO \"z\"]')",
+                "true",
+                false
+            )
+        )
     ),
     "merge" to VRLFunction(
         name = "merge",
@@ -64,7 +104,21 @@ val objectFunctions = mapOf(
                 defaultValue = false
             )
         ),
-        returnTypes = setOf("object")
+        returnTypes = setOf("object"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Object merge (shallow)",
+                "merge(\n    {\n        \"parent1\": {\n            \"child1\": 1,\n            \"child2\": 2\n        },\n        \"parent2\": {\n            \"child3\": 3\n        }\n    },\n    {\n        \"parent1\": {\n            \"child2\": 4,\n            \"child5\": 5\n        }\n    }\n)",
+                "{\n  \"parent1\": {\n    \"child2\": 4,\n    \"child5\": 5\n  },\n  \"parent2\": {\n    \"child3\": 3\n  }\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Object merge (deep)",
+                "merge(\n    {\n        \"parent1\": {\n            \"child1\": 1,\n            \"child2\": 2\n        },\n        \"parent2\": {\n            \"child3\": 3\n        }\n    },\n    {\n        \"parent1\": {\n            \"child2\": 4,\n            \"child5\": 5\n        }\n    },\n    deep: true\n)",
+                "{\n  \"parent1\": {\n    \"child1\": 1,\n    \"child2\": 4,\n    \"child5\": 5\n  },\n  \"parent2\": {\n    \"child3\": 3\n  }\n}",
+                false
+            )
+        )
     ),
     "object_from_array" to VRLFunction(
         name = "object_from_array",
@@ -85,7 +139,27 @@ val objectFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("object", "error")
+        returnTypes = setOf("object", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Create an object from one array",
+                "object_from_array([[\"one\", 1], [null, 2], [\"two\", 3]])",
+                "{\n  \"one\": 1,\n  \"two\": 3\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Create an object from separate key and value arrays",
+                "object_from_array([1, 2, 3], keys: [\"one\", null, \"two\"])",
+                "{\n  \"one\": 1,\n  \"two\": 3\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Create an object from a separate arrays of keys and values",
+                "object_from_array(values: [1, null, true], keys: [\"a\", \"b\", \"c\"])",
+                "{\n  \"a\": 1,\n  \"b\": null,\n  \"c\": true\n}",
+                false
+            )
+        )
     ),
     "to_entries" to VRLFunction(
         name = "to_entries",
@@ -100,7 +174,27 @@ val objectFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("array")
+        returnTypes = setOf("array"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Manipulate empty object",
+                "to_entries({})",
+                "[]",
+                false
+            ),
+            VRLFunctionExample(
+                "Manipulate object",
+                "to_entries({ \"foo\": \"bar\"})",
+                "[{\"key\":\"foo\",\"value\":\"bar\"}]",
+                false
+            ),
+            VRLFunctionExample(
+                "Manipulate array",
+                "to_entries([1, 2])",
+                "[{\"key\":0,\"value\":1},{\"key\":1,\"value\":2}]",
+                false
+            )
+        )
     ),
     "unnest" to VRLFunction(
         name = "unnest",
@@ -115,6 +209,20 @@ val objectFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("array", "error")
+        returnTypes = setOf("array", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Unnest an array field",
+                ". = {\"hostname\": \"localhost\", \"messages\": [\"message 1\", \"message 2\"]}\n. = unnest(.messages)",
+                "[{\"hostname\":\"localhost\",\"messages\":\"message 1\"},{\"hostname\":\"localhost\",\"messages\":\"message 2\"}]",
+                false
+            ),
+            VRLFunctionExample(
+                "Unnest a nested array field",
+                ". = {\"hostname\": \"localhost\", \"event\": {\"messages\": [\"message 1\", \"message 2\"]}}\n. = unnest(.event.messages)",
+                "[{\"event\":{\"messages\":\"message 1\"},\"hostname\":\"localhost\"},{\"event\":{\"messages\":\"message 2\"},\"hostname\":\"localhost\"}]",
+                false
+            )
+        )
     )
 )

@@ -86,5 +86,22 @@ class VRLDocumentationProvider : AbstractDocumentationProvider() {
         if (badges.isNotEmpty()) {
             append("<p><i>${badges.joinToString(", ")}</i></p>")
         }
+
+        // Unlike description/arg.description, source/result are plain code text (not HTML), so
+        // they're XML-escaped before being wrapped in <pre> rather than appended as-is.
+        if (examples.isNotEmpty()) {
+            append("<p><b>Examples</b></p>")
+            append(DocumentationMarkup.SECTIONS_START)
+            for (example in examples) {
+                append(DocumentationMarkup.SECTION_HEADER_START)
+                append(StringUtil.escapeXmlEntities(example.title))
+                append(DocumentationMarkup.SECTION_SEPARATOR)
+                append("<pre>").append(StringUtil.escapeXmlEntities(example.source)).append("</pre>")
+                append(if (example.isError) "<p>Raises</p>" else "<p>Returns</p>")
+                append("<pre>").append(StringUtil.escapeXmlEntities(example.result)).append("</pre>")
+                append(DocumentationMarkup.SECTION_END)
+            }
+            append(DocumentationMarkup.SECTIONS_END)
+        }
     }
 }

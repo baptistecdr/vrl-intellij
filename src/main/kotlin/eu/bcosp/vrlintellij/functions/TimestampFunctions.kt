@@ -27,7 +27,33 @@ val timestampFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Format a timestamp (ISO8601/RFC 3339)",
+                "format_timestamp!(t'2020-10-21T16:00:00Z', format: \"%+\")",
+                "2020-10-21T16:00:00+00:00",
+                false
+            ),
+            VRLFunctionExample(
+                "Format a timestamp (custom)",
+                "format_timestamp!(t'2020-10-21T16:00:00Z', format: \"%v %R\")",
+                "21-Oct-2020 16:00",
+                false
+            ),
+            VRLFunctionExample(
+                "Format a timestamp with custom format string",
+                "format_timestamp!(t'2021-02-10T23:32:00+00:00', format: \"%d %B %Y %H:%M\")",
+                "10 February 2021 23:32",
+                false
+            ),
+            VRLFunctionExample(
+                "Format a timestamp with timezone conversion",
+                "format_timestamp!(t'2021-02-10T23:32:00+00:00', format: \"%d %B %Y %H:%M\", timezone: \"Europe/Berlin\")",
+                "11 February 2021 00:32",
+                false
+            )
+        )
     ),
     "now" to VRLFunction(
         name = "now",
@@ -35,6 +61,14 @@ val timestampFunctions = mapOf(
         isFallible = false,
         isPure = true,
         arguments = listOf(),
-        returnTypes = setOf("timestamp")
+        returnTypes = setOf("timestamp"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Generate a current timestamp",
+                "now()",
+                "2012-03-04T12:34:56.789012345Z",
+                false
+            )
+        )
     )
 )

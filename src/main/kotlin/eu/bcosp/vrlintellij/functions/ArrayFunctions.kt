@@ -21,7 +21,15 @@ val arrayFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("array")
+        returnTypes = setOf("array"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Append to an array",
+                "append([1, 2], [3, 4])",
+                "[1,2,3,4]",
+                false
+            )
+        )
     ),
     "chunks" to VRLFunction(
         name = "chunks",
@@ -42,7 +50,21 @@ val arrayFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("array", "error")
+        returnTypes = setOf("array", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Split a string into chunks",
+                "chunks(\"abcdefgh\", 4)",
+                "[\"abcd\",\"efgh\"]",
+                false
+            ),
+            VRLFunctionExample(
+                "Chunks do not respect unicode code point boundaries",
+                "chunks(\"ab你好\", 4)",
+                "[\"ab�\",\"�好\"]",
+                false
+            )
+        )
     ),
     "pop" to VRLFunction(
         name = "pop",
@@ -57,7 +79,15 @@ val arrayFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("array")
+        returnTypes = setOf("array"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Pop an item from an array",
+                "pop([1, 2, 3])",
+                "[1,2]",
+                false
+            )
+        )
     ),
     "push" to VRLFunction(
         name = "push",
@@ -78,7 +108,21 @@ val arrayFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("array")
+        returnTypes = setOf("array"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Push an item onto an array",
+                "push([1, 2], 3)",
+                "[1,2,3]",
+                false
+            ),
+            VRLFunctionExample(
+                "Empty array",
+                "push([], \"bar\")",
+                "[\"bar\"]",
+                false
+            )
+        )
     ),
     "zip" to VRLFunction(
         name = "zip",
@@ -99,6 +143,32 @@ val arrayFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("array", "error")
+        returnTypes = setOf("array", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Merge two arrays",
+                "zip([1, 2, 3], [4, 5, 6, 7])",
+                "[[1,4],[2,5],[3,6]]",
+                false
+            ),
+            VRLFunctionExample(
+                "Merge three arrays",
+                "zip([[1, 2], [3, 4], [5, 6]])",
+                "[[1,3,5],[2,4,6]]",
+                false
+            ),
+            VRLFunctionExample(
+                "Merge an array of three arrays into an array of 3-tuples",
+                "zip([[\"a\", \"b\", \"c\"], [1, null, true], [4, 5, 6]])",
+                "[[\"a\",1,4],[\"b\",null,5],[\"c\",true,6]]",
+                false
+            ),
+            VRLFunctionExample(
+                "Merge two array parameters",
+                "zip([1, 2, 3, 4], [5, 6, 7])",
+                "[[1,5],[2,6],[3,7]]",
+                false
+            )
+        )
     )
 )

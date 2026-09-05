@@ -15,7 +15,33 @@ val stringFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "null", "error")
+        returnTypes = setOf("string", "null", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Extract basename from file path",
+                "basename!(\"/usr/local/bin/vrl\")",
+                "vrl",
+                false
+            ),
+            VRLFunctionExample(
+                "Extract basename from file path with extension",
+                "basename!(\"/home/user/file.txt\")",
+                "file.txt",
+                false
+            ),
+            VRLFunctionExample(
+                "Extract basename from directory path",
+                "basename!(\"/home/user/\")",
+                "user",
+                false
+            ),
+            VRLFunctionExample(
+                "Root directory has no basename",
+                "basename!(\"/\")",
+                "",
+                false
+            )
+        )
     ),
     "camelcase" to VRLFunction(
         name = "camelcase",
@@ -36,7 +62,27 @@ val stringFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "camelCase a string without specifying original case",
+                "camelcase(\"input-string\")",
+                "inputString",
+                false
+            ),
+            VRLFunctionExample(
+                "camelcase a snake_case string",
+                "camelcase(\"foo_bar_baz\", \"snake_case\")",
+                "fooBarBaz",
+                false
+            ),
+            VRLFunctionExample(
+                "camelcase specifying the wrong original case (noop)",
+                "camelcase(\"foo_bar_baz\", \"kebab-case\")",
+                "foo_bar_baz",
+                false
+            )
+        )
     ),
     "community_id" to VRLFunction(
         name = "community_id",
@@ -81,7 +127,33 @@ val stringFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Generate Community ID for TCP",
+                "community_id!(source_ip: \"1.2.3.4\", destination_ip: \"5.6.7.8\", source_port: 1122, destination_port: 3344, protocol: 6)",
+                "1:wCb3OG7yAFWelaUydu0D+125CLM=",
+                false
+            ),
+            VRLFunctionExample(
+                "Generate Community ID for UDP",
+                "community_id!(source_ip: \"1.2.3.4\", destination_ip: \"5.6.7.8\", source_port: 1122, destination_port: 3344, protocol: 17)",
+                "1:0Mu9InQx6z4ZiCZM/7HXi2WMhOg=",
+                false
+            ),
+            VRLFunctionExample(
+                "Generate Community ID for ICMP",
+                "community_id!(source_ip: \"1.2.3.4\", destination_ip: \"5.6.7.8\", source_port: 8, destination_port: 0, protocol: 1)",
+                "1:crodRHL2FEsHjbv3UkRrfbs4bZ0=",
+                false
+            ),
+            VRLFunctionExample(
+                "Generate Community ID for RSVP",
+                "community_id!(source_ip: \"1.2.3.4\", destination_ip: \"5.6.7.8\", protocol: 46)",
+                "1:ikv3kmf89luf73WPz1jOs49S768=",
+                false
+            )
+        )
     ),
     "contains" to VRLFunction(
         name = "contains",
@@ -109,7 +181,21 @@ val stringFunctions = mapOf(
                 defaultValue = true
             )
         ),
-        returnTypes = setOf("boolean")
+        returnTypes = setOf("boolean"),
+        examples = listOf(
+            VRLFunctionExample(
+                "String contains with default parameters (case sensitive)",
+                "contains(\"banana\", \"AnA\")",
+                "false",
+                false
+            ),
+            VRLFunctionExample(
+                "String contains (case insensitive)",
+                "contains(\"banana\", \"AnA\", case_sensitive: false)",
+                "true",
+                false
+            )
+        )
     ),
     "contains_all" to VRLFunction(
         name = "contains_all",
@@ -136,7 +222,27 @@ val stringFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("boolean")
+        returnTypes = setOf("boolean"),
+        examples = listOf(
+            VRLFunctionExample(
+                "String contains all with default parameters (case sensitive)",
+                "contains_all(\"The NEEDLE in the Haystack\", [\"NEEDLE\", \"Haystack\"])",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "String doesn’t contain all with default parameters (case sensitive)",
+                "contains_all(\"The NEEDLE in the Haystack\", [\"needle\", \"Haystack\"])",
+                "false",
+                false
+            ),
+            VRLFunctionExample(
+                "String contains all (case insensitive)",
+                "contains_all(\"The NEEDLE in the HaYsTaCk\", [\"nEeDlE\", \"haystack\"], case_sensitive: false)",
+                "true",
+                false
+            )
+        )
     ),
     "dirname" to VRLFunction(
         name = "dirname",
@@ -151,7 +257,39 @@ val stringFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Extract dirname from file path",
+                "dirname!(\"/usr/local/bin/vrl\")",
+                "/usr/local/bin",
+                false
+            ),
+            VRLFunctionExample(
+                "Extract dirname from file path with extension",
+                "dirname!(\"/home/user/file.txt\")",
+                "/home/user",
+                false
+            ),
+            VRLFunctionExample(
+                "Extract dirname from directory path",
+                "dirname!(\"/home/user/\")",
+                "/home",
+                false
+            ),
+            VRLFunctionExample(
+                "Root directory dirname is itself",
+                "dirname!(\"/\")",
+                "/",
+                false
+            ),
+            VRLFunctionExample(
+                "Relative files have current directory as dirname",
+                "dirname!(\"file.txt\")",
+                ".",
+                false
+            )
+        )
     ),
     "downcase" to VRLFunction(
         name = "downcase",
@@ -166,7 +304,21 @@ val stringFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Downcase a string",
+                "downcase(\"Hello, World!\")",
+                "hello, world!",
+                false
+            ),
+            VRLFunctionExample(
+                "Downcase with number",
+                "downcase(\"FOO 2 BAR\")",
+                "foo 2 bar",
+                false
+            )
+        )
     ),
     "ends_with" to VRLFunction(
         name = "ends_with",
@@ -194,7 +346,27 @@ val stringFunctions = mapOf(
                 defaultValue = true
             )
         ),
-        returnTypes = setOf("boolean")
+        returnTypes = setOf("boolean"),
+        examples = listOf(
+            VRLFunctionExample(
+                "String ends with (case sensitive)",
+                "ends_with(\"The Needle In The Haystack\", \"The Haystack\")",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "String ends with (case insensitive)",
+                "ends_with(\"The Needle In The Haystack\", \"the haystack\", case_sensitive: false)",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "String ends with (case sensitive failure)",
+                "ends_with(\"foobar\", \"R\")",
+                "false",
+                false
+            )
+        )
     ),
     "find" to VRLFunction(
         name = "find",
@@ -222,7 +394,39 @@ val stringFunctions = mapOf(
                 defaultValue = 0
             )
         ),
-        returnTypes = setOf("integer", "null")
+        returnTypes = setOf("integer", "null"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Match text",
+                "find(\"foobar\", \"bar\")",
+                "3",
+                false
+            ),
+            VRLFunctionExample(
+                "Match text at start",
+                "find(\"foobar\", \"foo\")",
+                "0",
+                false
+            ),
+            VRLFunctionExample(
+                "Match regex",
+                "find(\"foobar\", r'b.r')",
+                "3",
+                false
+            ),
+            VRLFunctionExample(
+                "No matches",
+                "find(\"foobar\", \"baz\")",
+                "",
+                false
+            ),
+            VRLFunctionExample(
+                "With an offset",
+                "find(\"foobarfoobarfoo\", \"bar\", 4)",
+                "9",
+                false
+            )
+        )
     ),
     "join" to VRLFunction(
         name = "join",
@@ -243,7 +447,21 @@ val stringFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Join array (no separator)",
+                "join!([\"bring\", \"us\", \"together\"])",
+                "bringustogether",
+                false
+            ),
+            VRLFunctionExample(
+                "Join array (comma separator)",
+                "join!([\"sources\", \"transforms\", \"sinks\"], separator: \", \")",
+                "sources, transforms, sinks",
+                false
+            )
+        )
     ),
     "kebabcase" to VRLFunction(
         name = "kebabcase",
@@ -264,7 +482,27 @@ val stringFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "kebab-case a string without specifying original case",
+                "kebabcase(\"InputString\")",
+                "input-string",
+                false
+            ),
+            VRLFunctionExample(
+                "kebab-case a snake_case string",
+                "kebabcase(\"foo_bar_baz\", \"snake_case\")",
+                "foo-bar-baz",
+                false
+            ),
+            VRLFunctionExample(
+                "kebab-case specifying the wrong original case (noop)",
+                "kebabcase(\"foo_bar_baz\", \"PascalCase\")",
+                "foo_bar_baz",
+                false
+            )
+        )
     ),
     "match" to VRLFunction(
         name = "match",
@@ -285,7 +523,21 @@ val stringFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean")
+        returnTypes = setOf("boolean"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Regex match on a string",
+                "match(\"I'm a little teapot\", r'teapot')",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "String does not match the regular expression",
+                "match(\"I'm a little teapot\", r'.*balloon')",
+                "false",
+                false
+            )
+        )
     ),
     "match_any" to VRLFunction(
         name = "match_any",
@@ -306,7 +558,21 @@ val stringFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean")
+        returnTypes = setOf("boolean"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Regex match on a string",
+                "match_any(\"I'm a little teapot\", [r'frying pan', r'teapot'])",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "No match",
+                "match_any(\"My name is John Doe\", patterns: [r'\\d+', r'Jane'])",
+                "false",
+                false
+            )
+        )
     ),
     "parse_float" to VRLFunction(
         name = "parse_float",
@@ -321,7 +587,27 @@ val stringFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("float", "error")
+        returnTypes = setOf("float", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Parse negative integer",
+                "parse_float!(\"-42\")",
+                "-42",
+                false
+            ),
+            VRLFunctionExample(
+                "Parse float",
+                "parse_float!(\"42.38\")",
+                "42.38",
+                false
+            ),
+            VRLFunctionExample(
+                "Scientific notation",
+                "parse_float!(\"2.5e3\")",
+                "2500",
+                false
+            )
+        )
     ),
     "pascalcase" to VRLFunction(
         name = "pascalcase",
@@ -342,7 +628,27 @@ val stringFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "PascalCase a string without specifying original case",
+                "pascalcase(\"input-string\")",
+                "InputString",
+                false
+            ),
+            VRLFunctionExample(
+                "PascalCase a snake_case string",
+                "pascalcase(\"foo_bar_baz\", \"snake_case\")",
+                "FooBarBaz",
+                false
+            ),
+            VRLFunctionExample(
+                "PascalCase specifying the wrong original case (only capitalizes)",
+                "pascalcase(\"foo_bar_baz\", \"kebab-case\")",
+                "Foo_bar_baz",
+                false
+            )
+        )
     ),
     "redact" to VRLFunction(
         name = "redact",
@@ -369,7 +675,45 @@ val stringFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("string", "object", "array")
+        returnTypes = setOf("string", "object", "array"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Replace text using a regex",
+                "redact(\"my id is 123456\", filters: [r'\\d+'])",
+                "my id is [REDACTED]",
+                false
+            ),
+            VRLFunctionExample(
+                "Replace us social security numbers in any field",
+                "redact({ \"name\": \"John Doe\", \"ssn\": \"123-12-1234\"}, filters: [\"us_social_security_number\"])",
+                "{\n  \"name\": \"John Doe\",\n  \"ssn\": \"[REDACTED]\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Replace with custom text",
+                "redact(\"my id is 123456\", filters: [r'\\d+'], redactor: {\"type\": \"text\", \"replacement\": \"***\"})",
+                "my id is ***",
+                false
+            ),
+            VRLFunctionExample(
+                "Replace with SHA-2 hash",
+                "redact(\"my id is 123456\", filters: [r'\\d+'], redactor: \"sha2\")",
+                "my id is GEtTedW1p6tC094dDKH+3B8P+xSnZz69AmpjaXRd63I=",
+                false
+            ),
+            VRLFunctionExample(
+                "Replace with SHA-3 hash",
+                "redact(\"my id is 123456\", filters: [r'\\d+'], redactor: \"sha3\")",
+                "my id is ZNCdmTDI7PeeUTFnpYjLdUObdizo+bIupZdl8yqnTKGdLx6X3JIqPUlUWUoFBikX+yTR+OcvLtAqWO11NPlNJw==",
+                false
+            ),
+            VRLFunctionExample(
+                "Replace with SHA-256 hash using hex encoding",
+                "redact(\"my id is 123456\", filters: [r'\\d+'], redactor: {\"type\": \"sha2\", \"variant\": \"SHA-256\", \"encoding\": \"base16\"})",
+                "my id is 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+                false
+            )
+        )
     ),
     "replace" to VRLFunction(
         name = "replace",
@@ -403,7 +747,39 @@ val stringFunctions = mapOf(
                 defaultValue = -1
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Replace literal text",
+                "replace(\"Apples and Bananas\", \"and\", \"not\")",
+                "Apples not Bananas",
+                false
+            ),
+            VRLFunctionExample(
+                "Replace using regular expression",
+                "replace(\"Apples and Bananas\", r'(?i)bananas', \"Pineapples\")",
+                "Apples and Pineapples",
+                false
+            ),
+            VRLFunctionExample(
+                "Replace first instance",
+                "replace(\"Bananas and Bananas\", \"Bananas\", \"Pineapples\", count: 1)",
+                "Pineapples and Bananas",
+                false
+            ),
+            VRLFunctionExample(
+                "Replace with capture groups",
+                "# Note that in the context of Vector configuration files, an extra `\$` escape character is required\n# (i.e. `\$\$num`) to avoid interpreting `num` as an environment variable.\nreplace(\"foo123bar\", r'foo(?P<num>\\d+)bar', \"\$num\")",
+                "123",
+                false
+            ),
+            VRLFunctionExample(
+                "Replace all",
+                "replace(\"foobar\", \"o\", \"i\")",
+                "fiibar",
+                false
+            )
+        )
     ),
     "replace_with" to VRLFunction(
         name = "replace_with",
@@ -431,7 +807,45 @@ val stringFunctions = mapOf(
                 defaultValue = -1
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Capitalize words",
+                "replace_with(\"apples and bananas\", r'\\b(\\w)(\\w*)') -> |match| {\n    upcase!(match.captures[0]) + string!(match.captures[1])\n}",
+                "Apples And Bananas",
+                false
+            ),
+            VRLFunctionExample(
+                "Replace with hash",
+                "replace_with(\"email from test@example.com\", r'\\w+@example.com') -> |match| {\n    sha2(match.string, variant: \"SHA-512/224\")\n}",
+                "email from adf6e1bc4415d24912bd93072ad34ef825a7b6eb3bf53f68def1fc17",
+                false
+            ),
+            VRLFunctionExample(
+                "Replace first instance",
+                "replace_with(\"Apples and Apples\", r'(?i)apples|cones', count: 1) -> |match| {\n    \"Pine\" + downcase(match.string)\n}",
+                "Pineapples and Apples",
+                false
+            ),
+            VRLFunctionExample(
+                "Named capture group",
+                "replace_with(\"level=error A message\", r'level=(?P<level>\\w+)') -> |match| {\n    lvl = upcase!(match.level)\n    \"[{{lvl}}]\"\n}",
+                "[ERROR] A message",
+                false
+            ),
+            VRLFunctionExample(
+                "Replace with processed capture group",
+                "replace_with(s'Got message: {\"msg\": \"b\"}', r'message: (\\{.*\\})') -> |m| {\n    to_string!(parse_json!(m.captures[0]).msg)\n}",
+                "Got b",
+                false
+            ),
+            VRLFunctionExample(
+                "Replace with optional capture group",
+                "replace_with(\"bar of chocolate and bar of gold\", r'bar( of gold)?') -> |m| {\n    if m.captures[0] == null { \"pile\" } else { \"money\" }\n}",
+                "pile of chocolate and money",
+                false
+            )
+        )
     ),
     "screamingsnakecase" to VRLFunction(
         name = "screamingsnakecase",
@@ -452,7 +866,27 @@ val stringFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "SCREAMING_SNAKE_CASE a string without specifying original case",
+                "screamingsnakecase(\"input-string\")",
+                "INPUT_STRING",
+                false
+            ),
+            VRLFunctionExample(
+                "SCREAMING_SNAKE_CASE a snake_case string",
+                "screamingsnakecase(\"foo_bar_baz\", \"snake_case\")",
+                "FOO_BAR_BAZ",
+                false
+            ),
+            VRLFunctionExample(
+                "SCREAMING_SNAKE_CASE specifying the wrong original case (capitalizes but doesn’t include _ properly)",
+                "screamingsnakecase(\"FooBarBaz\", \"kebab-case\")",
+                "FOOBARBAZ",
+                false
+            )
+        )
     ),
     "shannon_entropy" to VRLFunction(
         name = "shannon_entropy",
@@ -474,7 +908,33 @@ val stringFunctions = mapOf(
                 defaultValue = "byte"
             )
         ),
-        returnTypes = setOf("float")
+        returnTypes = setOf("float"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Simple byte segmentation example",
+                "floor(shannon_entropy(\"vector.dev\"), precision: 4)",
+                "2.9219",
+                false
+            ),
+            VRLFunctionExample(
+                "UTF-8 string with bytes segmentation",
+                "floor(shannon_entropy(\"test123%456.فوائد.net.\"), precision: 4)",
+                "4.0784",
+                false
+            ),
+            VRLFunctionExample(
+                "UTF-8 string with grapheme segmentation",
+                "floor(shannon_entropy(\"test123%456.فوائد.net.\", segmentation: \"grapheme\"), precision: 4)",
+                "3.9362",
+                false
+            ),
+            VRLFunctionExample(
+                "UTF-8 emoji (7 Unicode scalar values) with grapheme segmentation",
+                "shannon_entropy(\"👨‍👩‍👧‍👦\", segmentation: \"grapheme\")",
+                "0",
+                false
+            )
+        )
     ),
     "sieve" to VRLFunction(
         name = "sieve",
@@ -507,7 +967,27 @@ val stringFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Keep only lowercase letters",
+                "sieve(\"vector.dev/lowerUPPER\", permitted_characters: r'[a-z]')",
+                "vectordevlower",
+                false
+            ),
+            VRLFunctionExample(
+                "Sieve with regex",
+                "sieve(\"test123%456.فوائد.net.\", r'[a-z0-9.]')",
+                "test123456..net.",
+                false
+            ),
+            VRLFunctionExample(
+                "Custom replacements",
+                "sieve(\"test123%456.فوائد.net.\", r'[a-z.0-9]', replace_single: \"X\", replace_repeated: \"<REMOVED>\")",
+                "test123X456.<REMOVED>.net.",
+                false
+            )
+        )
     ),
     "slice" to VRLFunction(
         name = "slice",
@@ -535,7 +1015,33 @@ val stringFunctions = mapOf(
                 defaultValue = "String length"
             )
         ),
-        returnTypes = setOf("string", "array")
+        returnTypes = setOf("string", "array"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Slice a string (positive index)",
+                "slice!(\"Supercalifragilisticexpialidocious\", start: 5, end: 13)",
+                "califrag",
+                false
+            ),
+            VRLFunctionExample(
+                "Slice a string (negative index)",
+                "slice!(\"Supercalifragilisticexpialidocious\", start: 5, end: -14)",
+                "califragilistic",
+                false
+            ),
+            VRLFunctionExample(
+                "String start",
+                "slice!(\"foobar\", 3)",
+                "bar",
+                false
+            ),
+            VRLFunctionExample(
+                "Array start",
+                "slice!([0, 1, 2], 1)",
+                "[1,2]",
+                false
+            )
+        )
     ),
     "snakecase" to VRLFunction(
         name = "snakecase",
@@ -562,7 +1068,27 @@ val stringFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "snake_case a string",
+                "snakecase(\"input-string\")",
+                "input_string",
+                false
+            ),
+            VRLFunctionExample(
+                "snake_case a string with original case",
+                "snakecase(\"input-string\", original_case: \"kebab-case\")",
+                "input_string",
+                false
+            ),
+            VRLFunctionExample(
+                "snake_case with excluded boundaries",
+                "snakecase(\"s3BucketDetails\", excluded_boundaries: [\"lower_digit\"])",
+                "s3_bucket_details",
+                false
+            )
+        )
     ),
     "split" to VRLFunction(
         name = "split",
@@ -589,7 +1115,33 @@ val stringFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("array")
+        returnTypes = setOf("array"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Split a string (no limit)",
+                "split(\"apples and pears and bananas\", \" and \")",
+                "[\"apples\",\"pears\",\"bananas\"]",
+                false
+            ),
+            VRLFunctionExample(
+                "Split a string (with a limit)",
+                "split(\"apples and pears and bananas\", \" and \", limit: 2)",
+                "[\"apples\",\"pears and bananas\"]",
+                false
+            ),
+            VRLFunctionExample(
+                "Split string",
+                "split(\"foobar\", \"b\")",
+                "[\"foo\",\"ar\"]",
+                false
+            ),
+            VRLFunctionExample(
+                "Split regex",
+                "split(\"barbaz\", r'ba')",
+                "[\"\",\"r\",\"z\"]",
+                false
+            )
+        )
     ),
     "split_path" to VRLFunction(
         name = "split_path",
@@ -604,7 +1156,33 @@ val stringFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("array", "error")
+        returnTypes = setOf("array", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Split path with trailing slash",
+                "split_path(\"/home/user/\")",
+                "[\"/\",\"home\",\"user\"]",
+                false
+            ),
+            VRLFunctionExample(
+                "Split path from file path",
+                "split_path(\"/home/user\")",
+                "[\"/\",\"home\",\"user\"]",
+                false
+            ),
+            VRLFunctionExample(
+                "Split path from root",
+                "split_path(\"/\")",
+                "[\"/\"]",
+                false
+            ),
+            VRLFunctionExample(
+                "Empty path returns empty array",
+                "split_path(\"\")",
+                "[]",
+                false
+            )
+        )
     ),
     "starts_with" to VRLFunction(
         name = "starts_with",
@@ -632,7 +1210,27 @@ val stringFunctions = mapOf(
                 defaultValue = true
             )
         ),
-        returnTypes = setOf("boolean")
+        returnTypes = setOf("boolean"),
+        examples = listOf(
+            VRLFunctionExample(
+                "String starts with (case sensitive)",
+                "starts_with(\"The Needle In The Haystack\", \"The Needle\")",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "String starts with (case insensitive)",
+                "starts_with(\"The Needle In The Haystack\", \"the needle\", case_sensitive: false)",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "String starts with (case sensitive failure)",
+                "starts_with(\"foobar\", \"F\")",
+                "false",
+                false
+            )
+        )
     ),
     "strip_ansi_escape_codes" to VRLFunction(
         name = "strip_ansi_escape_codes",
@@ -647,7 +1245,8 @@ val stringFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf()
     ),
     "strip_whitespace" to VRLFunction(
         name = "strip_whitespace",
@@ -662,7 +1261,33 @@ val stringFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Strip whitespace",
+                "strip_whitespace(\"  A sentence.  \")",
+                "A sentence.",
+                false
+            ),
+            VRLFunctionExample(
+                "Start whitespace",
+                "strip_whitespace(\"  foobar\")",
+                "foobar",
+                false
+            ),
+            VRLFunctionExample(
+                "End whitespace",
+                "strip_whitespace(\"foo bar  \")",
+                "foo bar",
+                false
+            ),
+            VRLFunctionExample(
+                "Newlines",
+                "strip_whitespace(\"\\n\\nfoo bar\\n  \")",
+                "foo bar",
+                false
+            )
+        )
     ),
     "truncate" to VRLFunction(
         name = "truncate",
@@ -689,7 +1314,27 @@ val stringFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Truncate a string",
+                "truncate(\"A rather long sentence.\", limit: 11, suffix: \"...\")",
+                "A rather lo...",
+                false
+            ),
+            VRLFunctionExample(
+                "Truncate a string (custom suffix)",
+                "truncate(\"A rather long sentence.\", limit: 11, suffix: \"[TRUNCATED]\")",
+                "A rather lo[TRUNCATED]",
+                false
+            ),
+            VRLFunctionExample(
+                "Truncate",
+                "truncate(\"foobar\", 3)",
+                "foo",
+                false
+            )
+        )
     ),
     "upcase" to VRLFunction(
         name = "upcase",
@@ -704,6 +1349,14 @@ val stringFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Upcase a string",
+                "upcase(\"Hello, World!\")",
+                "HELLO, WORLD!",
+                false
+            )
+        )
     )
 )

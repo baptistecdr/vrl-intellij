@@ -8,7 +8,15 @@ val randomFunctions = mapOf(
         isFallible = false,
         isPure = true,
         arguments = listOf(),
-        returnTypes = setOf("boolean")
+        returnTypes = setOf("boolean"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Random boolean",
+                "is_boolean(random_bool())",
+                "true",
+                false
+            )
+        )
     ),
     "random_bytes" to VRLFunction(
         name = "random_bytes",
@@ -23,7 +31,21 @@ val randomFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Generate random base 64 encoded bytes",
+                "encode_base64(random_bytes(16))",
+                "LNu0BBgUbh7XAlXbjSOomQ==",
+                false
+            ),
+            VRLFunctionExample(
+                "Generate 16 random bytes",
+                "length(random_bytes(16))",
+                "16",
+                false
+            )
+        )
     ),
     "random_float" to VRLFunction(
         name = "random_float",
@@ -44,7 +66,15 @@ val randomFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("float", "error")
+        returnTypes = setOf("float", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Random float from 0.0 to 10.0, not including 10.0",
+                "f = random_float(0.0, 10.0)\nf >= 0 && f < 10",
+                "true",
+                false
+            )
+        )
     ),
     "random_int" to VRLFunction(
         name = "random_int",
@@ -65,7 +95,15 @@ val randomFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("integer", "error")
+        returnTypes = setOf("integer", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Random integer from 0 to 10, not including 10",
+                "i = random_int(0, 10)\ni >= 0 && i < 10",
+                "true",
+                false
+            )
+        )
     ),
     "uuid_from_friendly_id" to VRLFunction(
         name = "uuid_from_friendly_id",
@@ -80,7 +118,15 @@ val randomFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Convert a Friendly ID to a UUID",
+                "uuid_from_friendly_id!(\"3s87yEvnmkiPBMHsj8bwwc\")",
+                "7f41deed-d5e2-8b5e-7a13-ab4ff93cfad2",
+                false
+            )
+        )
     ),
     "uuid_v4" to VRLFunction(
         name = "uuid_v4",
@@ -88,7 +134,15 @@ val randomFunctions = mapOf(
         isFallible = false,
         isPure = true,
         arguments = listOf(),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Create a UUIDv4",
+                "uuid_v4()",
+                "1d262f4f-199b-458d-879f-05fd0a5f0683",
+                false
+            )
+        )
     ),
     "uuid_v7" to VRLFunction(
         name = "uuid_v7",
@@ -104,6 +158,26 @@ val randomFunctions = mapOf(
                 defaultValue = "`now()`"
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Create a UUIDv7 with implicit now()",
+                "uuid_v7()",
+                "0135ddb4-a444-794c-a7a2-088f260104c0",
+                false
+            ),
+            VRLFunctionExample(
+                "Create a UUIDv7 with explicit now()",
+                "uuid_v7(now())",
+                "0135ddb4-a444-794c-a7a2-088f260104c0",
+                false
+            ),
+            VRLFunctionExample(
+                "Create a UUIDv7 with custom timestamp",
+                "uuid_v7(t'2020-12-30T22:20:53.824727Z')",
+                "0176b5bd-5d19-794c-a7a2-088f260104c0",
+                false
+            )
+        )
     )
 )

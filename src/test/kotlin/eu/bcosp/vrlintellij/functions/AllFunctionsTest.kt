@@ -71,6 +71,19 @@ class AllFunctionsTest : TestCase() {
         }
     }
 
+    fun testExamplesAreWellFormed() {
+        // Not asserting a non-blank `result`: vector.dev itself renders an empty "Return" code
+        // block for at least one real example (get's "Returns null for unknown field", whose return
+        // value - `null` - the page's syntax highlighter renders as nothing), so an empty result
+        // mirrors real upstream content rather than indicating a parsing bug.
+        for ((name, function) in allFunctions) {
+            for (example in function.examples) {
+                assertTrue("$name has an example with a blank title", example.title.isNotBlank())
+                assertTrue("$name.'${example.title}' has a blank source", example.source.isNotBlank())
+            }
+        }
+    }
+
     fun testRequiredArgumentsPrecedeNoOptionalOnesTheyDependOn() {
         // Not a VRL requirement, but a sanity check that required args aren't accidentally
         // marked optional (or vice versa) by checking every required arg has no default value.

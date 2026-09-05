@@ -28,7 +28,39 @@ val metricsFunctions = mapOf(
                 defaultValue = "{ }"
             )
         ),
-        returnTypes = setOf("float", "null")
+        returnTypes = setOf("float", "null"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Sum vector internal metrics matching the name",
+                "aggregate_vector_metrics(\"sum\", \"utilization\")",
+                "0.5",
+                false
+            ),
+            VRLFunctionExample(
+                "Sum vector internal metrics matching the name and tags",
+                "aggregate_vector_metrics(\"sum\", \"utilization\", tags: {\"component_id\": \"test\"})",
+                "0.5",
+                false
+            ),
+            VRLFunctionExample(
+                "Average of vector internal metrics matching the name",
+                "aggregate_vector_metrics(\"avg\", \"utilization\")",
+                "0.5",
+                false
+            ),
+            VRLFunctionExample(
+                "Max of vector internal metrics matching the name",
+                "aggregate_vector_metrics(\"max\", \"utilization\")",
+                "0.5",
+                false
+            ),
+            VRLFunctionExample(
+                "Min of vector internal metrics matching the name",
+                "aggregate_vector_metrics(\"min\", \"utilization\")",
+                "0.5",
+                false
+            )
+        )
     ),
     "find_vector_metrics" to VRLFunction(
         name = "find_vector_metrics",
@@ -50,7 +82,21 @@ val metricsFunctions = mapOf(
                 defaultValue = "{ }"
             )
         ),
-        returnTypes = setOf("array")
+        returnTypes = setOf("array"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Find vector internal metrics matching the name",
+                "find_vector_metrics(\"utilization\")",
+                "[{\"kind\":\"absolute\",\"name\":\"utilization\",\"tags\":{\"component_id\":[\"test\"]},\"type\":\"gauge\",\"value\":0.5}]",
+                false
+            ),
+            VRLFunctionExample(
+                "Find vector internal metrics matching the name and tags",
+                "find_vector_metrics(\"utilization\", tags: {\"component_id\": \"test\"})",
+                "[{\"kind\":\"absolute\",\"name\":\"utilization\",\"tags\":{\"component_id\":[\"test\"]},\"type\":\"gauge\",\"value\":0.5}]",
+                false
+            )
+        )
     ),
     "get_vector_metric" to VRLFunction(
         name = "get_vector_metric",
@@ -72,6 +118,20 @@ val metricsFunctions = mapOf(
                 defaultValue = "{ }"
             )
         ),
-        returnTypes = setOf("object", "null")
+        returnTypes = setOf("object", "null"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Get a vector internal metric matching the name",
+                "get_vector_metric(\"utilization\")",
+                "{\n  \"kind\": \"absolute\",\n  \"name\": \"utilization\",\n  \"tags\": {\n    \"component_id\": [\n      \"test\"\n    ]\n  },\n  \"type\": \"gauge\",\n  \"value\": 0.5\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Get a vector internal metric matching the name and tags",
+                "get_vector_metric(\"utilization\", tags: {\"component_id\": \"test\"})",
+                "{\n  \"kind\": \"absolute\",\n  \"name\": \"utilization\",\n  \"tags\": {\n    \"component_id\": [\n      \"test\"\n    ]\n  },\n  \"type\": \"gauge\",\n  \"value\": 0.5\n}",
+                false
+            )
+        )
     )
 )

@@ -21,7 +21,27 @@ val debugFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("boolean", "error")
+        returnTypes = setOf("boolean", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Assertion (true) - with message",
+                "assert!(\"foo\" == \"foo\", message: \"\\\"foo\\\" must be \\\"foo\\\"!\")",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "Assertion (false) - with message",
+                "assert!(\"foo\" == \"bar\", message: \"\\\"foo\\\" must be \\\"foo\\\"!\")",
+                "function call error for \"assert\" at (0:60): \"foo\" must be \"foo\"!",
+                true
+            ),
+            VRLFunctionExample(
+                "Assertion (false) - simple",
+                "assert!(false)",
+                "function call error for \"assert\" at (0:14): assertion failed",
+                true
+            )
+        )
     ),
     "assert_eq" to VRLFunction(
         name = "assert_eq",
@@ -48,7 +68,27 @@ val debugFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("boolean")
+        returnTypes = setOf("boolean"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Successful assertion",
+                "assert_eq!(1, 1)",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "Unsuccessful assertion",
+                "assert_eq!(127, [1, 2, 3])",
+                "function call error for \"assert_eq\" at (0:26): assertion failed: 127 == [1, 2, 3]",
+                true
+            ),
+            VRLFunctionExample(
+                "Unsuccessful assertion with custom log message",
+                "assert_eq!(1, 0, message: \"Unequal integers\")",
+                "function call error for \"assert_eq\" at (0:45): Unequal integers",
+                true
+            )
+        )
     ),
     "log" to VRLFunction(
         name = "log",
@@ -77,6 +117,20 @@ val debugFunctions = mapOf(
                 defaultValue = 1
             )
         ),
-        returnTypes = setOf("null")
+        returnTypes = setOf("null"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Log a message",
+                "log(\"Hello, World!\", level: \"info\", rate_limit_secs: 60)",
+                "",
+                false
+            ),
+            VRLFunctionExample(
+                "Log an error",
+                ". = { \"field\": \"not an integer\" }\n_, err = to_int(.field)\nif err != null {\n    log(err, level: \"error\")\n}",
+                "",
+                false
+            )
+        )
     )
 )

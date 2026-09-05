@@ -57,7 +57,39 @@ val enumerateFunctions = mapOf(
                 defaultValue = false
             )
         ),
-        returnTypes = setOf("object", "array")
+        returnTypes = setOf("object", "array"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Compact an object with default parameters",
+                "compact({\"field1\": 1, \"field2\": \"\", \"field3\": [], \"field4\": null})",
+                "{\n  \"field1\": 1\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Compact an array with default parameters",
+                "compact([\"foo\", \"bar\", \"\", null, [], \"buzz\"])",
+                "[\"foo\",\"bar\",\"buzz\"]",
+                false
+            ),
+            VRLFunctionExample(
+                "Compact an array using nullish",
+                "compact([\"-\", \"   \", \"\\n\", null, true], nullish: true)",
+                "[true]",
+                false
+            ),
+            VRLFunctionExample(
+                "Compact a complex object with default parameters",
+                "compact({ \"a\": {}, \"b\": null, \"c\": [null], \"d\": \"\", \"e\": \"-\", \"f\": true })",
+                "{\n  \"e\": \"-\",\n  \"f\": true\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Compact a complex object using null: false",
+                "compact({ \"a\": {}, \"b\": null, \"c\": [null], \"d\": \"\", \"e\": \"-\", \"f\": true }, null: false)",
+                "{\n  \"b\": null,\n  \"c\": [\n    null\n  ],\n  \"e\": \"-\",\n  \"f\": true\n}",
+                false
+            )
+        )
     ),
     "filter" to VRLFunction(
         name = "filter",
@@ -72,7 +104,27 @@ val enumerateFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("object", "array")
+        returnTypes = setOf("object", "array"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Filter elements",
+                ". = { \"tags\": [\"foo\", \"bar\", \"foo\", \"baz\"] }\nfilter(array(.tags)) -> |_index, value| {\n    value != \"foo\"\n}",
+                "[\"bar\",\"baz\"]",
+                false
+            ),
+            VRLFunctionExample(
+                "Filter object",
+                "filter({ \"a\": 1, \"b\": 2 }) -> |key, _value| { key == \"a\" }",
+                "{\n  \"a\": 1\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Filter array",
+                "filter([1, 2]) -> |_index, value| { value < 2 }",
+                "[1]",
+                false
+            )
+        )
     ),
     "flatten" to VRLFunction(
         name = "flatten",
@@ -101,7 +153,33 @@ val enumerateFunctions = mapOf(
                 defaultValue = "[]"
             )
         ),
-        returnTypes = setOf("object", "array")
+        returnTypes = setOf("object", "array"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Flatten array",
+                "flatten([1, [2, 3, 4], [5, [6, 7], 8], 9])",
+                "[1,2,3,4,5,6,7,8,9]",
+                false
+            ),
+            VRLFunctionExample(
+                "Flatten object",
+                "flatten({\n    \"parent1\": {\n        \"child1\": 1,\n        \"child2\": 2\n    },\n    \"parent2\": {\n        \"child3\": 3\n    }\n})",
+                "{\n  \"parent1.child1\": 1,\n  \"parent1.child2\": 2,\n  \"parent2.child3\": 3\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Flatten object with custom separator",
+                "flatten({ \"foo\": { \"bar\": true }}, \"_\")",
+                "{\n  \"foo_bar\": true\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Flatten object with except",
+                "flatten({ \"parent\": { \"child\": 1 }, \"keep\": { \"nested\": 2 } }, except: [\"keep\"])",
+                "{\n  \"keep\": {\n    \"nested\": 2\n  },\n  \"parent.child\": 1\n}",
+                false
+            )
+        )
     ),
     "for_each" to VRLFunction(
         name = "for_each",
@@ -116,7 +194,27 @@ val enumerateFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("null")
+        returnTypes = setOf("null"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Tally elements",
+                ".tags = [\"foo\", \"bar\", \"foo\", \"baz\"]\ntally = {}\nfor_each(array(.tags)) -> |_index, value| {\n    count = int(get!(tally, [value])) ?? 0\n    tally = set!(tally, [value], count + 1)\n}\ntally",
+                "{\n  \"bar\": 1,\n  \"baz\": 1,\n  \"foo\": 2\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Iterate over an object",
+                "count = 0\nfor_each({ \"a\": 1, \"b\": 2 }) -> |_key, value| {\n    count = count + value\n}\ncount",
+                "3",
+                false
+            ),
+            VRLFunctionExample(
+                "Iterate over an array",
+                "count = 0\nfor_each([1, 2, 3]) -> |index, value| {\n    count = count + index + value\n}\ncount",
+                "9",
+                false
+            )
+        )
     ),
     "includes" to VRLFunction(
         name = "includes",
@@ -137,7 +235,27 @@ val enumerateFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean")
+        returnTypes = setOf("boolean"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Array includes",
+                "includes([\"apple\", \"orange\", \"banana\"], \"banana\")",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "Includes boolean",
+                "includes([1, true], true)",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "Doesn’t include",
+                "includes([\"foo\", \"bar\"], \"baz\")",
+                "false",
+                false
+            )
+        )
     ),
     "keys" to VRLFunction(
         name = "keys",
@@ -152,7 +270,15 @@ val enumerateFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("array")
+        returnTypes = setOf("array"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Get keys from the object",
+                "keys({\n    \"key1\": \"val1\",\n    \"key2\": \"val2\"\n})",
+                "[\"key1\",\"key2\"]",
+                false
+            )
+        )
     ),
     "length" to VRLFunction(
         name = "length",
@@ -167,7 +293,33 @@ val enumerateFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("integer")
+        returnTypes = setOf("integer"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Length (object)",
+                "length({\n    \"portland\": \"Trail Blazers\",\n    \"seattle\": \"Supersonics\"\n})",
+                "2",
+                false
+            ),
+            VRLFunctionExample(
+                "Length (nested object)",
+                "length({\n    \"home\": {\n        \"city\":  \"Portland\",\n        \"state\": \"Oregon\"\n    },\n    \"name\": \"Trail Blazers\",\n    \"mascot\": {\n        \"name\": \"Blaze the Trail Cat\"\n    }\n})",
+                "3",
+                false
+            ),
+            VRLFunctionExample(
+                "Length (array)",
+                "length([\"Trail Blazers\", \"Supersonics\", \"Grizzlies\"])",
+                "3",
+                false
+            ),
+            VRLFunctionExample(
+                "Length (string)",
+                "length(\"The Planet of the Apes Musical\")",
+                "30",
+                false
+            )
+        )
     ),
     "map_keys" to VRLFunction(
         name = "map_keys",
@@ -189,7 +341,27 @@ val enumerateFunctions = mapOf(
                 defaultValue = false
             )
         ),
-        returnTypes = setOf("object")
+        returnTypes = setOf("object"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Upcase keys",
+                ". = {\n    \"foo\": \"foo\",\n    \"bar\": \"bar\",\n    \"baz\": {\"nested key\": \"val\"}\n}\nmap_keys(.) -> |key| { upcase(key) }",
+                "{\n  \"BAR\": \"bar\",\n  \"BAZ\": {\n    \"nested key\": \"val\"\n  },\n  \"FOO\": \"foo\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "De-dot keys",
+                ". = {\n    \"labels\": {\n        \"app.kubernetes.io/name\": \"mysql\"\n    }\n}\nmap_keys(., recursive: true) -> |key| { replace(key, \".\", \"_\") }",
+                "{\n  \"labels\": {\n    \"app_kubernetes_io/name\": \"mysql\"\n  }\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Recursively map object keys",
+                "val = {\n    \"a\": 1,\n    \"b\": [{ \"c\": 2 }, { \"d\": 3 }],\n    \"e\": { \"f\": 4 }\n}\nmap_keys(val, recursive: true) -> |key| { upcase(key) }",
+                "{\n  \"A\": 1,\n  \"B\": [\n    {\n      \"C\": 2\n    },\n    {\n      \"D\": 3\n    }\n  ],\n  \"E\": {\n    \"F\": 4\n  }\n}",
+                false
+            )
+        )
     ),
     "map_values" to VRLFunction(
         name = "map_values",
@@ -211,7 +383,21 @@ val enumerateFunctions = mapOf(
                 defaultValue = false
             )
         ),
-        returnTypes = setOf("object", "array")
+        returnTypes = setOf("object", "array"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Upcase values",
+                ". = {\n    \"foo\": \"foo\",\n    \"bar\": \"bar\"\n}\nmap_values(.) -> |value| { upcase(value) }",
+                "{\n  \"bar\": \"BAR\",\n  \"foo\": \"FOO\"\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Recursively map object values",
+                "val = {\n    \"a\": 1,\n    \"b\": [{ \"c\": 2 }, { \"d\": 3 }],\n    \"e\": { \"f\": 4 }\n}\nmap_values(val, recursive: true) -> |value| {\n    if is_integer(value) { int!(value) + 1 } else { value }\n}",
+                "{\n  \"a\": 2,\n  \"b\": [\n    {\n      \"c\": 3\n    },\n    {\n      \"d\": 4\n    }\n  ],\n  \"e\": {\n    \"f\": 5\n  }\n}",
+                false
+            )
+        )
     ),
     "match_array" to VRLFunction(
         name = "match_array",
@@ -239,7 +425,33 @@ val enumerateFunctions = mapOf(
                 defaultValue = false
             )
         ),
-        returnTypes = setOf("boolean")
+        returnTypes = setOf("boolean"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Match at least one element",
+                "match_array([\"foobar\", \"bazqux\"], r'foo')",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "Match all elements",
+                "match_array([\"foo\", \"foobar\", \"barfoo\"], r'foo', all: true)",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "No matches",
+                "match_array([\"bazqux\", \"xyz\"], r'foo')",
+                "false",
+                false
+            ),
+            VRLFunctionExample(
+                "Not all elements match",
+                "match_array([\"foo\", \"foobar\", \"baz\"], r'foo', all: true)",
+                "false",
+                false
+            )
+        )
     ),
     "strlen" to VRLFunction(
         name = "strlen",
@@ -254,7 +466,15 @@ val enumerateFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("integer")
+        returnTypes = setOf("integer"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Count Unicode scalar values",
+                "strlen(\"ñandú\")",
+                "5",
+                false
+            )
+        )
     ),
     "tally" to VRLFunction(
         name = "tally",
@@ -269,7 +489,15 @@ val enumerateFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("object")
+        returnTypes = setOf("object"),
+        examples = listOf(
+            VRLFunctionExample(
+                "tally",
+                "tally!([\"foo\", \"bar\", \"foo\", \"baz\"])",
+                "{\n  \"bar\": 1,\n  \"baz\": 1,\n  \"foo\": 2\n}",
+                false
+            )
+        )
     ),
     "tally_value" to VRLFunction(
         name = "tally_value",
@@ -290,7 +518,15 @@ val enumerateFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("integer")
+        returnTypes = setOf("integer"),
+        examples = listOf(
+            VRLFunctionExample(
+                "count matching values",
+                "tally_value([\"foo\", \"bar\", \"foo\", \"baz\"], \"foo\")",
+                "2",
+                false
+            )
+        )
     ),
     "unflatten" to VRLFunction(
         name = "unflatten",
@@ -319,7 +555,39 @@ val enumerateFunctions = mapOf(
                 defaultValue = true
             )
         ),
-        returnTypes = setOf("object")
+        returnTypes = setOf("object"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Unflatten",
+                "unflatten({\n    \"foo.bar.baz\": true,\n    \"foo.bar.qux\": false,\n    \"foo.quux\": 42\n})",
+                "{\n  \"foo\": {\n    \"bar\": {\n      \"baz\": true,\n      \"qux\": false\n    },\n    \"quux\": 42\n  }\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Unflatten recursively",
+                "unflatten({\n    \"flattened.parent\": {\n        \"foo.bar\": true,\n        \"foo.baz\": false\n    }\n})",
+                "{\n  \"flattened\": {\n    \"parent\": {\n      \"foo\": {\n        \"bar\": true,\n        \"baz\": false\n      }\n    }\n  }\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Unflatten non-recursively",
+                "unflatten({\n    \"flattened.parent\": {\n        \"foo.bar\": true,\n        \"foo.baz\": false\n    }\n}, recursive: false)",
+                "{\n  \"flattened\": {\n    \"parent\": {\n      \"foo.bar\": true,\n      \"foo.baz\": false\n    }\n  }\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Ignore inconsistent keys values",
+                "unflatten({\n    \"a\": 3,\n    \"a.b\": 2,\n    \"a.c\": 4\n})",
+                "{\n  \"a\": {\n    \"b\": 2,\n    \"c\": 4\n  }\n}",
+                false
+            ),
+            VRLFunctionExample(
+                "Unflatten with custom separator",
+                "unflatten({ \"foo_bar\": true }, \"_\")",
+                "{\n  \"foo\": {\n    \"bar\": true\n  }\n}",
+                false
+            )
+        )
     ),
     "unique" to VRLFunction(
         name = "unique",
@@ -334,7 +602,15 @@ val enumerateFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("array")
+        returnTypes = setOf("array"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Unique",
+                "unique([\"foo\", \"bar\", \"foo\", \"baz\"])",
+                "[\"foo\",\"bar\",\"baz\"]",
+                false
+            )
+        )
     ),
     "values" to VRLFunction(
         name = "values",
@@ -349,6 +625,20 @@ val enumerateFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("array")
+        returnTypes = setOf("array"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Get values from the object",
+                "values({\"key1\": \"val1\", \"key2\": \"val2\"})",
+                "[\"val1\",\"val2\"]",
+                false
+            ),
+            VRLFunctionExample(
+                "Get values from a complex object",
+                "values({\"key1\": \"val1\", \"key2\": [1, 2, 3], \"key3\": {\"foo\": \"bar\"}})",
+                "[\"val1\",[1,2,3],{\"foo\":\"bar\"}]",
+                false
+            )
+        )
     )
 )

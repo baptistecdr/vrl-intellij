@@ -15,7 +15,123 @@ val coerceFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean", "error")
+        returnTypes = setOf("boolean", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Coerce to a Boolean (string)",
+                "to_bool!(\"yes\")",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "Coerce to a Boolean (float)",
+                "to_bool(0.0)",
+                "false",
+                false
+            ),
+            VRLFunctionExample(
+                "Coerce to a Boolean (int)",
+                "to_bool(0)",
+                "false",
+                false
+            ),
+            VRLFunctionExample(
+                "Coerce to a Boolean (null)",
+                "to_bool(null)",
+                "false",
+                false
+            ),
+            VRLFunctionExample(
+                "Coerce to a Boolean (Boolean)",
+                "to_bool(true)",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "Integer (other)",
+                "to_bool(2)",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "Float (other)",
+                "to_bool(5.6)",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "False",
+                "to_bool(false)",
+                "false",
+                false
+            ),
+            VRLFunctionExample(
+                "True string",
+                "to_bool!(s'true')",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "Y string",
+                "to_bool!(s'y')",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "Non-zero integer string",
+                "to_bool!(s'1')",
+                "true",
+                false
+            ),
+            VRLFunctionExample(
+                "False string",
+                "to_bool!(s'false')",
+                "false",
+                false
+            ),
+            VRLFunctionExample(
+                "No string",
+                "to_bool!(s'no')",
+                "false",
+                false
+            ),
+            VRLFunctionExample(
+                "N string",
+                "to_bool!(s'n')",
+                "false",
+                false
+            ),
+            VRLFunctionExample(
+                "Invalid string",
+                "to_bool!(s'foobar')",
+                "function call error for \"to_bool\" at (0:19): Invalid boolean value \"foobar\"",
+                true
+            ),
+            VRLFunctionExample(
+                "Timestamp",
+                "to_bool!(t'2020-01-01T00:00:00Z')",
+                "function call error for \"to_bool\" at (0:33): unable to coerce timestamp into boolean",
+                true
+            ),
+            VRLFunctionExample(
+                "Array",
+                "to_bool!([])",
+                "function call error for \"to_bool\" at (0:12): unable to coerce array into boolean",
+                true
+            ),
+            VRLFunctionExample(
+                "Object",
+                "to_bool!({})",
+                "function call error for \"to_bool\" at (0:12): unable to coerce object into boolean",
+                true
+            ),
+            VRLFunctionExample(
+                "Regex",
+                "to_bool!(r'foo')",
+                "function call error for \"to_bool\" at (0:16): unable to coerce regex into boolean",
+                true
+            )
+        )
     ),
     "to_float" to VRLFunction(
         name = "to_float",
@@ -30,7 +146,75 @@ val coerceFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("float", "error")
+        returnTypes = setOf("float", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Coerce to a float",
+                "to_float!(\"3.145\")",
+                "3.145",
+                false
+            ),
+            VRLFunctionExample(
+                "Coerce to a float (timestamp)",
+                "to_float(t'2020-12-30T22:20:53.824727Z')",
+                "1609366853.824727",
+                false
+            ),
+            VRLFunctionExample(
+                "Integer",
+                "to_float(5)",
+                "5",
+                false
+            ),
+            VRLFunctionExample(
+                "Float",
+                "to_float(5.6)",
+                "5.6",
+                false
+            ),
+            VRLFunctionExample(
+                "True",
+                "to_float(true)",
+                "1",
+                false
+            ),
+            VRLFunctionExample(
+                "False",
+                "to_float(false)",
+                "0",
+                false
+            ),
+            VRLFunctionExample(
+                "Null",
+                "to_float(null)",
+                "0",
+                false
+            ),
+            VRLFunctionExample(
+                "Invalid string",
+                "to_float!(s'foobar')",
+                "function call error for \"to_float\" at (0:20): Invalid floating point number \"foobar\": invalid float literal",
+                true
+            ),
+            VRLFunctionExample(
+                "Array",
+                "to_float!([])",
+                "function call error for \"to_float\" at (0:13): unable to coerce array into float",
+                true
+            ),
+            VRLFunctionExample(
+                "Object",
+                "to_float!({})",
+                "function call error for \"to_float\" at (0:13): unable to coerce object into float",
+                true
+            ),
+            VRLFunctionExample(
+                "Regex",
+                "to_float!(r'foo')",
+                "function call error for \"to_float\" at (0:17): unable to coerce regex into float",
+                true
+            )
+        )
     ),
     "to_int" to VRLFunction(
         name = "to_int",
@@ -45,7 +229,75 @@ val coerceFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("integer", "error")
+        returnTypes = setOf("integer", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Coerce to an int (string)",
+                "to_int!(\"2\")",
+                "2",
+                false
+            ),
+            VRLFunctionExample(
+                "Coerce to an int (timestamp)",
+                "to_int(t'2020-12-30T22:20:53.824727Z')",
+                "1609366853",
+                false
+            ),
+            VRLFunctionExample(
+                "Integer",
+                "to_int(5)",
+                "5",
+                false
+            ),
+            VRLFunctionExample(
+                "Float",
+                "to_int(5.6)",
+                "5",
+                false
+            ),
+            VRLFunctionExample(
+                "True",
+                "to_int(true)",
+                "1",
+                false
+            ),
+            VRLFunctionExample(
+                "False",
+                "to_int(false)",
+                "0",
+                false
+            ),
+            VRLFunctionExample(
+                "Null",
+                "to_int(null)",
+                "0",
+                false
+            ),
+            VRLFunctionExample(
+                "Invalid string",
+                "to_int!(s'foobar')",
+                "function call error for \"to_int\" at (0:18): Invalid integer \"foobar\": invalid digit found in string",
+                true
+            ),
+            VRLFunctionExample(
+                "Array",
+                "to_int!([])",
+                "function call error for \"to_int\" at (0:11): unable to coerce array into integer",
+                true
+            ),
+            VRLFunctionExample(
+                "Object",
+                "to_int!({})",
+                "function call error for \"to_int\" at (0:11): unable to coerce object into integer",
+                true
+            ),
+            VRLFunctionExample(
+                "Regex",
+                "to_int!(r'foo')",
+                "function call error for \"to_int\" at (0:15): unable to coerce regex into integer",
+                true
+            )
+        )
     ),
     "to_regex" to VRLFunction(
         name = "to_regex",
@@ -60,7 +312,15 @@ val coerceFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("regex", "error")
+        returnTypes = setOf("regex", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Coerce to a regex",
+                "to_regex!(\"^foo\$\")",
+                "r'^foo\$'",
+                false
+            )
+        )
     ),
     "to_string" to VRLFunction(
         name = "to_string",
@@ -75,6 +335,68 @@ val coerceFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Coerce to a string (Boolean)",
+                "to_string(true)",
+                "s'true'",
+                false
+            ),
+            VRLFunctionExample(
+                "Coerce to a string (int)",
+                "to_string(52)",
+                "s'52'",
+                false
+            ),
+            VRLFunctionExample(
+                "Coerce to a string (float)",
+                "to_string(52.2)",
+                "s'52.2'",
+                false
+            ),
+            VRLFunctionExample(
+                "String",
+                "to_string(s'foo')",
+                "foo",
+                false
+            ),
+            VRLFunctionExample(
+                "False",
+                "to_string(false)",
+                "s'false'",
+                false
+            ),
+            VRLFunctionExample(
+                "Null",
+                "to_string(null)",
+                "",
+                false
+            ),
+            VRLFunctionExample(
+                "Timestamp",
+                "to_string(t'2020-01-01T00:00:00Z')",
+                "2020-01-01T00:00:00Z",
+                false
+            ),
+            VRLFunctionExample(
+                "Array",
+                "to_string!([])",
+                "function call error for \"to_string\" at (0:14): unable to coerce array into string",
+                true
+            ),
+            VRLFunctionExample(
+                "Object",
+                "to_string!({})",
+                "function call error for \"to_string\" at (0:14): unable to coerce object into string",
+                true
+            ),
+            VRLFunctionExample(
+                "Regex",
+                "to_string!(r'foo')",
+                "function call error for \"to_string\" at (0:18): unable to coerce regex into string",
+                true
+            )
+        )
     )
 )

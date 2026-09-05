@@ -15,7 +15,21 @@ val codecFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Decode Base16 data",
+                "decode_base16!(\"736F6D6520737472696E672076616C7565\")",
+                "some string value",
+                false
+            ),
+            VRLFunctionExample(
+                "Decode longer Base16 data",
+                "decode_base16!(\"796f752068617665207375636365737366756c6c79206465636f646564206d65\")",
+                "you have successfully decoded me",
+                false
+            )
+        )
     ),
     "decode_base64" to VRLFunction(
         name = "decode_base64",
@@ -37,7 +51,21 @@ val codecFunctions = mapOf(
                 defaultValue = "standard"
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Decode Base64 data (default)",
+                "decode_base64!(\"eW91IGhhdmUgc3VjY2Vzc2Z1bGx5IGRlY29kZWQgbWU=\")",
+                "you have successfully decoded me",
+                false
+            ),
+            VRLFunctionExample(
+                "Decode Base64 data (URL safe)",
+                "decode_base64!(\"eW91IGNhbid0IG1ha2UgeW91ciBoZWFydCBmZWVsIHNvbWV0aGluZyBpdCB3b24ndA==\", charset: \"url_safe\")",
+                "you can't make your heart feel something it won't",
+                false
+            )
+        )
     ),
     "decode_charset" to VRLFunction(
         name = "decode_charset",
@@ -58,7 +86,27 @@ val codecFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Decode EUC-KR string",
+                "decode_charset!(decode_base64!(\"vsiz58fPvLy/5A==\"), \"euc-kr\")",
+                "안녕하세요",
+                false
+            ),
+            VRLFunctionExample(
+                "Decode EUC-JP string",
+                "decode_charset!(decode_base64!(\"pLOk86TLpMGkzw==\"), \"euc-jp\")",
+                "こんにちは",
+                false
+            ),
+            VRLFunctionExample(
+                "Decode GB2312 string",
+                "decode_charset!(decode_base64!(\"xOO6ww==\"), \"gb2312\")",
+                "你好",
+                false
+            )
+        )
     ),
     "decode_gzip" to VRLFunction(
         name = "decode_gzip",
@@ -73,7 +121,15 @@ val codecFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Decode Gzip data",
+                "decode_gzip!(decode_base64!(\"H4sIAB8BymMAAyvISU0sTlVISU3OT0lVyE0FAJsZ870QAAAA\"))",
+                "please decode me",
+                false
+            )
+        )
     ),
     "decode_lz4" to VRLFunction(
         name = "decode_lz4",
@@ -102,7 +158,21 @@ val codecFunctions = mapOf(
                 defaultValue = false
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "LZ4 block with prepended size",
+                "decode_lz4!(decode_base64!(\"LAAAAPAdVGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIDEzIGxhenkgZG9ncy4=\"), prepended_size: true)",
+                "The quick brown fox jumps over 13 lazy dogs.",
+                false
+            ),
+            VRLFunctionExample(
+                "Decode Lz4 data without prepended size.",
+                "decode_lz4!(decode_base64!(\"BCJNGGBAgiwAAIBUaGUgcXVpY2sgYnJvd24gZm94IGp1bXBzIG92ZXIgMTMgbGF6eSBkb2dzLgAAAAA=\"))",
+                "The quick brown fox jumps over 13 lazy dogs.",
+                false
+            )
+        )
     ),
     "decode_mime_q" to VRLFunction(
         name = "decode_mime_q",
@@ -117,7 +187,27 @@ val codecFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Decode single encoded-word",
+                "decode_mime_q!(\"=?utf-8?b?SGVsbG8sIFdvcmxkIQ==?=\")",
+                "Hello, World!",
+                false
+            ),
+            VRLFunctionExample(
+                "Embedded",
+                "decode_mime_q!(\"From: =?utf-8?b?SGVsbG8sIFdvcmxkIQ==?= <=?utf-8?q?hello=5Fworld=40example=2ecom?=>\")",
+                "From: Hello, World! <hello_world@example.com>",
+                false
+            ),
+            VRLFunctionExample(
+                "Without charset",
+                "decode_mime_q!(\"?b?SGVsbG8sIFdvcmxkIQ==\")",
+                "Hello, World!",
+                false
+            )
+        )
     ),
     "decode_percent" to VRLFunction(
         name = "decode_percent",
@@ -132,7 +222,15 @@ val codecFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Percent decode a value",
+                "decode_percent(\"foo%20bar%3F\")",
+                "foo bar?",
+                false
+            )
+        )
     ),
     "decode_punycode" to VRLFunction(
         name = "decode_punycode",
@@ -154,7 +252,27 @@ val codecFunctions = mapOf(
                 defaultValue = true
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Decode a punycode encoded internationalized domain name",
+                "decode_punycode!(\"www.xn--caf-dma.com\")",
+                "www.café.com",
+                false
+            ),
+            VRLFunctionExample(
+                "Decode an ASCII only string",
+                "decode_punycode!(\"www.cafe.com\")",
+                "www.cafe.com",
+                false
+            ),
+            VRLFunctionExample(
+                "Ignore validation",
+                "decode_punycode!(\"xn--8hbb.xn--fiba.xn--8hbf.xn--eib.\", validate: false)",
+                "١٠.٦٦.٣٠.٥.",
+                false
+            )
+        )
     ),
     "decode_snappy" to VRLFunction(
         name = "decode_snappy",
@@ -169,7 +287,15 @@ val codecFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Decode Snappy data",
+                "decode_snappy!(decode_base64!(\"LKxUaGUgcXVpY2sgYnJvd24gZm94IGp1bXBzIG92ZXIgMTMgbGF6eSBkb2dzLg==\"))",
+                "The quick brown fox jumps over 13 lazy dogs.",
+                false
+            )
+        )
     ),
     "decode_zlib" to VRLFunction(
         name = "decode_zlib",
@@ -184,7 +310,15 @@ val codecFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Decode Zlib data",
+                "decode_zlib!(decode_base64!(\"eJxLzUvOT0mNz00FABI5A6A=\"))",
+                "encode_me",
+                false
+            )
+        )
     ),
     "decode_zstd" to VRLFunction(
         name = "decode_zstd",
@@ -199,7 +333,15 @@ val codecFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Decode Zstd data",
+                "decode_zstd!(decode_base64!(\"KLUv/QBY/QEAYsQOFKClbQBedqXsb96EWDax/f/F/z+gNU4ZTInaUeAj82KqPFjUzKqhcfDqAIsLvAsnY1bI/N2mHzDixRQA\"))",
+                "you_have_successfully_decoded_me.congratulations.you_are_breathtaking.",
+                false
+            )
+        )
     ),
     "encode_base16" to VRLFunction(
         name = "encode_base16",
@@ -214,7 +356,15 @@ val codecFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Encode to Base16",
+                "encode_base16(\"some string value\")",
+                "736f6d6520737472696e672076616c7565",
+                false
+            )
+        )
     ),
     "encode_base64" to VRLFunction(
         name = "encode_base64",
@@ -243,7 +393,33 @@ val codecFunctions = mapOf(
                 defaultValue = "standard"
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Encode to Base64 (default)",
+                "encode_base64(\"please encode me\")",
+                "cGxlYXNlIGVuY29kZSBtZQ==",
+                false
+            ),
+            VRLFunctionExample(
+                "Encode to Base64 (without padding)",
+                "encode_base64(\"please encode me, no padding though\", padding: false)",
+                "cGxlYXNlIGVuY29kZSBtZSwgbm8gcGFkZGluZyB0aG91Z2g",
+                false
+            ),
+            VRLFunctionExample(
+                "Encode to Base64 (URL safe)",
+                "encode_base64(\"please encode me, but safe for URLs\", charset: \"url_safe\")",
+                "cGxlYXNlIGVuY29kZSBtZSwgYnV0IHNhZmUgZm9yIFVSTHM=",
+                false
+            ),
+            VRLFunctionExample(
+                "Encode to Base64 (without padding and URL safe)",
+                "encode_base64(\"some string value\", padding: false, charset: \"url_safe\")",
+                "c29tZSBzdHJpbmcgdmFsdWU",
+                false
+            )
+        )
     ),
     "encode_charset" to VRLFunction(
         name = "encode_charset",
@@ -264,7 +440,27 @@ val codecFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Encode UTF8 string to EUC-KR",
+                "encode_base64(encode_charset!(\"안녕하세요\", \"euc-kr\"))",
+                "vsiz58fPvLy/5A==",
+                false
+            ),
+            VRLFunctionExample(
+                "Encode UTF8 string to EUC-JP",
+                "encode_base64(encode_charset!(\"こんにちは\", \"euc-jp\"))",
+                "pLOk86TLpMGkzw==",
+                false
+            ),
+            VRLFunctionExample(
+                "Encode UTF8 string to GB2312",
+                "encode_base64(encode_charset!(\"你好\", \"gb2312\"))",
+                "xOO6ww==",
+                false
+            )
+        )
     ),
     "encode_csv" to VRLFunction(
         name = "encode_csv",
@@ -286,7 +482,27 @@ val codecFunctions = mapOf(
                 defaultValue = ","
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Encode object to a single CSV formatted row",
+                "encode_csv!([\"foo\",\"bar\",\"foo \\\", bar\"])",
+                "foo,bar,\"foo \"\", bar\"",
+                false
+            ),
+            VRLFunctionExample(
+                "Encode object to a single CSV formatted row with custom delimiter",
+                "encode_csv!([\"foo\",\"bar\"], delimiter: \" \")",
+                "foo bar",
+                false
+            ),
+            VRLFunctionExample(
+                "Encode object to a single CSV formatted row with linebreaks",
+                "encode_csv!([\"line\", \"with_linebreak\", \"here\\n\", \"and\", \"\\nhere\"])",
+                "line,with_linebreak,\"here\n\",and,\"\nhere\"",
+                false
+            )
+        )
     ),
     "encode_gzip" to VRLFunction(
         name = "encode_gzip",
@@ -308,7 +524,15 @@ val codecFunctions = mapOf(
                 defaultValue = 6
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Encode to Gzip",
+                "encode_base64(encode_gzip(\"please encode me\"))",
+                "H4sIAAAAAAAA/yvISU0sTlVIzUvOT0lVyE0FAI4R4vcQAAAA",
+                false
+            )
+        )
     ),
     "encode_json" to VRLFunction(
         name = "encode_json",
@@ -330,7 +554,21 @@ val codecFunctions = mapOf(
                 defaultValue = false
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Encode object to JSON",
+                "encode_json({\"field\": \"value\", \"another\": [1,2,3]})",
+                "s'{\"another\":[1,2,3],\"field\":\"value\"}'",
+                false
+            ),
+            VRLFunctionExample(
+                "Encode object to as pretty-printed JSON",
+                "encode_json({\"field\": \"value\", \"another\": [1,2,3]}, true)",
+                "{\n  \"another\": [\n    1,\n    2,\n    3\n  ],\n  \"field\": \"value\"\n}",
+                false
+            )
+        )
     ),
     "encode_key_value" to VRLFunction(
         name = "encode_key_value",
@@ -373,7 +611,45 @@ val codecFunctions = mapOf(
                 defaultValue = false
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Encode with default delimiters (no ordering)",
+                "encode_key_value(\n    {\n        \"ts\": \"2021-06-05T17:20:00Z\",\n        \"msg\": \"This is a message\",\n        \"lvl\": \"info\"\n    }\n)",
+                "lvl=info msg=\"This is a message\" ts=2021-06-05T17:20:00Z",
+                false
+            ),
+            VRLFunctionExample(
+                "Encode with default delimiters (fields ordering)",
+                "encode_key_value!(\n    {\n        \"ts\": \"2021-06-05T17:20:00Z\",\n        \"msg\": \"This is a message\",\n        \"lvl\": \"info\",\n        \"log_id\": 12345\n    },\n    [\"ts\", \"lvl\", \"msg\"]\n)",
+                "ts=2021-06-05T17:20:00Z lvl=info msg=\"This is a message\" log_id=12345",
+                false
+            ),
+            VRLFunctionExample(
+                "Encode with default delimiters (nested fields)",
+                "encode_key_value(\n    {\n        \"agent\": {\"name\": \"foo\"},\n        \"log\": {\"file\": {\"path\": \"my.log\"}},\n        \"event\": \"log\"\n    }\n)",
+                "agent.name=foo event=log log.file.path=my.log",
+                false
+            ),
+            VRLFunctionExample(
+                "Encode with default delimiters (nested fields ordering)",
+                "encode_key_value!(\n    {\n        \"agent\": {\"name\": \"foo\"},\n        \"log\": {\"file\": {\"path\": \"my.log\"}},\n        \"event\": \"log\"\n    },\n    [\"event\", \"log.file.path\", \"agent.name\"])",
+                "event=log log.file.path=my.log agent.name=foo",
+                false
+            ),
+            VRLFunctionExample(
+                "Encode with custom delimiters (no ordering)",
+                "encode_key_value(\n    {\"ts\": \"2021-06-05T17:20:00Z\", \"msg\": \"This is a message\", \"lvl\": \"info\"},\n    field_delimiter: \",\",\n    key_value_delimiter: \":\"\n)",
+                "lvl:info,msg:\"This is a message\",ts:2021-06-05T17:20:00Z",
+                false
+            ),
+            VRLFunctionExample(
+                "Encode with custom delimiters and flatten boolean",
+                "encode_key_value(\n    {\"ts\": \"2021-06-05T17:20:00Z\", \"msg\": \"This is a message\", \"lvl\": \"info\", \"beta\": true, \"dropped\": false},\n    field_delimiter: \",\",\n    key_value_delimiter: \":\",\n    flatten_boolean: true\n)",
+                "beta,lvl:info,msg:\"This is a message\",ts:2021-06-05T17:20:00Z",
+                false
+            )
+        )
     ),
     "encode_logfmt" to VRLFunction(
         name = "encode_logfmt",
@@ -395,7 +671,33 @@ val codecFunctions = mapOf(
                 defaultValue = "[]"
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Encode to logfmt (no ordering)",
+                "encode_logfmt({\"ts\": \"2021-06-05T17:20:00Z\", \"msg\": \"This is a message\", \"lvl\": \"info\"})",
+                "lvl=info msg=\"This is a message\" ts=2021-06-05T17:20:00Z",
+                false
+            ),
+            VRLFunctionExample(
+                "Encode to logfmt (fields ordering)",
+                "encode_logfmt!({\"ts\": \"2021-06-05T17:20:00Z\", \"msg\": \"This is a message\", \"lvl\": \"info\", \"log_id\": 12345}, [\"ts\", \"lvl\", \"msg\"])",
+                "ts=2021-06-05T17:20:00Z lvl=info msg=\"This is a message\" log_id=12345",
+                false
+            ),
+            VRLFunctionExample(
+                "Encode to logfmt (nested fields)",
+                "encode_logfmt({\"agent\": {\"name\": \"foo\"}, \"log\": {\"file\": {\"path\": \"my.log\"}}, \"event\": \"log\"})",
+                "agent.name=foo event=log log.file.path=my.log",
+                false
+            ),
+            VRLFunctionExample(
+                "Encode to logfmt (nested fields ordering)",
+                "encode_logfmt!({\"agent\": {\"name\": \"foo\"}, \"log\": {\"file\": {\"path\": \"my.log\"}}, \"event\": \"log\"}, [\"event\", \"log.file.path\", \"agent.name\"])",
+                "event=log log.file.path=my.log agent.name=foo",
+                false
+            )
+        )
     ),
     "encode_lz4" to VRLFunction(
         name = "encode_lz4",
@@ -417,7 +719,15 @@ val codecFunctions = mapOf(
                 defaultValue = true
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Encode to Lz4",
+                "encode_base64(encode_lz4!(\"The quick brown fox jumps over 13 lazy dogs.\", true))",
+                "LAAAAPAdVGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIDEzIGxhenkgZG9ncy4=",
+                false
+            )
+        )
     ),
     "encode_percent" to VRLFunction(
         name = "encode_percent",
@@ -439,7 +749,27 @@ val codecFunctions = mapOf(
                 defaultValue = "NON_ALPHANUMERIC"
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Percent encode all non-alphanumeric characters (default)",
+                "encode_percent(\"foo bar?\")",
+                "foo%20bar%3F",
+                false
+            ),
+            VRLFunctionExample(
+                "Percent encode only control characters",
+                "encode_percent(\"foo \\tbar\", ascii_set: \"CONTROLS\")",
+                "foo %09bar",
+                false
+            ),
+            VRLFunctionExample(
+                "Percent encode special characters",
+                "encode_percent(\"foo@bar?\")",
+                "foo%40bar%3F",
+                false
+            )
+        )
     ),
     "encode_proto" to VRLFunction(
         name = "encode_proto",
@@ -473,7 +803,15 @@ val codecFunctions = mapOf(
                 defaultValue = true
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Encode to proto",
+                "encode_base64(encode_proto!({ \"name\": \"someone\", \"phones\": [{\"number\": \"123456\"}]}, \"tests/data/protobuf/test_protobuf/v1/test_protobuf.desc\", \"test_protobuf.v1.Person\"))",
+                "Cgdzb21lb25lIggKBjEyMzQ1Ng==",
+                false
+            )
+        )
     ),
     "encode_punycode" to VRLFunction(
         name = "encode_punycode",
@@ -495,7 +833,33 @@ val codecFunctions = mapOf(
                 defaultValue = true
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Encode an internationalized domain name",
+                "encode_punycode!(\"www.café.com\")",
+                "www.xn--caf-dma.com",
+                false
+            ),
+            VRLFunctionExample(
+                "Encode an internationalized domain name with mixed case",
+                "encode_punycode!(\"www.CAFé.com\")",
+                "www.xn--caf-dma.com",
+                false
+            ),
+            VRLFunctionExample(
+                "Encode an ASCII only string",
+                "encode_punycode!(\"www.cafe.com\")",
+                "www.cafe.com",
+                false
+            ),
+            VRLFunctionExample(
+                "Ignore validation",
+                "encode_punycode!(\"xn--8hbb.xn--fiba.xn--8hbf.xn--eib.\", validate: false)",
+                "xn--8hbb.xn--fiba.xn--8hbf.xn--eib.",
+                false
+            )
+        )
     ),
     "encode_snappy" to VRLFunction(
         name = "encode_snappy",
@@ -510,7 +874,15 @@ val codecFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error")
+        returnTypes = setOf("string", "error"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Encode to Snappy",
+                "encode_base64(encode_snappy!(\"The quick brown fox jumps over 13 lazy dogs.\"))",
+                "LKxUaGUgcXVpY2sgYnJvd24gZm94IGp1bXBzIG92ZXIgMTMgbGF6eSBkb2dzLg==",
+                false
+            )
+        )
     ),
     "encode_zlib" to VRLFunction(
         name = "encode_zlib",
@@ -532,7 +904,15 @@ val codecFunctions = mapOf(
                 defaultValue = 6
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Encode to Zlib",
+                "encode_base64(encode_zlib(\"please encode me\"))",
+                "eJwryElNLE5VSM1Lzk9JVchNBQA0RQX7",
+                false
+            )
+        )
     ),
     "encode_zstd" to VRLFunction(
         name = "encode_zstd",
@@ -554,6 +934,14 @@ val codecFunctions = mapOf(
                 defaultValue = 3
             )
         ),
-        returnTypes = setOf("string")
+        returnTypes = setOf("string"),
+        examples = listOf(
+            VRLFunctionExample(
+                "Encode to Zstd",
+                "encode_base64(encode_zstd(\"please encode me\"))",
+                "KLUv/QBYgQAAcGxlYXNlIGVuY29kZSBtZQ==",
+                false
+            )
+        )
     )
 )
