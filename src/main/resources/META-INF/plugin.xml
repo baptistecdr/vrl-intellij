@@ -257,5 +257,15 @@
                 anchor="bottom"
                 factoryClass="eu.bcosp.vrlintellij.playground.VRLPlaygroundToolWindowFactory"
                 icon="/icons/vrl.svg"/>
+
+        <internalFileTemplate name="VRL File"/>
     </extensions>
+
+    <actions>
+        <action id="VRL.NewFile"
+                class="eu.bcosp.vrlintellij.actions.VRLCreateFileAction"
+                icon="/icons/vrl.svg">
+            <add-to-group group-id="NewGroup" anchor="last"/>
+        </action>
+    </actions>
 </idea-plugin>

@@ -73,6 +73,8 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
   sample event is remembered per file. Configure the path to the `vector` executable in
   *Settings/Preferences → Tools → VRL Playground* if it isn't on your `PATH`
 
+- Create new `.vrl` files from *File → New → VRL File*
+
 ## Quick start
 
 Install it from the [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/33859-vrl-vector-remap-language-),
