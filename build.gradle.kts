@@ -109,7 +109,7 @@ val generateStringTemplateLexer = tasks.register<GenerateLexerTask>("generateStr
     purgeOldFiles.set(true)
 }
 
-val generate by tasks.registering {
+val generate = tasks.register("generate") {
     outputs.dir(genOutputDir)
     dependsOn(generateSyntaxLexer, generateSyntaxParser, generateStringTemplateLexer)
 }
