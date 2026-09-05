@@ -59,6 +59,11 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
     - Unused variables, with a "Rename to `_`" quick fix
     - Unresolved variables, with a "did you mean" quick fix
     - Empty blocks (VRL disallows `{ }` with no statements)
+- VRL Playground tool window (*View → Tool Windows → VRL Playground*): run the currently open
+  script against a sample event using Vector's own [`vector vrl`](https://vector.dev/docs/reference/cli/#vrl)
+  subcommand, showing both the final expression's value and the resulting mutated event. The
+  sample event is remembered per file. Configure the path to the `vector` executable in
+  *Settings/Preferences → Tools → VRL Playground* if it isn't on your `PATH`
 
 ## Quick start
 
