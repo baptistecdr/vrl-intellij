@@ -263,6 +263,10 @@
         <liveTemplateContext contextId="VRL" implementation="eu.bcosp.vrlintellij.templates.VRLTemplateContextType"/>
 
         <defaultLiveTemplatesProvider implementation="eu.bcosp.vrlintellij.templates.VRLDefaultLiveTemplatesProvider"/>
+
+        <lang.smartEnterProcessor
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.smartenter.VRLSmartEnterProcessor"/>
     </extensions>
 
     <actions>
