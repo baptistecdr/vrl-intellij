@@ -76,6 +76,11 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
     - Unused variables, with a "Rename to `_`" quick fix
     - Unresolved variables, with a "did you mean" quick fix
     - Empty blocks (VRL disallows `{ }` with no statements)
+- Real compiler diagnostics (opt-in): runs the script through Vector's own
+  [`vector vrl`](https://vector.dev/docs/reference/cli/#vrl) compiler in the background and marks
+  whatever it reports as errors - a ground-truth check on top of this plugin's own inspections
+  above, which only approximate VRL's real type system. Off by default, since it spawns a `vector`
+  process on every edit; enable it in *Settings/Preferences → Tools → VRL Playground*
 - VRL Playground tool window (*View → Tool Windows → VRL Playground*): run the currently open
   script against a sample event using Vector's own [`vector vrl`](https://vector.dev/docs/reference/cli/#vrl)
   subcommand, showing both the final expression's value and the resulting mutated event. The

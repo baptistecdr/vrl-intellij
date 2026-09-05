@@ -32,6 +32,7 @@
             <li>Code folding, brace/bracket/quote matching, and line commenting</li>
             <li>Inline type hints on assignments, including VRL's error-destructuring form (<code>value, err = fallible_call()</code>)</li>
             <li>Inspections for unknown function names, invalid RFC 3339 timestamp literals, unhandled fallible function calls, invalid function-call arguments, argument type mismatches, unused variables, unresolved variables, and empty blocks</li>
+            <li>Real compiler diagnostics (opt-in): cross-checks the script against Vector's own <code>vector vrl</code> compiler in the background and marks whatever it reports as errors, on top of this plugin's own inspections</li>
             <li>VRL Playground tool window: run the current script against a sample event using Vector's own <code>vector vrl</code> subcommand, showing the resulting expression value and the mutated event</li>
         </ul>
         <p>
@@ -73,6 +74,10 @@
         <annotator
                 language="VRL"
                 implementationClass="eu.bcosp.vrlintellij.annotators.VRLClosureParameterAnnotator"/>
+
+        <externalAnnotator
+                language="VRL"
+                implementationClass="eu.bcosp.vrlintellij.diagnostics.VRLExternalAnnotator"/>
 
         <completion.contributor
                 language="VRL"
