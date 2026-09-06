@@ -36,33 +36,7 @@ val systemFunctions = mapOf(
                 defaultValue = "{ }"
             )
         ),
-        returnTypes = setOf("object"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Basic lookup",
-                "res = dns_lookup!(\"dns.google\")\n# reset non-static ttl so result is static\nres.answers = map_values(res.answers) -> |value| {\n  value.ttl = 600\n  value\n}\n# remove extra responses for example\nres.answers = filter(res.answers) -> |_, value| {\n    value.rData == \"8.8.8.8\"\n}\n# remove class since this is also dynamic\nres.additional = map_values(res.additional) -> |value| {\n    del(value.class)\n    value\n}\nres",
-                "{\n  \"additional\": [\n    {\n      \"domainName\": \"\",\n      \"rData\": \"OPT ...\",\n      \"recordType\": \"OPT\",\n      \"recordTypeId\": 41,\n      \"ttl\": 0\n    }\n  ],\n  \"answers\": [\n    {\n      \"class\": \"IN\",\n      \"domainName\": \"dns.google\",\n      \"rData\": \"8.8.8.8\",\n      \"recordType\": \"A\",\n      \"recordTypeId\": 1,\n      \"ttl\": 600\n    }\n  ],\n  \"authority\": [],\n  \"fullRcode\": 0,\n  \"header\": {\n    \"aa\": false,\n    \"ad\": false,\n    \"anCount\": 2,\n    \"arCount\": 1,\n    \"cd\": false,\n    \"nsCount\": 0,\n    \"opcode\": 0,\n    \"qdCount\": 1,\n    \"qr\": true,\n    \"ra\": true,\n    \"rcode\": 0,\n    \"rd\": true,\n    \"tc\": false\n  },\n  \"question\": [\n    {\n      \"class\": \"IN\",\n      \"domainName\": \"dns.google\",\n      \"questionType\": \"A\",\n      \"questionTypeId\": 1\n    }\n  ],\n  \"rcodeName\": \"NOERROR\"\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Custom class and qtype",
-                "res = dns_lookup!(\"dns.google\", class: \"IN\", qtype: \"A\")\n# reset non-static ttl so result is static\nres.answers = map_values(res.answers) -> |value| {\n  value.ttl = 600\n  value\n}\n# remove extra responses for example\nres.answers = filter(res.answers) -> |_, value| {\n    value.rData == \"8.8.8.8\"\n}\n# remove class since this is also dynamic\nres.additional = map_values(res.additional) -> |value| {\n    del(value.class)\n    value\n}\nres",
-                "{\n  \"additional\": [\n    {\n      \"domainName\": \"\",\n      \"rData\": \"OPT ...\",\n      \"recordType\": \"OPT\",\n      \"recordTypeId\": 41,\n      \"ttl\": 0\n    }\n  ],\n  \"answers\": [\n    {\n      \"class\": \"IN\",\n      \"domainName\": \"dns.google\",\n      \"rData\": \"8.8.8.8\",\n      \"recordType\": \"A\",\n      \"recordTypeId\": 1,\n      \"ttl\": 600\n    }\n  ],\n  \"authority\": [],\n  \"fullRcode\": 0,\n  \"header\": {\n    \"aa\": false,\n    \"ad\": false,\n    \"anCount\": 2,\n    \"arCount\": 1,\n    \"cd\": false,\n    \"nsCount\": 0,\n    \"opcode\": 0,\n    \"qdCount\": 1,\n    \"qr\": true,\n    \"ra\": true,\n    \"rcode\": 0,\n    \"rd\": true,\n    \"tc\": false\n  },\n  \"question\": [\n    {\n      \"class\": \"IN\",\n      \"domainName\": \"dns.google\",\n      \"questionType\": \"A\",\n      \"questionTypeId\": 1\n    }\n  ],\n  \"rcodeName\": \"NOERROR\"\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Custom options",
-                "res = dns_lookup!(\"dns.google\", options: {\"timeout\": 30, \"attempts\": 5})\nres.answers = map_values(res.answers) -> |value| {\n  value.ttl = 600\n  value\n}\n# remove extra responses for example\nres.answers = filter(res.answers) -> |_, value| {\n    value.rData == \"8.8.8.8\"\n}\n# remove class since this is also dynamic\nres.additional = map_values(res.additional) -> |value| {\n    del(value.class)\n    value\n}\nres",
-                "{\n  \"additional\": [\n    {\n      \"domainName\": \"\",\n      \"rData\": \"OPT ...\",\n      \"recordType\": \"OPT\",\n      \"recordTypeId\": 41,\n      \"ttl\": 0\n    }\n  ],\n  \"answers\": [\n    {\n      \"class\": \"IN\",\n      \"domainName\": \"dns.google\",\n      \"rData\": \"8.8.8.8\",\n      \"recordType\": \"A\",\n      \"recordTypeId\": 1,\n      \"ttl\": 600\n    }\n  ],\n  \"authority\": [],\n  \"fullRcode\": 0,\n  \"header\": {\n    \"aa\": false,\n    \"ad\": false,\n    \"anCount\": 2,\n    \"arCount\": 1,\n    \"cd\": false,\n    \"nsCount\": 0,\n    \"opcode\": 0,\n    \"qdCount\": 1,\n    \"qr\": true,\n    \"ra\": true,\n    \"rcode\": 0,\n    \"rd\": true,\n    \"tc\": false\n  },\n  \"question\": [\n    {\n      \"class\": \"IN\",\n      \"domainName\": \"dns.google\",\n      \"questionType\": \"A\",\n      \"questionTypeId\": 1\n    }\n  ],\n  \"rcodeName\": \"NOERROR\"\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Custom server",
-                "res = dns_lookup!(\"dns.google\", options: {\"servers\": [\"dns.quad9.net\"]})\nres.answers = map_values(res.answers) -> |value| {\n  value.ttl = 600\n  value\n}\n# remove extra responses for example\nres.answers = filter(res.answers) -> |_, value| {\n    value.rData == \"8.8.8.8\"\n}\n# remove class since this is also dynamic\nres.additional = map_values(res.additional) -> |value| {\n    del(value.class)\n    value\n}\nres",
-                "{\n  \"additional\": [\n    {\n      \"domainName\": \"\",\n      \"rData\": \"OPT ...\",\n      \"recordType\": \"OPT\",\n      \"recordTypeId\": 41,\n      \"ttl\": 0\n    }\n  ],\n  \"answers\": [\n    {\n      \"class\": \"IN\",\n      \"domainName\": \"dns.google\",\n      \"rData\": \"8.8.8.8\",\n      \"recordType\": \"A\",\n      \"recordTypeId\": 1,\n      \"ttl\": 600\n    }\n  ],\n  \"authority\": [],\n  \"fullRcode\": 0,\n  \"header\": {\n    \"aa\": false,\n    \"ad\": false,\n    \"anCount\": 2,\n    \"arCount\": 1,\n    \"cd\": false,\n    \"nsCount\": 0,\n    \"opcode\": 0,\n    \"qdCount\": 1,\n    \"qr\": true,\n    \"ra\": true,\n    \"rcode\": 0,\n    \"rd\": true,\n    \"tc\": false\n  },\n  \"question\": [\n    {\n      \"class\": \"IN\",\n      \"domainName\": \"dns.google\",\n      \"questionType\": \"A\",\n      \"questionTypeId\": 1\n    }\n  ],\n  \"rcodeName\": \"NOERROR\"\n}",
-                false
-            )
-        )
+        returnTypes = setOf("object")
     ),
     "get_env_var" to VRLFunction(
         name = "get_env_var",
@@ -77,15 +51,7 @@ val systemFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Get an environment variable",
-                "get_env_var!(\"HOME\")",
-                "/root",
-                false
-            )
-        )
+        returnTypes = setOf("string", "error")
     ),
     "get_hostname" to VRLFunction(
         name = "get_hostname",
@@ -93,15 +59,7 @@ val systemFunctions = mapOf(
         isFallible = true,
         isPure = true,
         arguments = listOf(),
-        returnTypes = setOf("string", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Get hostname",
-                "get_hostname!()",
-                "my-hostname",
-                false
-            )
-        )
+        returnTypes = setOf("string", "error")
     ),
     "get_timezone_name" to VRLFunction(
         name = "get_timezone_name",
@@ -109,15 +67,7 @@ val systemFunctions = mapOf(
         isFallible = true,
         isPure = true,
         arguments = listOf(),
-        returnTypes = setOf("string", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Get the IANA name of Vector’s timezone",
-                "get_timezone_name!()",
-                "UTC",
-                false
-            )
-        )
+        returnTypes = setOf("string", "error")
     ),
     "http_request" to VRLFunction(
         name = "http_request",
@@ -171,33 +121,7 @@ val systemFunctions = mapOf(
                 defaultValue = true
             )
         ),
-        returnTypes = setOf("string"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Basic HTTP request",
-                ". = parse_json!(http_request!(\"https://httpbin.org/get\"))\n\n# Redact the origin ip\n.origin = redact!(.origin, filters: [r'.*'], redactor: {\"type\": \"text\", \"replacement\": \"***\"})\n# Delete any ids in headers\n.headers = filter(object!(.headers)) -> |key, _value| { !contains(key, \"id\", false) }\n.",
-                "{\n  \"args\": {},\n  \"headers\": {\n    \"Accept\": \"*/*\",\n    \"Host\": \"httpbin.org\"\n  },\n  \"origin\": \"***\",\n  \"url\": \"https://httpbin.org/get\"\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "HTTP request with bearer token",
-                "parse_json!(http_request!(\"https://httpbin.org/bearer\", headers: {\"Authorization\": \"Bearer my_token\"}))",
-                "{\n  \"authenticated\": true,\n  \"token\": \"my_token\"\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "HTTP PUT request",
-                ". = parse_json!(http_request!(\"https://httpbin.org/put\", method: \"put\"))\n\n# Redact the origin ip\n.origin = redact!(.origin, filters: [r'.*'], redactor: {\"type\": \"text\", \"replacement\": \"***\"})\n# Delete any ids in headers\n.headers = filter(object!(.headers)) -> |key, _value| { !contains(key, \"id\", false) }\n.",
-                "{\n  \"args\": {},\n  \"data\": \"\",\n  \"files\": {},\n  \"form\": {},\n  \"headers\": {\n    \"Accept\": \"*/*\",\n    \"Content-Length\": \"0\",\n    \"Host\": \"httpbin.org\"\n  },\n  \"json\": null,\n  \"origin\": \"***\",\n  \"url\": \"https://httpbin.org/put\"\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "HTTP POST request with body",
-                ". = parse_json!(http_request!(\"https://httpbin.org/post\", method: \"post\", body: \"{\\\"data\\\":{\\\"hello\\\":\\\"world\\\"}}\"))\n\n# Redact the origin ip\n.origin = redact!(.origin, filters: [r'.*'], redactor: {\"type\": \"text\", \"replacement\": \"***\"})\n# Delete any ids in headers\n.headers = filter(object!(.headers)) -> |key, _value| { !contains(key, \"id\", false) }\n.",
-                "{\n  \"args\": {},\n  \"data\": \"{\\\"data\\\":{\\\"hello\\\":\\\"world\\\"}}\",\n  \"files\": {},\n  \"form\": {},\n  \"headers\": {\n    \"Accept\": \"*/*\",\n    \"Content-Length\": \"26\",\n    \"Host\": \"httpbin.org\"\n  },\n  \"json\": {\n    \"data\": {\n      \"hello\": \"world\"\n    }\n  },\n  \"origin\": \"***\",\n  \"url\": \"https://httpbin.org/post\"\n}",
-                false
-            )
-        )
+        returnTypes = setOf("string")
     ),
     "reverse_dns" to VRLFunction(
         name = "reverse_dns",
@@ -212,14 +136,6 @@ val systemFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Example",
-                "reverse_dns!(\"127.0.0.1\")",
-                "localhost",
-                false
-            )
-        )
+        returnTypes = setOf("string")
     )
 )

@@ -22,51 +22,7 @@ val pathFunctions = mapOf(
                 defaultValue = false
             )
         ),
-        returnTypes = setOf("any"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Delete a field",
-                ". = { \"foo\": \"bar\" }\ndel(.foo)",
-                "bar",
-                false
-            ),
-            VRLFunctionExample(
-                "Rename a field",
-                ". = { \"old\": \"foo\" }\n.new = del(.old)\n.",
-                "{\n  \"new\": \"foo\"\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Returns null for unknown field",
-                "del({\"foo\": \"bar\"}.baz)",
-                "",
-                false
-            ),
-            VRLFunctionExample(
-                "External target",
-                ". = { \"foo\": true, \"bar\": 10 }\ndel(.foo)\n.",
-                "{\n  \"bar\": 10\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Delete field from variable",
-                "var = { \"foo\": true, \"bar\": 10 }\ndel(var.foo)\nvar",
-                "{\n  \"bar\": 10\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Delete object field",
-                "var = { \"foo\": {\"nested\": true}, \"bar\": 10 }\ndel(var.foo.nested, false)\nvar",
-                "{\n  \"bar\": 10,\n  \"foo\": {}\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Compact object field",
-                "var = { \"foo\": {\"nested\": true}, \"bar\": 10 }\ndel(var.foo.nested, true)\nvar",
-                "{\n  \"bar\": 10\n}",
-                false
-            )
-        )
+        returnTypes = setOf("any")
     ),
     "exists" to VRLFunction(
         name = "exists",
@@ -81,27 +37,7 @@ val pathFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Exists (field)",
-                ". = { \"field\": 1 }\nexists(.field)",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Exists (array element)",
-                ". = { \"array\": [1, 2, 3] }\nexists(.array[2])",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Does not exist (field)",
-                "exists({ \"foo\": \"bar\"}.baz)",
-                "false",
-                false
-            )
-        )
+        returnTypes = setOf("boolean")
     ),
     "get" to VRLFunction(
         name = "get",
@@ -122,75 +58,7 @@ val pathFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("any", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Single-segment top-level field",
-                "get!(value: {\"foo\": \"bar\"}, path: [\"foo\"])",
-                "bar",
-                false
-            ),
-            VRLFunctionExample(
-                "Returns null for unknown field",
-                "get!(value: {\"foo\": \"bar\"}, path: [\"baz\"])",
-                "",
-                false
-            ),
-            VRLFunctionExample(
-                "Multi-segment nested field",
-                "get!(value: {\"foo\": { \"bar\": true }}, path: [\"foo\", \"bar\"])",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Array indexing",
-                "get!(value: [92, 42], path: [0])",
-                "92",
-                false
-            ),
-            VRLFunctionExample(
-                "Array indexing (negative)",
-                "get!(value: [\"foo\", \"bar\", \"baz\"], path: [-2])",
-                "bar",
-                false
-            ),
-            VRLFunctionExample(
-                "Nested indexing",
-                "get!(value: {\"foo\": { \"bar\": [92, 42] }}, path: [\"foo\", \"bar\", 1])",
-                "42",
-                false
-            ),
-            VRLFunctionExample(
-                "External target",
-                "get!(value: ., path: [\"foo\"])",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Variable",
-                "var = { \"foo\": true }\nget!(value: var, path: [\"foo\"])",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Missing index",
-                "get!(value: {\"foo\": { \"bar\": [92, 42] }}, path: [\"foo\", \"bar\", 1, -1])",
-                "",
-                false
-            ),
-            VRLFunctionExample(
-                "Invalid indexing",
-                "get!(value: [42], path: [\"foo\"])",
-                "",
-                false
-            ),
-            VRLFunctionExample(
-                "Invalid segment type",
-                "get!(value: {\"foo\": { \"bar\": [92, 42] }}, path: [\"foo\", true])",
-                "function call error for \"get\" at (0:62): path segment must be either string or integer, not boolean",
-                true
-            )
-        )
+        returnTypes = setOf("any", "error")
     ),
     "remove" to VRLFunction(
         name = "remove",
@@ -218,81 +86,7 @@ val pathFunctions = mapOf(
                 defaultValue = false
             )
         ),
-        returnTypes = setOf("object", "array", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Single-segment top-level field",
-                "remove!(value: { \"foo\": \"bar\" }, path: [\"foo\"])",
-                "{}",
-                false
-            ),
-            VRLFunctionExample(
-                "Remove unknown field",
-                "remove!(value: {\"foo\": \"bar\"}, path: [\"baz\"])",
-                "{\n  \"foo\": \"bar\"\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Multi-segment nested field",
-                "remove!(value: { \"foo\": { \"bar\": \"baz\" } }, path: [\"foo\", \"bar\"])",
-                "{\n  \"foo\": {}\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Array indexing",
-                "remove!(value: [\"foo\", \"bar\", \"baz\"], path: [-2])",
-                "[\"foo\",\"baz\"]",
-                false
-            ),
-            VRLFunctionExample(
-                "Compaction",
-                "remove!(value: { \"foo\": { \"bar\": [42], \"baz\": true } }, path: [\"foo\", \"bar\", 0], compact: true)",
-                "{\n  \"foo\": {\n    \"baz\": true\n  }\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Compact object",
-                "remove!(value: {\"foo\": { \"bar\": true }}, path: [\"foo\", \"bar\"], compact: true)",
-                "{}",
-                false
-            ),
-            VRLFunctionExample(
-                "Compact array",
-                "remove!(value: {\"foo\": [42], \"bar\": true }, path: [\"foo\", 0], compact: true)",
-                "{\n  \"bar\": true\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "External target",
-                "remove!(value: ., path: [\"foo\"])",
-                "{}",
-                false
-            ),
-            VRLFunctionExample(
-                "Variable",
-                "var = { \"foo\": true }\nremove!(value: var, path: [\"foo\"])",
-                "{}",
-                false
-            ),
-            VRLFunctionExample(
-                "Missing index",
-                "remove!(value: {\"foo\": { \"bar\": [92, 42] }}, path: [\"foo\", \"bar\", 1, -1])",
-                "{\n  \"foo\": {\n    \"bar\": [\n      92,\n      42\n    ]\n  }\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Invalid indexing",
-                "remove!(value: [42], path: [\"foo\"])",
-                "[42]",
-                false
-            ),
-            VRLFunctionExample(
-                "Invalid segment type",
-                "remove!(value: {\"foo\": { \"bar\": [92, 42] }}, path: [\"foo\", true])",
-                "function call error for \"remove\" at (0:65): path segment must be either string or integer, not boolean",
-                true
-            )
-        )
+        returnTypes = setOf("object", "array", "error")
     ),
     "set" to VRLFunction(
         name = "set",
@@ -319,62 +113,6 @@ val pathFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("object", "array", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Single-segment top-level field",
-                "set!(value: { \"foo\": \"bar\" }, path: [\"foo\"], data: \"baz\")",
-                "{\n  \"foo\": \"baz\"\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Multi-segment nested field",
-                "set!(value: { \"foo\": { \"bar\": \"baz\" } }, path: [\"foo\", \"bar\"], data: \"qux\")",
-                "{\n  \"foo\": {\n    \"bar\": \"qux\"\n  }\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Array",
-                "set!(value: [\"foo\", \"bar\", \"baz\"], path: [-2], data: 42)",
-                "[\"foo\",42,\"baz\"]",
-                false
-            ),
-            VRLFunctionExample(
-                "Nested fields",
-                "set!(value: {}, path: [\"foo\", \"bar\"], data: \"baz\")",
-                "{\n  \"foo\": {\n    \"bar\": \"baz\"\n  }\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Nested indexing",
-                "set!(value: {\"foo\": { \"bar\": [] }}, path: [\"foo\", \"bar\", 1], data: \"baz\")",
-                "{\n  \"foo\": {\n    \"bar\": [\n      null,\n      \"baz\"\n    ]\n  }\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "External target",
-                "set!(value: ., path: [\"bar\"], data: \"baz\")",
-                "{\n  \"bar\": \"baz\",\n  \"foo\": true\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Variable",
-                "var = { \"foo\": true }\nset!(value: var, path: [\"bar\"], data: \"baz\")",
-                "{\n  \"bar\": \"baz\",\n  \"foo\": true\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Invalid indexing",
-                "set!(value: [], path: [\"foo\"], data: \"baz\")",
-                "{\n  \"foo\": \"baz\"\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Invalid segment type",
-                "set!({\"foo\": { \"bar\": [92, 42] }}, [\"foo\", true], \"baz\")",
-                "function call error for \"set\" at (0:56): path segment must be either string or integer, not boolean",
-                true
-            )
-        )
+        returnTypes = setOf("object", "array", "error")
     )
 )

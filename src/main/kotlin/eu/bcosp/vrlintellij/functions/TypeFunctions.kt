@@ -15,27 +15,7 @@ val typeFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("array", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Declare an array type",
-                "array!(.value)",
-                "[1,2,3]",
-                false
-            ),
-            VRLFunctionExample(
-                "Valid array literal",
-                "array([1,2,3])",
-                "[1,2,3]",
-                false
-            ),
-            VRLFunctionExample(
-                "Invalid type",
-                "array!(true)",
-                "function call error for \"array\" at (0:12): expected array, got boolean",
-                true
-            )
-        )
+        returnTypes = setOf("array", "error")
     ),
     "bool" to VRLFunction(
         name = "bool",
@@ -50,27 +30,7 @@ val typeFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Valid Boolean",
-                "bool(false)",
-                "false",
-                false
-            ),
-            VRLFunctionExample(
-                "Invalid Boolean",
-                "bool!(42)",
-                "function call error for \"bool\" at (0:9): expected boolean, got integer",
-                true
-            ),
-            VRLFunctionExample(
-                "Valid Boolean from path",
-                "bool!(.value)",
-                "true",
-                false
-            )
-        )
+        returnTypes = setOf("boolean", "error")
     ),
     "float" to VRLFunction(
         name = "float",
@@ -85,27 +45,7 @@ val typeFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("float", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Declare a float type",
-                ". = { \"value\": 42.0 }\nfloat(.value)",
-                "42",
-                false
-            ),
-            VRLFunctionExample(
-                "Declare a float type (literal)",
-                "float(3.1415)",
-                "3.1415",
-                false
-            ),
-            VRLFunctionExample(
-                "Invalid float type",
-                "float!(true)",
-                "function call error for \"float\" at (0:12): expected float, got boolean",
-                true
-            )
-        )
+        returnTypes = setOf("float", "error")
     ),
     "int" to VRLFunction(
         name = "int",
@@ -120,27 +60,7 @@ val typeFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("integer", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Declare an integer type",
-                ". = { \"value\": 42 }\nint(.value)",
-                "42",
-                false
-            ),
-            VRLFunctionExample(
-                "Declare an integer type (literal)",
-                "int(42)",
-                "42",
-                false
-            ),
-            VRLFunctionExample(
-                "Invalid integer type",
-                "int!(true)",
-                "function call error for \"int\" at (0:10): expected integer, got boolean",
-                true
-            )
-        )
+        returnTypes = setOf("integer", "error")
     ),
     "is_array" to VRLFunction(
         name = "is_array",
@@ -155,33 +75,7 @@ val typeFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Valid array",
-                "is_array([1, 2, 3])",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Non-matching type",
-                "is_array(\"a string\")",
-                "false",
-                false
-            ),
-            VRLFunctionExample(
-                "Boolean",
-                "is_array(true)",
-                "false",
-                false
-            ),
-            VRLFunctionExample(
-                "Null",
-                "is_array(null)",
-                "false",
-                false
-            )
-        )
+        returnTypes = setOf("boolean")
     ),
     "is_boolean" to VRLFunction(
         name = "is_boolean",
@@ -196,27 +90,7 @@ val typeFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Valid boolean",
-                "is_boolean(false)",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Non-matching type",
-                "is_boolean(\"a string\")",
-                "false",
-                false
-            ),
-            VRLFunctionExample(
-                "Null",
-                "is_boolean(null)",
-                "false",
-                false
-            )
-        )
+        returnTypes = setOf("boolean")
     ),
     "is_empty" to VRLFunction(
         name = "is_empty",
@@ -231,45 +105,7 @@ val typeFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Empty array",
-                "is_empty([])",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Non-empty string",
-                "is_empty(\"a string\")",
-                "false",
-                false
-            ),
-            VRLFunctionExample(
-                "Non-empty object",
-                "is_empty({\"foo\": \"bar\"})",
-                "false",
-                false
-            ),
-            VRLFunctionExample(
-                "Empty string",
-                "is_empty(\"\")",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Empty object",
-                "is_empty({})",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Non-empty array",
-                "is_empty([1,2,3])",
-                "false",
-                false
-            )
-        )
+        returnTypes = setOf("boolean")
     ),
     "is_float" to VRLFunction(
         name = "is_float",
@@ -284,33 +120,7 @@ val typeFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Valid float",
-                "is_float(0.577)",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Non-matching type",
-                "is_float(\"a string\")",
-                "false",
-                false
-            ),
-            VRLFunctionExample(
-                "Boolean",
-                "is_float(true)",
-                "false",
-                false
-            ),
-            VRLFunctionExample(
-                "Null",
-                "is_float(null)",
-                "false",
-                false
-            )
-        )
+        returnTypes = setOf("boolean")
     ),
     "is_integer" to VRLFunction(
         name = "is_integer",
@@ -325,27 +135,7 @@ val typeFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Valid integer",
-                "is_integer(1)",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Non-matching type",
-                "is_integer(\"a string\")",
-                "false",
-                false
-            ),
-            VRLFunctionExample(
-                "Null",
-                "is_integer(null)",
-                "false",
-                false
-            )
-        )
+        returnTypes = setOf("boolean")
     ),
     "is_json" to VRLFunction(
         name = "is_json",
@@ -367,39 +157,7 @@ val typeFunctions = mapOf(
                 enumValues = listOf("object", "array", "string", "number", "bool", "null")
             )
         ),
-        returnTypes = setOf("boolean"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Valid JSON object",
-                "is_json(\"{}\")",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Non-valid value",
-                "is_json(\"{\")",
-                "false",
-                false
-            ),
-            VRLFunctionExample(
-                "Exact variant",
-                "is_json(\"{}\", variant: \"object\")",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Non-valid exact variant",
-                "is_json(\"{}\", variant: \"array\")",
-                "false",
-                false
-            ),
-            VRLFunctionExample(
-                "Valid JSON string",
-                "is_json(s'\"test\"')",
-                "true",
-                false
-            )
-        )
+        returnTypes = setOf("boolean")
     ),
     "is_null" to VRLFunction(
         name = "is_null",
@@ -414,27 +172,7 @@ val typeFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Null value",
-                "is_null(null)",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Non-matching type",
-                "is_null(\"a string\")",
-                "false",
-                false
-            ),
-            VRLFunctionExample(
-                "Array",
-                "is_null([1, 2, 3])",
-                "false",
-                false
-            )
-        )
+        returnTypes = setOf("boolean")
     ),
     "is_nullish" to VRLFunction(
         name = "is_nullish",
@@ -449,33 +187,7 @@ val typeFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Null detection (blank string)",
-                "is_nullish(\"\")",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Null detection (dash string)",
-                "is_nullish(\"-\")",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Null detection (whitespace)",
-                "is_nullish(\"\n  \n\")",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Null",
-                "is_nullish(null)",
-                "true",
-                false
-            )
-        )
+        returnTypes = setOf("boolean")
     ),
     "is_object" to VRLFunction(
         name = "is_object",
@@ -490,27 +202,7 @@ val typeFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Valid object",
-                "is_object({\"foo\": \"bar\"})",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Non-matching type",
-                "is_object(\"a string\")",
-                "false",
-                false
-            ),
-            VRLFunctionExample(
-                "Boolean",
-                "is_object(true)",
-                "false",
-                false
-            )
-        )
+        returnTypes = setOf("boolean")
     ),
     "is_regex" to VRLFunction(
         name = "is_regex",
@@ -525,27 +217,7 @@ val typeFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Valid regex",
-                "is_regex(r'pattern')",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Non-matching type",
-                "is_regex(\"a string\")",
-                "false",
-                false
-            ),
-            VRLFunctionExample(
-                "Null value",
-                "is_regex(null)",
-                "false",
-                false
-            )
-        )
+        returnTypes = setOf("boolean")
     ),
     "is_string" to VRLFunction(
         name = "is_string",
@@ -560,33 +232,7 @@ val typeFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Valid string",
-                "is_string(\"a string\")",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Non-matching type",
-                "is_string([1, 2, 3])",
-                "false",
-                false
-            ),
-            VRLFunctionExample(
-                "Boolean",
-                "is_string(true)",
-                "false",
-                false
-            ),
-            VRLFunctionExample(
-                "Null",
-                "is_string(null)",
-                "false",
-                false
-            )
-        )
+        returnTypes = setOf("boolean")
     ),
     "is_timestamp" to VRLFunction(
         name = "is_timestamp",
@@ -601,27 +247,7 @@ val typeFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Valid timestamp",
-                "is_timestamp(t'2021-03-26T16:00:00Z')",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Non-matching type",
-                "is_timestamp(\"a string\")",
-                "false",
-                false
-            ),
-            VRLFunctionExample(
-                "Boolean value",
-                "is_timestamp(true)",
-                "false",
-                false
-            )
-        )
+        returnTypes = setOf("boolean")
     ),
     "object" to VRLFunction(
         name = "object",
@@ -636,21 +262,7 @@ val typeFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("object", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Declare an object type",
-                ". = { \"value\": { \"field1\": \"value1\", \"field2\": \"value2\" } }\nobject(.value)",
-                "{\n  \"field1\": \"value1\",\n  \"field2\": \"value2\"\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Invalid type",
-                "object!(true)",
-                "function call error for \"object\" at (0:13): expected object, got boolean",
-                true
-            )
-        )
+        returnTypes = setOf("object", "error")
     ),
     "string" to VRLFunction(
         name = "string",
@@ -665,21 +277,7 @@ val typeFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Declare a string type",
-                ". = { \"message\": \"{\\\"field\\\": \\\"value\\\"}\" }\nstring(.message)",
-                "{\"field\": \"value\"}",
-                false
-            ),
-            VRLFunctionExample(
-                "Invalid type",
-                "string!(true)",
-                "function call error for \"string\" at (0:13): expected string, got boolean",
-                true
-            )
-        )
+        returnTypes = setOf("string", "error")
     ),
     "tag_types_externally" to VRLFunction(
         name = "tag_types_externally",
@@ -694,33 +292,7 @@ val typeFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("object", "array", "null"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Tag types externally (scalar)",
-                "tag_types_externally(123)",
-                "{\n  \"integer\": 123\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Tag types externally (object)",
-                "tag_types_externally({\n    \"message\": \"Hello world\",\n    \"request\": {\n        \"duration_ms\": 67.9\n    }\n})",
-                "{\n  \"message\": {\n    \"string\": \"Hello world\"\n  },\n  \"request\": {\n    \"duration_ms\": {\n      \"float\": 67.9\n    }\n  }\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Tag types externally (array)",
-                "tag_types_externally([\"foo\", \"bar\"])",
-                "[{\"string\":\"foo\"},{\"string\":\"bar\"}]",
-                false
-            ),
-            VRLFunctionExample(
-                "Tag types externally (null)",
-                "tag_types_externally(null)",
-                "",
-                false
-            )
-        )
+        returnTypes = setOf("object", "array", "null")
     ),
     "timestamp" to VRLFunction(
         name = "timestamp",
@@ -735,21 +307,7 @@ val typeFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("timestamp", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Declare a timestamp type",
-                "timestamp(t'2020-10-10T16:00:00Z')",
-                "t'2020-10-10T16:00:00Z'",
-                false
-            ),
-            VRLFunctionExample(
-                "Invalid type",
-                "timestamp!(true)",
-                "function call error for \"timestamp\" at (0:16): expected timestamp, got boolean",
-                true
-            )
-        )
+        returnTypes = setOf("timestamp", "error")
     ),
     "type_def" to VRLFunction(
         name = "type_def",
@@ -764,15 +322,7 @@ val typeFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("any"),
-        examples = listOf(
-            VRLFunctionExample(
-                "return type definition",
-                "type_def(42)",
-                "{\n  \"integer\": true\n}",
-                false
-            )
-        )
+        returnTypes = setOf("any")
     ),
     "validate_json_schema" to VRLFunction(
         name = "validate_json_schema",
@@ -799,32 +349,6 @@ val typeFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("boolean", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Payload contains a valid email",
-                "validate_json_schema!(s'{ \"productUser\": \"valid@email.com\" }', \"tests/data/jsonschema/validate_json_schema/schema_with_email_format.json\", false)",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Payload contains an invalid email",
-                "validate_json_schema!(s'{ \"productUser\": \"invalidEmail\" }', \"tests/data/jsonschema/validate_json_schema/schema_with_email_format.json\", false)",
-                "function call error for \"validate_json_schema\" at (0:142): JSON schema validation failed: \"invalidEmail\" is not a \"email\" at /productUser",
-                true
-            ),
-            VRLFunctionExample(
-                "Payload contains a custom format declaration",
-                "validate_json_schema!(s'{ \"productUser\": \"a-custom-formatted-string\" }', \"tests/data/jsonschema/validate_json_schema/schema_with_custom_format.json\", false)",
-                "function call error for \"validate_json_schema\" at (0:156): Failed to compile schema: Unknown format: 'my-custom-format'. Adjust configuration to ignore unrecognized formats",
-                true
-            ),
-            VRLFunctionExample(
-                "Payload contains a custom format declaration, with ignore_unknown_formats set to true",
-                "validate_json_schema!(s'{ \"productUser\": \"a-custom-formatted-string\" }', \"tests/data/jsonschema/validate_json_schema/schema_with_custom_format.json\", true)",
-                "true",
-                false
-            )
-        )
+        returnTypes = setOf("boolean", "error")
     )
 )

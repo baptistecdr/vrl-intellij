@@ -33,21 +33,7 @@ val cryptographyFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Decrypt value using AES-256-CFB",
-                "iv = \"0123456789012345\"\nkey = \"01234567890123456789012345678912\"\nciphertext = decode_base64!(\"c/dIOA==\")\ndecrypt!(ciphertext, \"AES-256-CFB\", key: key, iv: iv)",
-                "data",
-                false
-            ),
-            VRLFunctionExample(
-                "Decrypt value using AES-128-CBC-PKCS7",
-                "iv = decode_base64!(\"fVEIRkIiczCRWNxaarsyxA==\")\nkey = \"16_byte_keyxxxxx\"\nciphertext = decode_base64!(\"5fLGcu1VHdzsPcGNDio7asLqE1P43QrVfPfmP4i4zOU=\")\ndecrypt!(ciphertext, \"AES-128-CBC-PKCS7\", key: key, iv: iv)",
-                "super_secret_message",
-                false
-            )
-        )
+        returnTypes = setOf("string", "error")
     ),
     "encrypt" to VRLFunction(
         name = "encrypt",
@@ -80,21 +66,7 @@ val cryptographyFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Encrypt value using AES-256-CFB",
-                "iv = \"0123456789012345\" # typically you would call random_bytes(16)\nkey = \"01234567890123456789012345678912\"\nencrypted_message = encrypt!(\"data\", \"AES-256-CFB\", key: key, iv: iv)\nencode_base64(encrypted_message)",
-                "c/dIOA==",
-                false
-            ),
-            VRLFunctionExample(
-                "Encrypt value using AES-128-CBC-PKCS7",
-                "iv = \"1234567890123456\" # typically you would call random_bytes(16)\nkey = \"16_byte_keyxxxxx\"\nencrypted_message = encrypt!(\"super secret message\", \"AES-128-CBC-PKCS7\", key: key, iv: iv)\nencode_base64(encrypted_message)",
-                "GBw8Mu00v0Kc38+/PvsVtGgWuUJ+ZNLgF8Opy8ohIYE=",
-                false
-            )
-        )
+        returnTypes = setOf("string", "error")
     ),
     "hmac" to VRLFunction(
         name = "hmac",
@@ -123,33 +95,7 @@ val cryptographyFunctions = mapOf(
                 enumValues = listOf("SHA1", "SHA-224", "SHA-256", "SHA-384", "SHA-512")
             )
         ),
-        returnTypes = setOf("string"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Calculate message HMAC (defaults: SHA-256), encoding to a base64 string",
-                "encode_base64(hmac(\"Hello there\", \"super-secret-key\"))",
-                "eLGE8YMviv85NPXgISRUZxstBNSU47JQdcXkUWcClmI=",
-                false
-            ),
-            VRLFunctionExample(
-                "Calculate message HMAC using SHA-224, encoding to a hex-encoded string",
-                "encode_base16(hmac(\"Hello there\", \"super-secret-key\", algorithm: \"SHA-224\"))",
-                "42fccbc2b7d22a143b92f265a8046187558a94d11ddbb30622207e90",
-                false
-            ),
-            VRLFunctionExample(
-                "Calculate message HMAC using SHA1, encoding to a base64 string",
-                "encode_base64(hmac(\"Hello there\", \"super-secret-key\", algorithm: \"SHA1\"))",
-                "MiyBIHO8Set9+6crALiwkS0yFPE=",
-                false
-            ),
-            VRLFunctionExample(
-                "Calculate message HMAC using a variable hash algorithm",
-                ".hash_algo = \"SHA-256\"\nhmac_bytes, err = hmac(\"Hello there\", \"super-secret-key\", algorithm: .hash_algo)\nif err == null {\n    .hmac = encode_base16(hmac_bytes)\n}",
-                "78b184f1832f8aff3934f5e0212454671b2d04d494e3b25075c5e45167029662",
-                false
-            )
-        )
+        returnTypes = setOf("string")
     ),
     "md5" to VRLFunction(
         name = "md5",
@@ -164,15 +110,7 @@ val cryptographyFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Create md5 hash",
-                "md5(\"foo\")",
-                "acbd18db4cc2f85cedef654fccc4a4d8",
-                false
-            )
-        )
+        returnTypes = setOf("string")
     ),
     "seahash" to VRLFunction(
         name = "seahash",
@@ -187,21 +125,7 @@ val cryptographyFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("integer"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Calculate seahash",
-                "seahash(\"foobar\")",
-                "5348458858952426000",
-                false
-            ),
-            VRLFunctionExample(
-                "Calculate negative seahash",
-                "seahash(\"bar\")",
-                "-2796170501982571500",
-                false
-            )
-        )
+        returnTypes = setOf("integer")
     ),
     "sha1" to VRLFunction(
         name = "sha1",
@@ -216,15 +140,7 @@ val cryptographyFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Calculate sha1 hash",
-                "sha1(\"foo\")",
-                "0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
-                false
-            )
-        )
+        returnTypes = setOf("string")
     ),
     "sha2" to VRLFunction(
         name = "sha2",
@@ -247,27 +163,7 @@ val cryptographyFunctions = mapOf(
                 enumValues = listOf("SHA-224", "SHA-256", "SHA-384", "SHA-512", "SHA-512/224", "SHA-512/256")
             )
         ),
-        returnTypes = setOf("string"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Calculate sha2 hash using default variant",
-                "sha2(\"foobar\")",
-                "d014c752bc2be868e16330f47e0c316a5967bcbc9c286a457761d7055b9214ce",
-                false
-            ),
-            VRLFunctionExample(
-                "Calculate sha2 hash with SHA-512/224",
-                "sha2(\"foo\", variant: \"SHA-512/224\")",
-                "d68f258d37d670cfc1ec1001a0394784233f88f056994f9a7e5e99be",
-                false
-            ),
-            VRLFunctionExample(
-                "Calculate sha2 hash with SHA-384",
-                "sha2(\"foobar\", \"SHA-384\")",
-                "3c9c30d9f665e74d515c842960d4a451c83a0125fd3de7392d7b37231af10c72ea58aedfcdf89a5765bf902af93ecf06",
-                false
-            )
-        )
+        returnTypes = setOf("string")
     ),
     "sha3" to VRLFunction(
         name = "sha3",
@@ -290,26 +186,6 @@ val cryptographyFunctions = mapOf(
                 enumValues = listOf("SHA3-224", "SHA3-256", "SHA3-384", "SHA3-512")
             )
         ),
-        returnTypes = setOf("string"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Calculate sha3 hash using default variant",
-                "sha3(\"foobar\")",
-                "ff32a30c3af5012ea395827a3e99a13073c3a8d8410a708568ff7e6eb85968fccfebaea039bc21411e9d43fdb9a851b529b9960ffea8679199781b8f45ca85e2",
-                false
-            ),
-            VRLFunctionExample(
-                "Calculate sha3 hash with SHA3-224",
-                "sha3(\"foo\", variant: \"SHA3-224\")",
-                "f4f6779e153c391bbd29c95e72b0708e39d9166c7cea51d1f10ef58a",
-                false
-            ),
-            VRLFunctionExample(
-                "Calculate sha3 hash with SHA3-384",
-                "sha3(\"foobar\", \"SHA3-384\")",
-                "0fa8abfbdaf924ad307b74dd2ed183b9a4a398891a2f6bac8fd2db7041b77f068580f9c6c66f699b496c2da1cbcc7ed8",
-                false
-            )
-        )
+        returnTypes = setOf("string")
     )
 )

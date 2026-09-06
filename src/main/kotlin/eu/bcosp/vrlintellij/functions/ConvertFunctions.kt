@@ -23,33 +23,7 @@ val convertFunctions = mapOf(
                 enumValues = listOf("seconds", "milliseconds", "nanoseconds", "microseconds")
             )
         ),
-        returnTypes = setOf("timestamp"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Convert from a Unix timestamp (seconds)",
-                "from_unix_timestamp!(5)",
-                "t'1970-01-01T00:00:05Z'",
-                false
-            ),
-            VRLFunctionExample(
-                "Convert from a Unix timestamp (milliseconds)",
-                "from_unix_timestamp!(5000, unit: \"milliseconds\")",
-                "t'1970-01-01T00:00:05Z'",
-                false
-            ),
-            VRLFunctionExample(
-                "Convert from a Unix timestamp (microseconds)",
-                "from_unix_timestamp!(5000, unit: \"microseconds\")",
-                "t'1970-01-01T00:00:00.005Z'",
-                false
-            ),
-            VRLFunctionExample(
-                "Convert from a Unix timestamp (nanoseconds)",
-                "from_unix_timestamp!(5000, unit: \"nanoseconds\")",
-                "t'1970-01-01T00:00:00.000005Z'",
-                false
-            )
-        )
+        returnTypes = setOf("timestamp")
     ),
     "to_syslog_facility" to VRLFunction(
         name = "to_syslog_facility",
@@ -64,21 +38,7 @@ val convertFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Coerce to a Syslog facility",
-                "to_syslog_facility!(4)",
-                "auth",
-                false
-            ),
-            VRLFunctionExample(
-                "invalid",
-                "to_syslog_facility!(500)",
-                "function call error for \"to_syslog_facility\" at (0:24): facility code 500 not valid",
-                true
-            )
-        )
+        returnTypes = setOf("string", "error")
     ),
     "to_syslog_facility_code" to VRLFunction(
         name = "to_syslog_facility_code",
@@ -93,21 +53,7 @@ val convertFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("integer", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Coerce to Syslog facility code",
-                "to_syslog_facility_code!(\"authpriv\")",
-                "10",
-                false
-            ),
-            VRLFunctionExample(
-                "invalid",
-                "to_syslog_facility_code!(s'foobar')",
-                "function call error for \"to_syslog_facility_code\" at (0:35): syslog facility 'foobar' not valid",
-                true
-            )
-        )
+        returnTypes = setOf("integer", "error")
     ),
     "to_syslog_level" to VRLFunction(
         name = "to_syslog_level",
@@ -122,21 +68,7 @@ val convertFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Coerce to a Syslog level",
-                "to_syslog_level!(5)",
-                "notice",
-                false
-            ),
-            VRLFunctionExample(
-                "invalid",
-                "to_syslog_level!(500)",
-                "function call error for \"to_syslog_level\" at (0:21): severity level 500 not valid",
-                true
-            )
-        )
+        returnTypes = setOf("string", "error")
     ),
     "to_syslog_severity" to VRLFunction(
         name = "to_syslog_severity",
@@ -151,21 +83,7 @@ val convertFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("integer", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Coerce to Syslog severity",
-                "to_syslog_severity!(\"alert\")",
-                "1",
-                false
-            ),
-            VRLFunctionExample(
-                "invalid",
-                "to_syslog_severity!(s'foobar')",
-                "function call error for \"to_syslog_severity\" at (0:30): syslog level foobar not valid",
-                true
-            )
-        )
+        returnTypes = setOf("integer", "error")
     ),
     "to_unix_timestamp" to VRLFunction(
         name = "to_unix_timestamp",
@@ -188,32 +106,6 @@ val convertFunctions = mapOf(
                 enumValues = listOf("seconds", "milliseconds", "nanoseconds")
             )
         ),
-        returnTypes = setOf("integer", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Convert to a Unix timestamp (seconds)",
-                "to_unix_timestamp(t'2021-01-01T00:00:00+00:00')",
-                "1609459200",
-                false
-            ),
-            VRLFunctionExample(
-                "Convert to a Unix timestamp (milliseconds)",
-                "to_unix_timestamp(t'2021-01-01T00:00:00Z', unit: \"milliseconds\")",
-                "1609459200000",
-                false
-            ),
-            VRLFunctionExample(
-                "Convert to a Unix timestamp (microseconds)",
-                "to_unix_timestamp(t'2021-01-01T00:00:00Z', unit: \"microseconds\")",
-                "1609459200000000",
-                false
-            ),
-            VRLFunctionExample(
-                "Convert to a Unix timestamp (nanoseconds)",
-                "to_unix_timestamp(t'2021-01-01T00:00:00Z', unit: \"nanoseconds\")",
-                "1609459200000000000",
-                false
-            )
-        )
+        returnTypes = setOf("integer", "error")
     )
 )

@@ -15,27 +15,7 @@ val numberFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("integer", "float"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Computes the absolute value of an integer",
-                "abs(-42)",
-                "42",
-                false
-            ),
-            VRLFunctionExample(
-                "Computes the absolute value of a float",
-                "abs(-42.2)",
-                "42.2",
-                false
-            ),
-            VRLFunctionExample(
-                "Computes the absolute value of a positive integer",
-                "abs(10)",
-                "10",
-                false
-            )
-        )
+        returnTypes = setOf("integer", "float")
     ),
     "ceil" to VRLFunction(
         name = "ceil",
@@ -57,27 +37,7 @@ val numberFunctions = mapOf(
                 defaultValue = 0
             )
         ),
-        returnTypes = setOf("integer", "float"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Round a number up (without precision)",
-                "ceil(4.345)",
-                "5",
-                false
-            ),
-            VRLFunctionExample(
-                "Round a number up (with precision)",
-                "ceil(4.345, precision: 2)",
-                "4.35",
-                false
-            ),
-            VRLFunctionExample(
-                "Round an integer up (noop)",
-                "ceil(5)",
-                "5",
-                false
-            )
-        )
+        returnTypes = setOf("integer", "float")
     ),
     "floor" to VRLFunction(
         name = "floor",
@@ -99,21 +59,7 @@ val numberFunctions = mapOf(
                 defaultValue = 0
             )
         ),
-        returnTypes = setOf("integer", "float"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Round a number down (without precision)",
-                "floor(9.8)",
-                "9",
-                false
-            ),
-            VRLFunctionExample(
-                "Round a number down (with precision)",
-                "floor(4.345, precision: 2)",
-                "4.34",
-                false
-            )
-        )
+        returnTypes = setOf("integer", "float")
     ),
     "format_int" to VRLFunction(
         name = "format_int",
@@ -135,27 +81,7 @@ val numberFunctions = mapOf(
                 defaultValue = 10
             )
         ),
-        returnTypes = setOf("string", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Format as a hexadecimal integer",
-                "format_int!(42, 16)",
-                "2a",
-                false
-            ),
-            VRLFunctionExample(
-                "Format as a negative hexadecimal integer",
-                "format_int!(-42, 16)",
-                "-2a",
-                false
-            ),
-            VRLFunctionExample(
-                "Format as a decimal integer (default base)",
-                "format_int!(42)",
-                "42",
-                false
-            )
-        )
+        returnTypes = setOf("string", "error")
     ),
     "format_number" to VRLFunction(
         name = "format_number",
@@ -189,27 +115,7 @@ val numberFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("string"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Format a number (3 decimals)",
-                "format_number(1234567.89, 3, decimal_separator: \".\", grouping_separator: \",\")",
-                "1,234,567.890",
-                false
-            ),
-            VRLFunctionExample(
-                "Format a number with European-style separators",
-                "format_number(4672.4, decimal_separator: \",\", grouping_separator: \"_\")",
-                "4_672,4",
-                false
-            ),
-            VRLFunctionExample(
-                "Format a number with a middle dot separator",
-                "format_number(4321.09, 3, decimal_separator: \"·\")",
-                "4321·090",
-                false
-            )
-        )
+        returnTypes = setOf("string")
     ),
     "mod" to VRLFunction(
         name = "mod",
@@ -230,15 +136,7 @@ val numberFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("integer", "float", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Calculate the remainder of two integers",
-                "mod(5, 2)",
-                "1",
-                false
-            )
-        )
+        returnTypes = setOf("integer", "float", "error")
     ),
     "round" to VRLFunction(
         name = "round",
@@ -260,32 +158,6 @@ val numberFunctions = mapOf(
                 defaultValue = 0
             )
         ),
-        returnTypes = setOf("integer", "float"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Round a number (without precision)",
-                "round(4.345)",
-                "4",
-                false
-            ),
-            VRLFunctionExample(
-                "Round a number (with precision)",
-                "round(4.345, precision: 2)",
-                "4.35",
-                false
-            ),
-            VRLFunctionExample(
-                "Round up",
-                "round(5.5)",
-                "6",
-                false
-            ),
-            VRLFunctionExample(
-                "Round down",
-                "round(5.45)",
-                "5",
-                false
-            )
-        )
+        returnTypes = setOf("integer", "float")
     )
 )

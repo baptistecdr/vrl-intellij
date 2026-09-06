@@ -15,21 +15,7 @@ val eventFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "null"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Get the Datadog API key from the event metadata",
-                "get_secret(\"datadog_api_key\")",
-                "secret value",
-                false
-            ),
-            VRLFunctionExample(
-                "Get a non existent secret",
-                "get_secret(\"i_dont_exist\")",
-                "",
-                false
-            )
-        )
+        returnTypes = setOf("string", "null")
     ),
     "remove_secret" to VRLFunction(
         name = "remove_secret",
@@ -44,15 +30,7 @@ val eventFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("null"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Remove the datadog api key",
-                "remove_secret(\"datadog_api_key\")",
-                "",
-                false
-            )
-        )
+        returnTypes = setOf("null")
     ),
     "set_secret" to VRLFunction(
         name = "set_secret",
@@ -73,15 +51,7 @@ val eventFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("null"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Set the datadog api key",
-                "set_secret(\"datadog_api_key\", \"secret-value\")",
-                "",
-                false
-            )
-        )
+        returnTypes = setOf("null")
     ),
     "set_semantic_meaning" to VRLFunction(
         name = "set_semantic_meaning",
@@ -102,14 +72,6 @@ val eventFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("null"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Sets custom field semantic meaning",
-                "set_semantic_meaning(.foo, \"bar\")",
-                "",
-                false
-            )
-        )
+        returnTypes = setOf("null")
     )
 )

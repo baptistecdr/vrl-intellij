@@ -40,33 +40,7 @@ val enrichmentFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("array"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Exact match",
-                "find_enrichment_table_records!(\n    \"test\",\n    {\"surname\": \"Smith\"}\n)",
-                "[{\"firstname\":\"Bob\",\"id\":1,\"surname\":\"Smith\"},{\"firstname\":\"Fred\",\"id\":2,\"surname\":\"Smith\"}]",
-                false
-            ),
-            VRLFunctionExample(
-                "Case insensitive match",
-                "find_enrichment_table_records!(\n    \"test\",\n    {\"surname\": \"smith\"},\n    case_sensitive: false\n)",
-                "[{\"firstname\":\"Bob\",\"id\":1,\"surname\":\"Smith\"},{\"firstname\":\"Fred\",\"id\":2,\"surname\":\"Smith\"}]",
-                false
-            ),
-            VRLFunctionExample(
-                "Wildcard match",
-                "find_enrichment_table_records!(\n    \"test\",\n    {\"firstname\": \"Bob\"},\n    wildcard: \"fred\",\n    case_sensitive: false\n)",
-                "[{\"firstname\":\"Bob\",\"id\":1,\"surname\":\"Smith\"},{\"firstname\":\"Fred\",\"id\":2,\"surname\":\"Smith\"}]",
-                false
-            ),
-            VRLFunctionExample(
-                "Date range search",
-                "find_enrichment_table_records!(\n    \"test\",\n    {\n        \"surname\": \"Smith\",\n        \"date_of_birth\": {\n            \"from\": t'1985-01-01T00:00:00Z',\n            \"to\": t'1985-12-31T00:00:00Z'\n        }\n    }\n)",
-                "[{\"firstname\":\"Bob\",\"id\":1,\"surname\":\"Smith\"},{\"firstname\":\"Fred\",\"id\":2,\"surname\":\"Smith\"}]",
-                false
-            )
-        )
+        returnTypes = setOf("array")
     ),
     "get_enrichment_table_record" to VRLFunction(
         name = "get_enrichment_table_record",
@@ -106,26 +80,6 @@ val enrichmentFunctions = mapOf(
                 false
             )
         ),
-        returnTypes = setOf("object", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Exact match",
-                "get_enrichment_table_record!(\"test\", {\"id\": 1})",
-                "{\n  \"firstname\": \"Bob\",\n  \"id\": 1,\n  \"surname\": \"Smith\"\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Case insensitive match",
-                "get_enrichment_table_record!(\n    \"test\",\n    {\"surname\": \"bob\", \"firstname\": \"John\"},\n    case_sensitive: false\n)",
-                "{\n  \"firstname\": \"Bob\",\n  \"id\": 1,\n  \"surname\": \"Smith\"\n}",
-                false
-            ),
-            VRLFunctionExample(
-                "Date range search",
-                "get_enrichment_table_record!(\n    \"test\",\n    {\n        \"surname\": \"Smith\",\n        \"date_of_birth\": {\n            \"from\": t'1985-01-01T00:00:00Z',\n            \"to\": t'1985-12-31T00:00:00Z'\n        }\n    }\n)",
-                "{\n  \"firstname\": \"Bob\",\n  \"id\": 1,\n  \"surname\": \"Smith\"\n}",
-                false
-            )
-        )
+        returnTypes = setOf("object", "error")
     )
 )

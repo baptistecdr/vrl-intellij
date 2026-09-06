@@ -7,5 +7,4 @@ data class VRLFunction(
     val isPure: Boolean,
     val arguments: List<VRLFunctionArgument>,
     val returnTypes: Set<String>,
-    val examples: List<VRLFunctionExample>,
 )

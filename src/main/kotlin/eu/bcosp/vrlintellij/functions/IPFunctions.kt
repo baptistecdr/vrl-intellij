@@ -27,39 +27,7 @@ val ipFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Decrypt IPv4 address with AES128",
-                "decrypt_ip!(\"72b9:a747:f2e9:72af:76ca:5866:6dcf:c3b0\", \"sixteen byte key\", \"aes128\")",
-                "192.168.1.1",
-                false
-            ),
-            VRLFunctionExample(
-                "Decrypt IPv6 address with AES128",
-                "decrypt_ip!(\"c0e6:eb35:6887:f554:4c65:8ace:17ca:6c6a\", \"sixteen byte key\", \"aes128\")",
-                "2001:db8::1",
-                false
-            ),
-            VRLFunctionExample(
-                "Decrypt IPv4 address with prefix-preserving mode",
-                "decrypt_ip!(\"33.245.248.61\", \"thirty-two bytes key for pfx use\", \"pfx\")",
-                "192.168.1.1",
-                false
-            ),
-            VRLFunctionExample(
-                "Decrypt IPv6 address with prefix-preserving mode",
-                "decrypt_ip!(\"88bd:d2bf:8865:8c4d:84b:44f6:6077:72c9\", \"thirty-two bytes key for ipv6pfx\", \"pfx\")",
-                "2001:db8::1",
-                false
-            ),
-            VRLFunctionExample(
-                "Round-trip encryption and decryption",
-                "original_ip = \"192.168.1.100\"\nkey = \"sixteen byte key\"\nmode = \"aes128\"\n\nencrypted = encrypt_ip!(original_ip, key, mode)\ndecrypt_ip!(encrypted, key, mode)",
-                "192.168.1.100",
-                false
-            )
-        )
+        returnTypes = setOf("string", "error")
     ),
     "encrypt_ip" to VRLFunction(
         name = "encrypt_ip",
@@ -86,33 +54,7 @@ val ipFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Encrypt IPv4 address with AES128",
-                "encrypt_ip!(\"192.168.1.1\", \"sixteen byte key\", \"aes128\")",
-                "72b9:a747:f2e9:72af:76ca:5866:6dcf:c3b0",
-                false
-            ),
-            VRLFunctionExample(
-                "Encrypt IPv6 address with AES128",
-                "encrypt_ip!(\"2001:db8::1\", \"sixteen byte key\", \"aes128\")",
-                "c0e6:eb35:6887:f554:4c65:8ace:17ca:6c6a",
-                false
-            ),
-            VRLFunctionExample(
-                "Encrypt IPv4 address with prefix-preserving mode",
-                "encrypt_ip!(\"192.168.1.1\", \"thirty-two bytes key for pfx use\", \"pfx\")",
-                "33.245.248.61",
-                false
-            ),
-            VRLFunctionExample(
-                "Encrypt IPv6 address with prefix-preserving mode",
-                "encrypt_ip!(\"2001:db8::1\", \"thirty-two bytes key for ipv6pfx\", \"pfx\")",
-                "88bd:d2bf:8865:8c4d:84b:44f6:6077:72c9",
-                false
-            )
-        )
+        returnTypes = setOf("string", "error")
     ),
     "ip_aton" to VRLFunction(
         name = "ip_aton",
@@ -127,15 +69,7 @@ val ipFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("integer", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "IPv4 to integer",
-                "ip_aton!(\"1.2.3.4\")",
-                "16909060",
-                false
-            )
-        )
+        returnTypes = setOf("integer", "error")
     ),
     "ip_cidr_contains" to VRLFunction(
         name = "ip_cidr_contains",
@@ -156,39 +90,7 @@ val ipFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "IPv4 contains CIDR",
-                "ip_cidr_contains!(\"192.168.0.0/16\", \"192.168.10.32\")",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "IPv4 is private",
-                "ip_cidr_contains!([\"10.0.0.0/8\", \"172.16.0.0/12\", \"192.168.0.0/16\"], \"192.168.10.32\")",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "IPv6 contains CIDR",
-                "ip_cidr_contains!(\"2001:4f8:4:ba::/64\", \"2001:4f8:4:ba:2e0:81ff:fe22:d1f1\")",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Not in range",
-                "ip_cidr_contains!(\"192.168.0.0/24\", \"192.168.10.32\")",
-                "false",
-                false
-            ),
-            VRLFunctionExample(
-                "Invalid address",
-                "ip_cidr_contains!(\"192.168.0.0/24\", \"INVALID\")",
-                "function call error for \"ip_cidr_contains\" at (0:46): unable to parse IP address: invalid IP address syntax",
-                true
-            )
-        )
+        returnTypes = setOf("boolean", "error")
     ),
     "ip_ntoa" to VRLFunction(
         name = "ip_ntoa",
@@ -203,15 +105,7 @@ val ipFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Integer to IPv4",
-                "ip_ntoa!(16909060)",
-                "1.2.3.4",
-                false
-            )
-        )
+        returnTypes = setOf("string", "error")
     ),
     "ip_ntop" to VRLFunction(
         name = "ip_ntop",
@@ -226,21 +120,7 @@ val ipFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Convert IPv4 address from bytes after decoding from Base64",
-                "ip_ntop!(decode_base64!(\"wKgAAQ==\"))",
-                "192.168.0.1",
-                false
-            ),
-            VRLFunctionExample(
-                "Convert IPv6 address from bytes after decoding from Base64",
-                "ip_ntop!(decode_base64!(\"IAENuIWjAAAAAIouA3BzNA==\"))",
-                "2001:db8:85a3::8a2e:370:7334",
-                false
-            )
-        )
+        returnTypes = setOf("string", "error")
     ),
     "ip_pton" to VRLFunction(
         name = "ip_pton",
@@ -255,21 +135,7 @@ val ipFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Convert IPv4 address to bytes and encode to Base64",
-                "encode_base64(ip_pton!(\"192.168.0.1\"))",
-                "wKgAAQ==",
-                false
-            ),
-            VRLFunctionExample(
-                "Convert IPv6 address to bytes and encode to Base64",
-                "encode_base64(ip_pton!(\"2001:db8:85a3::8a2e:370:7334\"))",
-                "IAENuIWjAAAAAIouA3BzNA==",
-                false
-            )
-        )
+        returnTypes = setOf("string", "error")
     ),
     "ip_subnet" to VRLFunction(
         name = "ip_subnet",
@@ -290,27 +156,7 @@ val ipFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "IPv4 subnet",
-                "ip_subnet!(\"192.168.10.32\", \"255.255.255.0\")",
-                "192.168.10.0",
-                false
-            ),
-            VRLFunctionExample(
-                "IPv6 subnet",
-                "ip_subnet!(\"2404:6800:4003:c02::64\", \"/32\")",
-                "2404:6800::",
-                false
-            ),
-            VRLFunctionExample(
-                "Subnet /1",
-                "ip_subnet!(\"192.168.0.1\", \"/1\")",
-                "128.0.0.0",
-                false
-            )
-        )
+        returnTypes = setOf("string", "error")
     ),
     "ip_to_ipv6" to VRLFunction(
         name = "ip_to_ipv6",
@@ -325,15 +171,7 @@ val ipFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "IPv4 to IPv6",
-                "ip_to_ipv6!(\"192.168.10.32\")",
-                "::ffff:192.168.10.32",
-                false
-            )
-        )
+        returnTypes = setOf("string", "error")
     ),
     "ipv6_to_ipv4" to VRLFunction(
         name = "ipv6_to_ipv4",
@@ -348,15 +186,7 @@ val ipFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("string", "error"),
-        examples = listOf(
-            VRLFunctionExample(
-                "IPv6 to IPv4",
-                "ipv6_to_ipv4!(\"::ffff:192.168.0.1\")",
-                "192.168.0.1",
-                false
-            )
-        )
+        returnTypes = setOf("string", "error")
     ),
     "is_ipv4" to VRLFunction(
         name = "is_ipv4",
@@ -371,27 +201,7 @@ val ipFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Valid IPv4 address",
-                "is_ipv4(\"10.0.102.37\")",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Valid IPv6 address",
-                "is_ipv4(\"2001:0db8:85a3:0000:0000:8a2e:0370:7334\")",
-                "false",
-                false
-            ),
-            VRLFunctionExample(
-                "Arbitrary string",
-                "is_ipv4(\"foobar\")",
-                "false",
-                false
-            )
-        )
+        returnTypes = setOf("boolean")
     ),
     "is_ipv6" to VRLFunction(
         name = "is_ipv6",
@@ -406,26 +216,6 @@ val ipFunctions = mapOf(
                 true
             )
         ),
-        returnTypes = setOf("boolean"),
-        examples = listOf(
-            VRLFunctionExample(
-                "Valid IPv6 address",
-                "is_ipv6(\"2001:0db8:85a3:0000:0000:8a2e:0370:7334\")",
-                "true",
-                false
-            ),
-            VRLFunctionExample(
-                "Valid IPv4 address",
-                "is_ipv6(\"10.0.102.37\")",
-                "false",
-                false
-            ),
-            VRLFunctionExample(
-                "Arbitrary string",
-                "is_ipv6(\"foobar\")",
-                "false",
-                false
-            )
-        )
+        returnTypes = setOf("boolean")
     )
 )

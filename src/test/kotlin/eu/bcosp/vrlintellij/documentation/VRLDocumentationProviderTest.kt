@@ -32,16 +32,6 @@ class VRLDocumentationProviderTest : BasePlatformTestCase() {
         assertNull(documentationAt(offset))
     }
 
-    fun testGeneratesDocIncludesAnExample() {
-        myFixture.configureByText("t.vrl", "upcase(\"x\")")
-        val doc = documentationAt(myFixture.file.text.indexOf("upcase") + 2)
-        assertNotNull(doc)
-        // upcase's one vector.dev example: source `upcase("Hello, World!")` returning `HELLO, WORLD!`.
-        assertTrue(doc!!.contains("Upcase a string"))
-        assertTrue(doc.contains("upcase(&quot;Hello, World!&quot;)"))
-        assertTrue(doc.contains("HELLO, WORLD!"))
-    }
-
     fun testQuickNavigateInfoIncludesSignature() {
         myFixture.configureByText("t.vrl", "upcase(\"x\")")
         val offset = myFixture.file.text.indexOf("upcase") + 2
