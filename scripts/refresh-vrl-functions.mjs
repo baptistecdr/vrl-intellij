@@ -29,6 +29,19 @@ const FUNCTIONS_DIR = fileURLToPath(new URL("../src/main/kotlin/eu/bcosp/vrlinte
 const VRL_REPO_TREE_URL = "https://api.github.com/repos/vectordotdev/vrl/git/trees/main?recursive=1";
 const VRL_RAW_BASE = "https://raw.githubusercontent.com/vectordotdev/vrl/main/";
 
+// A handful of stdlib functions validate an argument against a fixed set of strings (and say so in
+// their own doc comment/error message) without ever calling `.enum_variants(...)` on it - an
+// omission on vrl's side rather than something fetchEnumVariantsByFunction failed to find. Found
+// by grepping the whole stdlib for "must be (either|one of)" outside of any `.enum_variants(...)`
+// call; cross-checked directly against each function's `Parameter`/`match ... { ... }` in
+// src/stdlib/encrypt_ip.rs, decrypt_ip.rs, and xxhash.rs. Each entry here is a real gap to remove
+// once vrl's own Parameter definition adds the annotation - not a substitute for it.
+const MANUAL_ENUM_OVERRIDES = {
+    encrypt_ip: { mode: ["aes128", "pfx"] },
+    decrypt_ip: { mode: ["aes128", "pfx"] },
+    xxhash: { variant: ["XXH32", "XXH64", "XXH3-64", "XXH3-128"] },
+};
+
 // category id (from the page's <h2 id=...>) -> the Kotlin file/variable this plugin already uses
 // for it. Deliberately an explicit table rather than a derived PascalCase/camelCase transform,
 // both because "IP" isn't a plain capitalization of "ip" and so a new category vector.dev adds in
@@ -268,6 +281,12 @@ async function fetchEnumVariantsByFunction() {
         for (const identifier of identifiers) {
             byFunction.set(identifier, { ...(byFunction.get(identifier) ?? {}), ...argumentEnums });
         }
+    }
+
+    // Applied so the override loses to real source data for the same argument if one ever
+    // appears (e.g. vrl adds .enum_variants(...) for it later) rather than silently shadowing it.
+    for (const [fn, overrideArgs] of Object.entries(MANUAL_ENUM_OVERRIDES)) {
+        byFunction.set(fn, { ...overrideArgs, ...(byFunction.get(fn) ?? {}) });
     }
     return byFunction;
 }

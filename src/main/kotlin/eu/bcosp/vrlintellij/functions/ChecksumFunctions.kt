@@ -42,7 +42,8 @@ val checksumFunctions = mapOf(
                 setOf("string"),
                 "The xxHash hashing algorithm to use.",
                 false,
-                defaultValue = "XXH32"
+                defaultValue = "XXH32",
+                enumValues = listOf("XXH32", "XXH64", "XXH3-64", "XXH3-128")
             )
         ),
         returnTypes = setOf("string", "integer")

@@ -24,7 +24,8 @@ val ipFunctions = mapOf(
                 "mode",
                 setOf("string"),
                 "The decryption mode to use. Must match the mode used for encryption: either <code>aes128</code> or <code>pfx</code>.",
-                true
+                true,
+                enumValues = listOf("aes128", "pfx")
             )
         ),
         returnTypes = setOf("string", "error")
@@ -51,7 +52,8 @@ val ipFunctions = mapOf(
                 "mode",
                 setOf("string"),
                 "The encryption mode to use. Must be either <code>aes128</code> or <code>pfx</code>.",
-                true
+                true,
+                enumValues = listOf("aes128", "pfx")
             )
         ),
         returnTypes = setOf("string", "error")
