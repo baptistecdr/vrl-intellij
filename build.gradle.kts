@@ -76,6 +76,16 @@ tasks {
 kotlin {
     compilerOptions {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+        // Without this, Kotlin compiles every unoverridden default method of a Kotlin-authored
+        // platform interface (e.g. ToolWindowFactory.isApplicable/isDoNotActivateOnStart/getIcon)
+        // into its own forwarding stub on each implementing class - confirmed by decompiling
+        // VRLPlaygroundToolWindowFactory.class, which had one for every default member of
+        // ToolWindowFactory despite the source only defining createToolWindowContent(). That's
+        // what made the plugin verifier report those as "overridden"/"invoked" in our own code.
+        // "enable" (Kotlin's default) still generates that stub for pre-1.4 binary compatibility;
+        // only "no-compatibility" skips it entirely and relies on real JVM default dispatch,
+        // which is safe here since nothing in this codebase is consumed as a pre-1.4 Kotlin binary.
+        freeCompilerArgs.add("-jvm-default=no-compatibility")
     }
 }
 
