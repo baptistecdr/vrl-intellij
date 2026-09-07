@@ -42,7 +42,9 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
 - `# TODO`-style comments show up in the TODO tool window and "Search for TODOs"
 - Spellchecking inside string literals and comments
 - Reformat Code support (indentation and spacing for blocks, objects, arrays, and operators), with
-  its own Code Style settings page (indent size, "Keep Blank Lines", and comma spacing)
+  its own Code Style settings page (indent size, "Keep Blank Lines", comma spacing, and "Use
+  trailing comma" - adds/removes a trailing comma before `]`/`}`/`)` on array/object literals and
+  call argument lists that already span multiple lines)
 - Language injection into string, raw string, and regex literals (*Alt+Enter → Inject language or
   reference*), plus automatic RegExp support (syntax highlighting and the "Check RegExp" intention)
   inside every `r'...'` regex literal

@@ -25,7 +25,7 @@
             <li>Go to Declaration, Find Usages, and Rename for variables and closure parameters</li>
             <li>Introduce Variable and Inline Variable refactorings</li>
             <li>Structure view listing a script's statements, including nested blocks</li>
-            <li>Reformat Code support for blocks, objects, arrays, and operator spacing</li>
+            <li>Reformat Code support for blocks, objects, arrays, and operator spacing, including an optional trailing comma on multi-line literals/argument lists</li>
             <li>Language injection into string, raw string, and regex literals, plus automatic RegExp support (syntax highlighting, "Check RegExp") inside every regex literal</li>
             <li>Automatic VRL injection into Vector's own TOML/YAML pipeline configs (the <code>source</code> of a <code>remap</code> transform, any plain-string <code>condition</code>, and <code>source</code> under a <code>vrl</code> codec)</li>
             <li>Postfix templates: <code>expr.iferr</code> and <code>expr.raise</code> for VRL's error-handling forms</li>
@@ -113,6 +113,9 @@
 
         <langCodeStyleSettingsProvider
                 implementation="eu.bcosp.vrlintellij.formatting.VRLLanguageCodeStyleSettingsProvider"/>
+
+        <postFormatProcessor
+                implementation="eu.bcosp.vrlintellij.formatting.VRLTrailingCommaPostFormatProcessor"/>
 
         <lang.findUsagesProvider
                 language="VRL"

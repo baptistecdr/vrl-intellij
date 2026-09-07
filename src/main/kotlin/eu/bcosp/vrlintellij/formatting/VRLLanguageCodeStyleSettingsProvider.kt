@@ -6,6 +6,7 @@ import com.intellij.application.options.TabbedLanguageCodeStylePanel
 import com.intellij.psi.codeStyle.CodeStyleConfigurable
 import com.intellij.psi.codeStyle.CodeStyleSettings
 import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable
+import com.intellij.psi.codeStyle.CustomCodeStyleSettings
 import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider
 import eu.bcosp.vrlintellij.VRL
 
@@ -33,9 +34,23 @@ class VRLLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider()
                 "KEEP_BLANK_LINES_IN_CODE",
             )
 
+            // Real VRL, verified against the vector vrl CLI: a trailing comma is accepted right
+            // before the closing bracket/brace/paren of an array/object literal or a function
+            // call's argument list (the grammar's own `(COMMA x)* COMMA?` already reflects this -
+            // see VRL.bnf). VRLTrailingCommaPostFormatProcessor only ever adds one when that
+            // container is already multi-line, matching this option's usual meaning elsewhere.
+            SettingsType.WRAPPING_AND_BRACES_SETTINGS -> consumer.showCustomOption(
+                VRLCodeStyleSettings::class.java,
+                "TRAILING_COMMA",
+                "Use trailing comma",
+                null,
+            )
+
             else -> Unit
         }
     }
+
+    override fun createCustomSettings(settings: CodeStyleSettings): CustomCodeStyleSettings = VRLCodeStyleSettings(settings)
 
     // The base LanguageCodeStyleSettingsProvider.createConfigurable() just throws - a language
     // only gets its own entry in Settings | Editor | Code Style if it overrides this (confirmed
@@ -68,7 +83,11 @@ class VRLLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider()
                 .level = "error"
             }
 
-            .tags = ["a", "b", "c"]
+            .tags = [
+                "a",
+                "b",
+                "c"
+            ]
         """.trimIndent()
     }
 }
