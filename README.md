@@ -90,7 +90,6 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
   subcommand, showing both the final expression's value and the resulting mutated event. The
   sample event is remembered per file. Configure the path to the `vector` executable in
   *Settings/Preferences → Tools → VRL Playground* if it isn't on your `PATH`
-
 - Create new `.vrl` files from *File → New → VRL File*
 
 ## Quick start

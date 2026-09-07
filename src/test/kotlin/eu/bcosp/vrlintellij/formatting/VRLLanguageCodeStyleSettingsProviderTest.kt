@@ -22,6 +22,26 @@ class VRLLanguageCodeStyleSettingsProviderTest : BasePlatformTestCase() {
         }
     }
 
+    // Regression test for a real bug: LanguageCodeStyleSettingsProvider.createConfigurable() is
+    // NOT overridden by default - the inherited implementation just throws - and
+    // getSettingsPagesProviders() (what Settings | Editor | Code Style actually builds its
+    // language list from) reflectively excludes any provider whose createConfigurable() is still
+    // that inherited stub, to avoid crashing when it's invoked. Without overriding it ourselves,
+    // "VRL" silently never appeared as a language in Code Style settings at all - confirmed by
+    // decompiling the platform's own filtering logic, and by cross-checking JSON's and
+    // Properties' bundled providers, which both override it the same way.
+    fun `test gets its own Code Style settings page`() {
+        assertTrue(LanguageCodeStyleSettingsProvider.getSettingsPagesProviders().any { it.language == VRL })
+    }
+
+    fun `test createConfigurable does not throw and returns a real panel`() {
+        val settings = CodeStyle.getSettings(project)
+        val configurable = provider.createConfigurable(settings, settings)
+        val component = configurable.createComponent()
+        assertNotNull(component)
+        configurable.disposeUIResources()
+    }
+
     private fun commonSettings(): CommonCodeStyleSettings = CodeStyle.getSettings(project).getCommonSettings(VRL)
 
     private fun reformat(text: String): String {
