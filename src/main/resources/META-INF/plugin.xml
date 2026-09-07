@@ -279,7 +279,7 @@
 
         <liveTemplateContext contextId="VRL" implementation="eu.bcosp.vrlintellij.templates.VRLTemplateContextType"/>
 
-        <defaultLiveTemplatesProvider implementation="eu.bcosp.vrlintellij.templates.VRLDefaultLiveTemplatesProvider"/>
+        <defaultLiveTemplates file="/liveTemplates/VRL.xml"/>
 
         <lang.smartEnterProcessor
                 language="VRL"

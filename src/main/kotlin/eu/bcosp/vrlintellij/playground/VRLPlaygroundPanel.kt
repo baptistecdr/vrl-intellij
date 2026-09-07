@@ -102,7 +102,7 @@ class VRLPlaygroundPanel(private val project: Project) : SimpleToolWindowPanel(t
     }
 
     private fun registerRunShortcut() {
-        runAction.registerCustomShortcutSet(CommonShortcuts.CTRL_ENTER, sampleEventArea)
+        runAction.registerCustomShortcutSet(CommonShortcuts.getCtrlEnter(), sampleEventArea)
     }
 
     private fun subscribeToFileEditorChanges() {
