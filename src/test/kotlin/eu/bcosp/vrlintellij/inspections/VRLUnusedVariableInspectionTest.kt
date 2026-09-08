@@ -58,11 +58,32 @@ class VRLUnusedVariableInspectionTest : BasePlatformTestCase() {
         assertEquals(1, messages.count { it.contains("'x' is never used") })
     }
 
-    fun testQuickFixRenamesToUnderscore() {
+    // `_ = 1` is a compile error in VRL (E640 "unnecessary no-op assignment") - `_` is only legal
+    // as a multi-assignment target, so a single `x = ...` assignment's fix has to be different
+    // from a `value, err = ...` one's (see testQuickFixRenamesMultiAssignmentTargetToUnderscore).
+    fun testQuickFixRemovesUnusedSingleAssignment() {
         myFixture.configureByText("t.vrl", "x = 1\n")
-        val intention = myFixture.getAvailableIntention("Rename to '_'")
+        val intention = myFixture.getAvailableIntention("Remove unused assignment")
+        assertNotNull(intention)
+        assertNull(myFixture.getAvailableIntention("Rename to '_'"))
+        myFixture.launchAction(intention!!)
+        myFixture.checkResult("1\n")
+    }
+
+    fun testQuickFixRemovesUnusedSingleAssignmentKeepsCallSideEffect() {
+        myFixture.configureByText("t.vrl", "x = log(\"hi\")\n")
+        val intention = myFixture.getAvailableIntention("Remove unused assignment")
         assertNotNull(intention)
         myFixture.launchAction(intention!!)
-        myFixture.checkResult("_ = 1\n")
+        myFixture.checkResult("log(\"hi\")\n")
+    }
+
+    fun testQuickFixRenamesMultiAssignmentTargetToUnderscore() {
+        myFixture.configureByText("t.vrl", "value, err = parse_json(.message)\n")
+        val intention = myFixture.getAvailableIntention("Rename to '_'")
+        assertNotNull(intention)
+        assertNull(myFixture.getAvailableIntention("Remove unused assignment"))
+        myFixture.launchAction(intention!!)
+        myFixture.checkResult("_, err = parse_json(.message)\n")
     }
 }

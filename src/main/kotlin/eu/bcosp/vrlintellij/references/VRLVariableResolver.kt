@@ -55,26 +55,37 @@ object VRLVariableResolver {
     /** True if `primaryExpr` sits in assignment-target position: either the sole target of a
      * plain `x = ...` assignment, or either target of an error-destructuring
      * `value, err = fallible_call()` assignment. */
-    fun isBareAssignmentTarget(primaryExpr: PsiElement): Boolean {
-        var current = primaryExpr.node ?: return false
+    fun isBareAssignmentTarget(primaryExpr: PsiElement): Boolean =
+        assignmentTargetKind(primaryExpr) != AssignmentTargetKind.NONE
+
+    /** Distinguishes the two assignment-target shapes [isBareAssignmentTarget] treats alike -
+     * callers that need to react differently to a plain `x = ...` versus a `value, err = ...`
+     * target (e.g. [eu.bcosp.vrlintellij.inspections.VRLUnusedVariableInspection]'s quick fix:
+     * `_` is only a legal replacement for a [MULTI] target, since VRL rejects a bare `_ = ...` as
+     * a no-op assignment) use this instead of re-deriving the same tree walk. */
+    fun assignmentTargetKind(primaryExpr: PsiElement): AssignmentTargetKind {
+        var current = primaryExpr.node ?: return AssignmentTargetKind.NONE
         var parent = current.treeParent
         while (parent != null) {
             if (parent.elementType == VRLElementTypes.ASSIGNMENT_EXPR) {
-                if (firstSignificantChild(parent) !== current) return false
-                val assignment = parent.psi as? VRLAssignmentExpr ?: return false
-                return assignment.assignmentExpr != null
+                if (firstSignificantChild(parent) !== current) return AssignmentTargetKind.NONE
+                val assignment = parent.psi as? VRLAssignmentExpr ?: return AssignmentTargetKind.NONE
+                return if (assignment.assignmentExpr != null) AssignmentTargetKind.SINGLE else AssignmentTargetKind.NONE
             }
             if (parent.elementType == VRLElementTypes.MULTI_ASSIGNMENT_EXPR) {
                 val targets = significantChildren(parent)
                 val index = targets.indexOf(current)
-                return index == 0 || (index == 2 && targets.getOrNull(1)?.elementType == VRLElementTypes.COMMA)
+                val isTarget = index == 0 || (index == 2 && targets.getOrNull(1)?.elementType == VRLElementTypes.COMMA)
+                return if (isTarget) AssignmentTargetKind.MULTI else AssignmentTargetKind.NONE
             }
-            if (onlySignificantChild(parent) !== current) return false
+            if (onlySignificantChild(parent) !== current) return AssignmentTargetKind.NONE
             current = parent
             parent = current.treeParent
         }
-        return false
+        return AssignmentTargetKind.NONE
     }
+
+    enum class AssignmentTargetKind { NONE, SINGLE, MULTI }
 
     private fun findClosureParam(usage: PsiElement, name: String): PsiElement? {
         var closure = PsiTreeUtil.getParentOfType(usage, VRLClosureExpr::class.java)

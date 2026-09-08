@@ -6,14 +6,18 @@ import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor
 import com.intellij.psi.impl.source.tree.LeafPsiElement
+import com.intellij.psi.util.PsiTreeUtil
+import eu.bcosp.vrlintellij.psi.VRLAssignmentExpr
 import eu.bcosp.vrlintellij.psi.VRLElementTypes
 import eu.bcosp.vrlintellij.psi.VRLPrimaryExpr
 import eu.bcosp.vrlintellij.references.VRLVariableResolver
+import eu.bcosp.vrlintellij.references.VRLVariableResolver.AssignmentTargetKind
 
 /**
  * Flags a bare variable assignment (`x = ...`, or either target of `value, err = fallible_call()`)
@@ -36,14 +40,20 @@ class VRLUnusedVariableInspection : LocalInspectionTool() {
                 val primaryExpr = element as VRLPrimaryExpr
                 val identifier = primaryExpr.identifier ?: return
                 if (identifier.text == "_") return
-                if (!VRLVariableResolver.isBareAssignmentTarget(primaryExpr)) return
+                val kind = VRLVariableResolver.assignmentTargetKind(primaryExpr)
+                if (kind == AssignmentTargetKind.NONE) return
                 if (primaryExpr in usedDeclarations) return
 
+                // `_` is only a legal target in the `value, err = ...` destructuring form - VRL
+                // rejects a bare `_ = ...` as a no-op assignment (compiler error 640), so a plain
+                // `x = ...` is fixed by dropping the assignment instead, keeping the right-hand
+                // side as a bare statement in case evaluating it matters (e.g. a fallible call).
+                val fix = if (kind == AssignmentTargetKind.MULTI) RenameToUnderscoreQuickFix else RemoveUnusedAssignmentQuickFix
                 holder.registerProblem(
                     identifier,
                     "Variable '${identifier.text}' is never used",
                     ProblemHighlightType.LIKE_UNUSED_SYMBOL,
-                    RenameToUnderscoreQuickFix,
+                    fix,
                 )
             }
         }
@@ -71,6 +81,20 @@ class VRLUnusedVariableInspection : LocalInspectionTool() {
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             (descriptor.psiElement as? LeafPsiElement)?.replaceWithText("_")
+        }
+    }
+
+    private object RemoveUnusedAssignmentQuickFix : LocalQuickFix {
+        override fun getFamilyName(): String = "Remove unused assignment"
+
+        override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
+            val identifier = descriptor.psiElement
+            val primaryExpr = identifier.parent as? VRLPrimaryExpr ?: return
+            val assignmentExpr = PsiTreeUtil.getParentOfType(primaryExpr, VRLAssignmentExpr::class.java) ?: return
+            val rhs = assignmentExpr.assignmentExpr ?: return
+            val document = PsiDocumentManager.getInstance(project).getDocument(assignmentExpr.containingFile) ?: return
+            document.replaceString(assignmentExpr.textRange.startOffset, assignmentExpr.textRange.endOffset, rhs.text)
+            PsiDocumentManager.getInstance(project).commitDocument(document)
         }
     }
 }
