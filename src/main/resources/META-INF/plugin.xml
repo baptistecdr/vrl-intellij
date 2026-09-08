@@ -154,6 +154,10 @@
         <multiHostInjector
                 implementation="eu.bcosp.vrlintellij.injection.VRLRegexInjector"/>
 
+        <regExpLanguageHost
+                forClass="eu.bcosp.vrlintellij.psi.VRLLiteral"
+                implementationClass="eu.bcosp.vrlintellij.injection.VRLRegExpLanguageHost"/>
+
         <localInspection
                 language="VRL"
                 shortName="VRLUnknownFunction"
