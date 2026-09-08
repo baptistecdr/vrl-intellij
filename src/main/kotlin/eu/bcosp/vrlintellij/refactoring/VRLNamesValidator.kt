@@ -16,11 +16,23 @@ class VRLNamesValidator : NamesValidator {
         IDENTIFIER_PATTERN.matches(name) && name !in RESERVED_WORDS
 
     companion object {
-        // Mirrors VRLLexer.flex's IDENTIFIER token pattern and keyword literals exactly.
+        // Mirrors VRLLexer.flex's IDENTIFIER token pattern exactly.
         private val IDENTIFIER_PATTERN = Regex("[a-zA-Z_][a-zA-Z0-9_]*")
-        private val RESERVED_WORDS = setOf(
-            "if", "else", "for", "while", "loop", "break", "continue",
-            "return", "abort", "true", "false", "null", "in",
+
+        // Mirrors vrl's own lexer (src/parser/lex.rs) exactly - both its keyword literals and its
+        // separate `ReservedIdentifier` list (words held back for future syntax, e.g. `string`,
+        // `object`, `timestamp` - several of which double as stdlib function names, which stay
+        // callable since this only governs variable/rename identifiers). `in` is deliberately
+        // absent: it reads like an operator but isn't reserved (`vector vrl 'in = 1'` compiles).
+        private val KEYWORDS = setOf(
+            "if", "else", "true", "false", "null", "abort", "return",
         )
+        private val RESERVED_IDENTIFIERS = setOf(
+            "array", "bool", "boolean", "break", "continue", "do", "emit", "float",
+            "for", "forall", "foreach", "all", "each", "any", "try", "undefined",
+            "int", "integer", "iter", "object", "regex", "string", "traverse",
+            "timestamp", "duration", "unless", "walk", "while", "loop",
+        )
+        private val RESERVED_WORDS = KEYWORDS + RESERVED_IDENTIFIERS
     }
 }
