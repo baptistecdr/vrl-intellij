@@ -21,9 +21,18 @@ import org.toml.lang.psi.ext.kind
  * - `source` under a `remap` transform (`type = "remap"`), e.g.
  *   `[transforms.parse]\ntype = "remap"\nsource = ".foo = 1"`.
  * - `condition`, whenever given as a plain string - per Vector's own docs this always defaults to
- *   a VRL boolean expression (used by `filter`/`route`/swimlane conditions). The table form
- *   (`condition = { type = "datadog_search", source = "..." }`) is deliberately left alone since
- *   distinguishing its non-VRL condition types isn't worth the added complexity here.
+ *   a VRL boolean expression (used by `filter`/`route`/swimlane conditions).
+ * - `source` alongside `type = "vrl"`, which is the fully-specified table form of a condition
+ *   (`condition = { type = "vrl", source = ".foo == 1" }`). `source` alone can't carry the
+ *   decision here: `datadog_search` conditions spell their query with the very same key, so the
+ *   sibling `type` is what separates them. Keyed off that `type` rather than off the enclosing
+ *   key's name so it holds for every condition-shaped field Vector has - `condition`,
+ *   `starts_when`, `ends_when`, `exclude`, `flush_when`, `forward_when`, and the `route`
+ *   transform's arbitrarily-named `route.<name>` outputs - all of which take the same
+ *   `AnyCondition` (see src/conditions/mod.rs, whose `ConditionConfig` is
+ *   `#[serde(tag = "type", rename_all = "snake_case")]`). That is unambiguous because no Vector
+ *   component is itself named `vrl`: `type = "vrl"` fails to load as a transform ("unknown
+ *   variant `vrl`"), so it can only ever be a VRL condition.
  * - `source` under a `vrl` codec table (`decoding.vrl.source` / `encoding.vrl.source`, e.g.
  *   https://vector.dev/docs/reference/configuration/sources/http_server/#decoding.vrl.source) -
  *   any source's `decoding` or any sink's `encoding` can be set to `codec = "vrl"`, which then
@@ -42,7 +51,7 @@ class VRLTomlConfigInjector : MultiHostInjector {
         if (!host.isValidHost) return
 
         val isVrl = when (lastSegmentName(keyValue.key)) {
-            "source" -> siblingTypeIsRemap(keyValue) || isNestedUnderVrlCodec(keyValue)
+            "source" -> siblingType(keyValue) in VRL_SOURCE_TYPES || isNestedUnderVrlCodec(keyValue)
             "condition" -> true
             else -> false
         }
@@ -54,11 +63,32 @@ class VRLTomlConfigInjector : MultiHostInjector {
             .doneInjecting()
     }
 
-    private fun siblingTypeIsRemap(keyValue: TomlKeyValue): Boolean {
-        val owner = keyValue.parent as? TomlKeyValueOwner ?: return false
-        val typeLiteral = owner.entries.firstOrNull { lastSegmentName(it.key) == "type" }?.value as? TomlLiteral ?: return false
-        val kind = typeLiteral.kind as? TomlLiteralKind.String ?: return false
-        return kind.value == "remap"
+    /**
+     * The `type` declared alongside [keyValue] - `"remap"` for a remap transform's `source`,
+     * `"vrl"` for a VRL condition's, or null when there's no such sibling.
+     *
+     * Matched on the key's prefix rather than just its last segment, because in the dotted form
+     * both the component's own `type` and the condition's live as entries of the same table:
+     *
+     * ```toml
+     * [transforms.f]
+     * type = "filter"          # prefix []           - the component
+     * condition.type = "vrl"   # prefix [condition]  - the condition
+     * condition.source = '...' # prefix [condition]  - what we're resolving
+     * ```
+     *
+     * Taking the first `type` entry regardless of prefix would answer `"filter"` here and miss
+     * the injection.
+     */
+    private fun siblingType(keyValue: TomlKeyValue): String? {
+        val owner = keyValue.parent as? TomlKeyValueOwner ?: return null
+        val prefix = keyValue.key.segments.dropLast(1).map { it.name }
+        val typeEntry = owner.entries.firstOrNull { entry ->
+            val segments = entry.key.segments
+            segments.lastOrNull()?.name == "type" && segments.dropLast(1).map { it.name } == prefix
+        } ?: return null
+        val kind = (typeEntry.value as? TomlLiteral)?.kind as? TomlLiteralKind.String ?: return null
+        return kind.value
     }
 
     private fun isNestedUnderVrlCodec(keyValue: TomlKeyValue): Boolean {
@@ -87,4 +117,12 @@ class VRLTomlConfigInjector : MultiHostInjector {
     private fun lastSegmentName(key: TomlKey): String? = key.segments.lastOrNull()?.name
 
     override fun elementsToInjectIn(): List<Class<out PsiElement>> = listOf(TomlKeyValue::class.java)
+
+    companion object {
+        // The two `type` values whose sibling `source` holds VRL: a remap transform's program, and
+        // a fully-specified condition's boolean expression. Every other condition type
+        // (`datadog_search`, `is_log`, `is_metric`, `is_trace`) either has no `source` or holds a
+        // non-VRL query in it.
+        private val VRL_SOURCE_TYPES = setOf("remap", "vrl")
+    }
 }

@@ -49,7 +49,9 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
   reference*), plus automatic RegExp support (syntax highlighting and the "Check RegExp" intention)
   inside every `r'...'` regex literal
 - Automatic VRL injection into Vector's own TOML/YAML pipeline configs - `source` under a
-  `type = "remap"` transform, any plain-string `condition`, and `source` under a `vrl` codec
+  `type = "remap"` transform, any plain-string `condition`, `source` alongside `type = "vrl"`
+  (the fully-specified condition form, which also covers `starts_when`/`ends_when`/`exclude` and
+  the `route` transform's named outputs), and `source` under a `vrl` codec
   (`decoding.vrl.source` / `encoding.vrl.source`) - so a `.vrl` script written inline in
   `vector.toml`/`vector.yaml` gets full editor support with no manual setup (needs the bundled
   TOML and/or YAML plugin)

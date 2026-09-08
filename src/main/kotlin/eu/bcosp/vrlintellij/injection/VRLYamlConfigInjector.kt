@@ -9,11 +9,13 @@ import org.jetbrains.yaml.psi.YAMLScalar
 
 /**
  * YAML counterpart to [VRLTomlConfigInjector] - same config keys
- * (https://vector.dev/docs/reference/configuration/), same scoping rationale (including the
+ * (https://vector.dev/docs/reference/configuration/), same scoping rationale (including both the
  * `vrl`-codec `decoding.vrl.source`/`encoding.vrl.source` shape, e.g.
- * https://vector.dev/docs/reference/configuration/sources/http_server/#decoding.vrl.source), just
- * matched against the bundled YAML plugin's PSI instead of TOML's. Declared as an optional
- * dependency (`org.jetbrains.plugins.yaml`, see plugin.xml's `vrl-yaml.xml` config file).
+ * https://vector.dev/docs/reference/configuration/sources/http_server/#decoding.vrl.source, and
+ * the fully-specified condition's `type: vrl` + `source:` - which is the exact shape Vector's own
+ * `deserialize_anycondition_vrl` test in src/conditions/mod.rs is written in), just matched
+ * against the bundled YAML plugin's PSI instead of TOML's. Declared as an optional dependency
+ * (`org.jetbrains.plugins.yaml`, see plugin.xml's `vrl-yaml.xml` config file).
  */
 class VRLYamlConfigInjector : MultiHostInjector {
 
@@ -23,7 +25,7 @@ class VRLYamlConfigInjector : MultiHostInjector {
         if (!host.isValidHost) return
 
         val isVrl = when (keyValue.keyText) {
-            "source" -> siblingTypeIsRemap(keyValue) || isNestedUnderVrlCodec(keyValue)
+            "source" -> siblingType(keyValue) in VRL_SOURCE_TYPES || isNestedUnderVrlCodec(keyValue)
             "condition" -> true
             else -> false
         }
@@ -35,10 +37,12 @@ class VRLYamlConfigInjector : MultiHostInjector {
             .doneInjecting()
     }
 
-    private fun siblingTypeIsRemap(keyValue: YAMLKeyValue): Boolean {
-        val mapping = keyValue.parentMapping ?: return false
-        val typeValue = mapping.getKeyValueByKey("type")?.value as? YAMLScalar ?: return false
-        return typeValue.textValue == "remap"
+    // Unlike TOML, YAML has no dotted-key form - a condition's `type`/`source` are always both
+    // entries of the same nested mapping - so the enclosing mapping is already the right scope,
+    // with no key-prefix matching needed (contrast [VRLTomlConfigInjector.siblingType]).
+    private fun siblingType(keyValue: YAMLKeyValue): String? {
+        val mapping = keyValue.parentMapping ?: return null
+        return (mapping.getKeyValueByKey("type")?.value as? YAMLScalar)?.textValue
     }
 
     // `decoding:\n  codec: vrl\n  vrl:\n    source: ...` (or the flow-mapping `vrl: { source: ... }`
@@ -50,4 +54,10 @@ class VRLYamlConfigInjector : MultiHostInjector {
     }
 
     override fun elementsToInjectIn(): List<Class<out PsiElement>> = listOf(YAMLKeyValue::class.java)
+
+    companion object {
+        // See VRLTomlConfigInjector.VRL_SOURCE_TYPES - a remap transform's program, or a
+        // fully-specified VRL condition's boolean expression.
+        private val VRL_SOURCE_TYPES = setOf("remap", "vrl")
+    }
 }

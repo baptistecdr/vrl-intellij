@@ -82,4 +82,42 @@ class VRLYamlConfigInjectorTest : BasePlatformTestCase() {
         )
         assertNull(injected)
     }
+
+    // The shape Vector's own deserialize_anycondition_vrl test uses (src/conditions/mod.rs).
+    fun testInjectsIntoVrlConditionBlockMappingForm() {
+        val injected = injectedElementAt(
+            "transforms:\n  drop:\n    type: filter\n    condition:\n      type: vrl\n      source: '.nork == true'\n",
+            ".nork",
+        )
+        assertNotNull(injected)
+        assertEquals(VRL, injected!!.containingFile.language)
+    }
+
+    fun testInjectsIntoVrlConditionFlowMappingForm() {
+        val injected = injectedElementAt(
+            "transforms:\n  drop:\n    type: filter\n    condition: { type: vrl, source: \".status == 200\" }\n",
+            ".status",
+        )
+        assertNotNull(injected)
+        assertEquals(VRL, injected!!.containingFile.language)
+    }
+
+    // `source` is the query key for datadog_search conditions too, so the sibling `type` is what
+    // separates them - this must stay uninjected.
+    fun testDoesNotInjectDatadogSearchConditionSource() {
+        val injected = injectedElementAt(
+            "transforms:\n  drop:\n    type: filter\n    condition:\n      type: datadog_search\n      source: '*stack'\n",
+            "*stack",
+        )
+        assertNull(injected)
+    }
+
+    fun testInjectsIntoVrlConditionUnderArbitrarilyNamedRouteOutput() {
+        val injected = injectedElementAt(
+            "transforms:\n  r:\n    type: route\n    route:\n      important:\n        type: vrl\n        source: '.severity == \"high\"'\n",
+            ".severity",
+        )
+        assertNotNull(injected)
+        assertEquals(VRL, injected!!.containingFile.language)
+    }
 }

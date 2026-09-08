@@ -92,4 +92,65 @@ class VRLTomlConfigInjectorTest : BasePlatformTestCase() {
         )
         assertNull(injected)
     }
+
+    // The fully-specified condition form, in each of TOML's three spellings for it. All three are
+    // accepted by `vector validate` against a real filter transform.
+    fun testInjectsIntoVrlConditionInlineTableForm() {
+        val injected = injectedElementAt(
+            "[transforms.drop]\ntype = \"filter\"\ncondition = { type = \"vrl\", source = \".status == 200\" }\n",
+            ".status",
+        )
+        assertNotNull(injected)
+        assertEquals(VRL, injected!!.containingFile.language)
+    }
+
+    fun testInjectsIntoVrlConditionDottedKeyForm() {
+        val injected = injectedElementAt(
+            "[transforms.drop]\ntype = \"filter\"\ncondition.type = \"vrl\"\ncondition.source = \".status == 200\"\n",
+            ".status",
+        )
+        assertNotNull(injected)
+        assertEquals(VRL, injected!!.containingFile.language)
+    }
+
+    fun testInjectsIntoVrlConditionTableHeaderForm() {
+        val injected = injectedElementAt(
+            "[transforms.drop]\ntype = \"filter\"\n\n[transforms.drop.condition]\ntype = \"vrl\"\nsource = \".status == 200\"\n",
+            ".status",
+        )
+        assertNotNull(injected)
+        assertEquals(VRL, injected!!.containingFile.language)
+    }
+
+    // Regression guard for the dotted form's prefix matching: `condition.source` has to pair with
+    // `condition.type`, not with the enclosing transform's own `type = "filter"` sitting in the
+    // same table. Matching the first `type` entry regardless of prefix would read "filter" here.
+    fun testDottedConditionSourcePairsWithConditionTypeNotComponentType() {
+        val injected = injectedElementAt(
+            "[transforms.drop]\ntype = \"filter\"\ncondition.type = \"datadog_search\"\ncondition.source = \"*stack\"\n",
+            "*stack",
+        )
+        assertNull(injected)
+    }
+
+    // `type = "vrl"` identifies a condition wherever it appears, so the other condition-shaped
+    // fields (`starts_when`/`ends_when`/`exclude`/`flush_when`/`forward_when`, and the route
+    // transform's arbitrarily-named outputs) come along without naming any of them.
+    fun testInjectsIntoVrlConditionUnderReduceStartsWhen() {
+        val injected = injectedElementAt(
+            "[transforms.r]\ntype = \"reduce\"\nstarts_when = { type = \"vrl\", source = \".start == true\" }\n",
+            ".start",
+        )
+        assertNotNull(injected)
+        assertEquals(VRL, injected!!.containingFile.language)
+    }
+
+    fun testInjectsIntoVrlConditionUnderArbitrarilyNamedRouteOutput() {
+        val injected = injectedElementAt(
+            "[transforms.r]\ntype = \"route\"\nroute.important = { type = \"vrl\", source = \".severity == \\\"high\\\"\" }\n",
+            ".severity",
+        )
+        assertNotNull(injected)
+        assertEquals(VRL, injected!!.containingFile.language)
+    }
 }
