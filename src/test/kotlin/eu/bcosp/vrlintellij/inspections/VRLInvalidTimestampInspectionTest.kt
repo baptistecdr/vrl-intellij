@@ -22,19 +22,47 @@ class VRLInvalidTimestampInspectionTest : BasePlatformTestCase() {
         assertTrue(hasInvalidTimestampWarning())
     }
 
-    fun testFlagsSpaceInsteadOfT() {
-        myFixture.configureByText("t.vrl", "t'2021-01-01 00:00:00Z'")
-        assertTrue(hasInvalidTimestampWarning())
-    }
-
-    fun testFlagsLowercaseSeparators() {
-        myFixture.configureByText("t.vrl", "t'2021-01-01t00:00:00z'")
-        assertTrue(hasInvalidTimestampWarning())
-    }
-
     fun testFlagsInvalidCalendarDate() {
         myFixture.configureByText("t.vrl", "t'2021-13-01T00:00:00Z'")
         assertTrue(hasInvalidTimestampWarning())
+    }
+
+    fun testFlagsSecondOutOfRange() {
+        myFixture.configureByText("t.vrl", "t'2021-01-01T23:59:61Z'")
+        assertTrue(hasInvalidTimestampWarning())
+    }
+
+    fun testFlagsShortOffset() {
+        myFixture.configureByText("t.vrl", "t'2021-01-01T00:00:00+01'")
+        assertTrue(hasInvalidTimestampWarning())
+    }
+
+    // VRL parses `t'...'` with chrono's `DateTime<Utc>: FromStr`, documented as "a relaxed form
+    // of RFC 3339" - a space is accepted as the date/time separator (vector vrl accepts
+    // 't\'2021-01-01 00:00:00Z\'' outright).
+    fun testDoesNotFlagSpaceInsteadOfT() {
+        myFixture.configureByText("t.vrl", "t'2021-01-01 00:00:00Z'")
+        assertFalse(hasInvalidTimestampWarning())
+    }
+
+    fun testDoesNotFlagLowercaseSeparators() {
+        myFixture.configureByText("t.vrl", "t'2021-01-01t00:00:00z'")
+        assertFalse(hasInvalidTimestampWarning())
+    }
+
+    fun testDoesNotFlagOffsetWithoutColon() {
+        myFixture.configureByText("t.vrl", "t'2021-01-01T00:00:00+0100'")
+        assertFalse(hasInvalidTimestampWarning())
+    }
+
+    fun testDoesNotFlagLeapSecond() {
+        myFixture.configureByText("t.vrl", "t'2021-01-01T10:32:60Z'")
+        assertFalse(hasInvalidTimestampWarning())
+    }
+
+    fun testDoesNotFlagUnpaddedFields() {
+        myFixture.configureByText("t.vrl", "t'2021-1-5T0:0:0Z'")
+        assertFalse(hasInvalidTimestampWarning())
     }
 
     fun testDoesNotFlagUtcTimestamp() {
