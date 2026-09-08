@@ -10,9 +10,10 @@ import org.jetbrains.yaml.psi.YAMLScalar
 /**
  * YAML counterpart to [VRLTomlConfigInjector] - same config keys
  * (https://vector.dev/docs/reference/configuration/), same scoping rationale (including both the
- * `vrl`-codec `decoding.vrl.source`/`encoding.vrl.source` shape, e.g.
- * https://vector.dev/docs/reference/configuration/sources/http_server/#decoding.vrl.source, and
- * the fully-specified condition's `type: vrl` + `source:` - which is the exact shape Vector's own
+ * `vrl`-codec `decoding.vrl.source` shape, e.g.
+ * https://vector.dev/docs/reference/configuration/sources/http_server/#decoding.vrl.source - the
+ * `vrl` codec is decoding-only, there's no `encoding.vrl.source` counterpart - and the
+ * fully-specified condition's `type: vrl` + `source:` - which is the exact shape Vector's own
  * `deserialize_anycondition_vrl` test in src/conditions/mod.rs is written in), just matched
  * against the bundled YAML plugin's PSI instead of TOML's. Declared as an optional dependency
  * (`org.jetbrains.plugins.yaml`, see plugin.xml's `vrl-yaml.xml` config file).

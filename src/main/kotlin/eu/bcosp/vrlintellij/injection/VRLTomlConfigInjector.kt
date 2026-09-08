@@ -33,11 +33,16 @@ import org.toml.lang.psi.ext.kind
  *   `#[serde(tag = "type", rename_all = "snake_case")]`). That is unambiguous because no Vector
  *   component is itself named `vrl`: `type = "vrl"` fails to load as a transform ("unknown
  *   variant `vrl`"), so it can only ever be a VRL condition.
- * - `source` under a `vrl` codec table (`decoding.vrl.source` / `encoding.vrl.source`, e.g.
+ * - `source` under a `vrl` codec table (`decoding.vrl.source`, e.g.
  *   https://vector.dev/docs/reference/configuration/sources/http_server/#decoding.vrl.source) -
- *   any source's `decoding` or any sink's `encoding` can be set to `codec = "vrl"`, which then
- *   takes its own nested `vrl.source`. This is a distinct shape from the transform case: the
- *   "this is VRL" signal is an ancestor table/key literally named `vrl`, not a sibling `type`.
+ *   any source's `decoding` can be set to `codec = "vrl"`, which then takes its own nested
+ *   `vrl.source`. This is a distinct shape from the transform case: the "this is VRL" signal is an
+ *   ancestor table/key literally named `vrl`, not a sibling `type`. There's no encoding-side
+ *   counterpart - the `vrl` codec is decoding-only (`lib/codecs/src/decoding/format/vrl.rs`, no
+ *   `encoding/format` equivalent; `vector validate` rejects `encoding.codec = "vrl"` outright) -
+ *   but matching is still done on the ancestor key's name rather than the specific
+ *   `decoding.vrl` path, since that's simpler and Vector itself is the only thing that can ever
+ *   make an `encoding.vrl.*` shape exist to inject into.
  *
  * Declared as an optional dependency (`org.toml.lang`, see plugin.xml's `vrl-toml.xml` config
  * file) since not every IDE this plugin runs in bundles TOML support.
