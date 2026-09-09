@@ -9,8 +9,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiRecursiveElementWalkingVisitor
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import eu.bcosp.vrlintellij.psi.VRLAssignmentExpr
@@ -33,7 +31,7 @@ import eu.bcosp.vrlintellij.references.VRLVariableResolver.AssignmentTargetKind
 class VRLUnusedVariableInspection : LocalInspectionTool() {
 
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
-        val usedDeclarations = collectUsedDeclarations(holder.file)
+        val usedDeclarations = VRLVariableResolver.readDeclarations(holder.file)
         return object : PsiElementVisitor() {
             override fun visitElement(element: PsiElement) {
                 if (element.node?.elementType != VRLElementTypes.PRIMARY_EXPR) return
@@ -57,23 +55,6 @@ class VRLUnusedVariableInspection : LocalInspectionTool() {
                 )
             }
         }
-    }
-
-    private fun collectUsedDeclarations(file: PsiFile): Set<PsiElement> {
-        val used = mutableSetOf<PsiElement>()
-        file.accept(object : PsiRecursiveElementWalkingVisitor() {
-            override fun visitElement(element: PsiElement) {
-                if (element.node?.elementType == VRLElementTypes.PRIMARY_EXPR) {
-                    val primaryExpr = element as VRLPrimaryExpr
-                    val identifier = primaryExpr.identifier
-                    if (identifier != null && !VRLVariableResolver.isBareAssignmentTarget(primaryExpr)) {
-                        VRLVariableResolver.resolve(identifier)?.let { used.add(it) }
-                    }
-                }
-                super.visitElement(element)
-            }
-        })
-        return used
     }
 
     private object RenameToUnderscoreQuickFix : LocalQuickFix {

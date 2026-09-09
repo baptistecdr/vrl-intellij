@@ -27,6 +27,31 @@ object VRLVariableResolver {
         return findNearestPrecedingAssignment(usage.containingFile, name, usage.textRange.startOffset)
     }
 
+    /**
+     * Every bare assignment target in [file] whose value is read somewhere - the set an unused
+     * variable is defined by *not* being in.
+     *
+     * Shared by [eu.bcosp.vrlintellij.inspections.VRLUnusedVariableInspection] and
+     * [eu.bcosp.vrlintellij.intentions.VRLReplaceErrorDestructuringWithRaiseIntention], which ask
+     * the same question about the same model and would drift apart if each walked the tree itself.
+     */
+    fun readDeclarations(file: PsiFile): Set<PsiElement> {
+        val read = mutableSetOf<PsiElement>()
+        file.accept(object : PsiRecursiveElementWalkingVisitor() {
+            override fun visitElement(element: PsiElement) {
+                if (element.node?.elementType == VRLElementTypes.PRIMARY_EXPR) {
+                    val primaryExpr = element as VRLPrimaryExpr
+                    val identifier = primaryExpr.identifier
+                    if (identifier != null && !isBareAssignmentTarget(primaryExpr)) {
+                        resolve(identifier)?.let { read.add(it) }
+                    }
+                }
+                super.visitElement(element)
+            }
+        })
+        return read
+    }
+
     /** Every variable name visible from `fromOffset`: enclosing closure params plus every
      * preceding bare assignment in the file, closure params first (innermost scope first). */
     fun visibleVariableNames(fromOffset: Int, contextElement: PsiElement): List<String> {

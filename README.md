@@ -54,6 +54,11 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
   the `route` transform's named outputs), and `source` under a source's decoding `vrl` codec
   (`decoding.vrl.source`) - so a `.vrl` script written inline in `vector.toml`/`vector.yaml` gets
   full editor support with no manual setup (needs the bundled TOML and/or YAML plugin)
+- Intentions (*Alt+Enter*): flip a comparison's operands (`.status > 200` becomes
+  `200 < .status`) or negate its operator; convert a string literal between `"..."` and `s'...'`,
+  re-escaping so the value is unchanged (and not offered where a raw string couldn't express it);
+  and switch a fallible call between `target = f!(...)` and `target, err = f(...)`, the latter
+  only when nothing reads `err`
 - Postfix templates: `expr.iferr` expands to VRL's error-destructuring pattern
   (`target, err = expr; if err != null { }`), and `expr.raise` inserts the `!` raise-on-error
   suffix

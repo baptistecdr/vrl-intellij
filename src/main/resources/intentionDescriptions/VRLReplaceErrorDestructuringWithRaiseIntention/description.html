@@ -1,0 +1,7 @@
+<html>
+<body>
+Rewrites <code>target, err = f(...)</code> as <code>target = f!(...)</code>. Offered only when
+nothing reads <code>err</code>, where the captured error would otherwise be discarded silently.
+This changes behaviour: a failure aborts instead of passing unnoticed.
+</body>
+</html>
