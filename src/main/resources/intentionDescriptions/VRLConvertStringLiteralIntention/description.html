@@ -1,0 +1,11 @@
+<html>
+<body>
+Switches a string literal between VRL's interpreted form (<code>"..."</code>) and its raw form
+(<code>s'...'</code>), re-escaping the contents so the value is unchanged.
+<p>
+Converting to a raw string is not offered when the value could not survive it: when the string
+interpolates (<code>{{ ... }}</code>, which a raw string would leave literal), when it contains a
+single quote (a raw string cannot hold one), or when it contains a control character.
+</p>
+</body>
+</html>
