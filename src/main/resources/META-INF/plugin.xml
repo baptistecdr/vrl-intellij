@@ -239,6 +239,33 @@
                 level="ERROR"
                 implementationClass="eu.bcosp.vrlintellij.inspections.VRLEmptyBlockInspection"/>
 
+        <localInspection
+                language="VRL"
+                shortName="VRLUnnecessaryErrorCoalescing"
+                displayName="Unnecessary error coalescing"
+                groupName="VRL"
+                enabledByDefault="true"
+                level="WARNING"
+                implementationClass="eu.bcosp.vrlintellij.inspections.VRLUnnecessaryErrorCoalescingInspection"/>
+
+        <localInspection
+                language="VRL"
+                shortName="VRLUnnecessaryErrorAssignment"
+                displayName="Unnecessary error assignment"
+                groupName="VRL"
+                enabledByDefault="true"
+                level="WARNING"
+                implementationClass="eu.bcosp.vrlintellij.inspections.VRLUnnecessaryErrorAssignmentInspection"/>
+
+        <localInspection
+                language="VRL"
+                shortName="VRLNonBooleanPredicate"
+                displayName="Non-boolean predicate"
+                groupName="VRL"
+                enabledByDefault="true"
+                level="WARNING"
+                implementationClass="eu.bcosp.vrlintellij.inspections.VRLNonBooleanPredicateInspection"/>
+
         <codeInsight.parameterInfo
                 language="VRL"
                 implementationClass="eu.bcosp.vrlintellij.parameterInfo.VRLParameterInfoHandler"/>

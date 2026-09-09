@@ -83,6 +83,13 @@ transformation language from [Vector](https://vector.dev). It isn't affiliated w
     - Unused variables, with a "Rename to `_`" quick fix
     - Unresolved variables, with a "did you mean" quick fix
     - Empty blocks (VRL disallows `{ }` with no statements)
+    - Unnecessary error coalescing - `??` after an expression that can't fail (a literal or an
+      already-raised `f!(...)` call), which VRL rejects outright, with a "Remove `??` fallback"
+      quick fix
+    - Unnecessary error assignment - the `value, err = ...` form used on an expression that can't
+      fail, which VRL only allows for genuinely fallible right-hand sides
+    - Non-boolean predicates, for `if` conditions written as a literal of the wrong type
+      (e.g. `if "a" { }`)
 - Real compiler diagnostics (opt-in): runs the script through Vector's own
   [`vector vrl`](https://vector.dev/docs/reference/cli/#vrl) compiler in the background and marks
   whatever it reports as errors - a ground-truth check on top of this plugin's own inspections

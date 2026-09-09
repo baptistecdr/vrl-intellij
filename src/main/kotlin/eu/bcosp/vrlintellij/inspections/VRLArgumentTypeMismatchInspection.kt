@@ -3,7 +3,6 @@ package eu.bcosp.vrlintellij.inspections
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
-import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
 import eu.bcosp.vrlintellij.functions.VRLFunction
@@ -12,7 +11,6 @@ import eu.bcosp.vrlintellij.psi.VRLArgument
 import eu.bcosp.vrlintellij.psi.VRLElementTypes
 import eu.bcosp.vrlintellij.psi.VRLPostfixExpr
 import eu.bcosp.vrlintellij.psi.VRLPrimaryExpr
-import eu.bcosp.vrlintellij.psi.collapsePassThroughWrappers
 
 /**
  * Flags a call argument whose value is an unambiguous literal (a string, number, boolean, null,
@@ -20,7 +18,7 @@ import eu.bcosp.vrlintellij.psi.collapsePassThroughWrappers
  * the per-argument `types` already recorded in [allFunctions] - e.g. `split(1, ",")`, where
  * `split`'s first parameter only accepts `string`.
  *
- * Deliberately conservative: only literals get a static type at all (see [literalType]) - a
+ * Deliberately conservative: only literals get a static type at all (see [literalTypeName]) - a
  * variable, path, function call, or any other expression could be any type at runtime, so those
  * are left unchecked rather than guessed at, avoiding false positives entirely at the cost of
  * missing every non-literal mismatch. Argument-to-parameter resolution (matching each call
@@ -61,7 +59,7 @@ class VRLArgumentTypeMismatchInspection : LocalInspectionTool() {
             } ?: continue
 
             val valueNode = (argument.expression ?: argument.assignmentExpr)?.node ?: continue
-            val actualType = literalType(valueNode) ?: continue
+            val actualType = literalTypeName(valueNode) ?: continue
             if ("any" in declared.types || actualType in declared.types) continue
 
             holder.registerProblem(
@@ -73,16 +71,4 @@ class VRLArgumentTypeMismatchInspection : LocalInspectionTool() {
         }
     }
 
-    private fun literalType(node: ASTNode): String? = when (collapsePassThroughWrappers(node).elementType) {
-        VRLElementTypes.STRING, VRLElementTypes.RAW_STRING -> "string"
-        VRLElementTypes.INTEGER_LITERAL -> "integer"
-        VRLElementTypes.FLOAT_LITERAL -> "float"
-        VRLElementTypes.TRUE, VRLElementTypes.FALSE -> "boolean"
-        VRLElementTypes.NULL -> "null"
-        VRLElementTypes.REGEX -> "regex"
-        VRLElementTypes.TIMESTAMP -> "timestamp"
-        VRLElementTypes.ARRAY_EXPR -> "array"
-        VRLElementTypes.OBJECT_EXPR -> "object"
-        else -> null
-    }
 }
