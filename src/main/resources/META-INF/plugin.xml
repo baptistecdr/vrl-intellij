@@ -239,6 +239,18 @@
                 level="ERROR"
                 implementationClass="eu.bcosp.vrlintellij.inspections.VRLEmptyBlockInspection"/>
 
+        <intentionAction>
+            <language>VRL</language>
+            <className>eu.bcosp.vrlintellij.intentions.VRLFlipComparisonIntention</className>
+            <category>VRL</category>
+        </intentionAction>
+
+        <intentionAction>
+            <language>VRL</language>
+            <className>eu.bcosp.vrlintellij.intentions.VRLNegateComparisonIntention</className>
+            <category>VRL</category>
+        </intentionAction>
+
         <localInspection
                 language="VRL"
                 shortName="VRLUnnecessaryErrorCoalescing"
