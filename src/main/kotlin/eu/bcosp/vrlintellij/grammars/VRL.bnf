@@ -68,13 +68,24 @@
         QUESTION='?'
         ARROW='->'
 
-        // Literals (regexp patterns for reference)
+        // Literals. These patterns are reference only - lexing is done by VRLLexer.flex, which is
+        // the file to change if a token's shape is wrong. They are kept in step with it because
+        // this block is what anyone reads first to learn the token shapes.
+        //
+        // The three quoted forms share one rule, mirroring vrl's own lexer (quoted_literal in
+        // src/parser/lex.rs, which raw_string_literal/regex_literal/timestamp_literal all call): a
+        // backslash escapes whatever character follows it, and the first unescaped quote ends the
+        // literal. There is no doubled-quote escape - `vector vrl` rejects s'a''b' with error 203 -
+        // and a trailing backslash swallows the closing quote, leaving the literal unterminated
+        // (error 208). The backslash only affects where the literal *ends*: the escape stays in
+        // the token's content, so s'a\'b' is the four characters a \ ' b, which is why
+        // VRLRawLiteralEscaper decodes by straight substring copy.
         FLOAT_LITERAL='regexp:[0-9][0-9_]*\.[0-9][0-9_]*([eE][+-]?[0-9]+)?'
         INTEGER_LITERAL='regexp:[0-9][0-9_]*'
         STRING='regexp:"([^"\\]|\\.)*"'
-        RAW_STRING="regexp:s'([^']|'')*'"
-        REGEX="regexp:r'([^']|'')*'"
-        TIMESTAMP="regexp:t'[^']*'"
+        RAW_STRING="regexp:s'([^'\\]|\\.)*'"
+        REGEX="regexp:r'([^'\\]|\\.)*'"
+        TIMESTAMP="regexp:t'([^'\\]|\\.)*'"
         IDENTIFIER='regexp:[a-zA-Z_][a-zA-Z0-9_]*'
         FUNCTION_CALL='regexp:[a-zA-Z_][a-zA-Z0-9_]*(?=[(!])'
     ]

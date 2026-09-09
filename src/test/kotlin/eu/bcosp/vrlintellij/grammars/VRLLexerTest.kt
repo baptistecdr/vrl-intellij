@@ -83,8 +83,42 @@ class VRLLexerTest : TestCase() {
         )
     }
 
+    // Doubling is *not* an escape: `vector vrl` rejects s'a''b' with error 203, so the literal has
+    // to end at the first unescaped quote rather than swallowing the pair.
+    fun testRawStringLiteralDoesNotTreatDoubledQuoteAsEscape() {
+        val tokens = nonTrivialTokens("s'a''b'")
+        assertEquals(VRLElementTypes.RAW_STRING to "s'a'", tokens.first())
+        assertTrue("expected the rest to not lex as one literal, got $tokens", tokens.size > 1)
+    }
+
+    // A trailing backslash escapes the closing quote, leaving the literal unterminated - which
+    // `vector vrl` reports as error 208, so there is no RAW_STRING token to hand out here.
+    fun testUnterminatedRawStringLiteralIsNotAToken() {
+        assertTrue(nonTrivialTokens("s'ab\\'").none { it.first == VRLElementTypes.RAW_STRING })
+    }
+
     fun testRegexLiteral() {
         assertEquals(listOf(VRLElementTypes.REGEX to "r'^[a-z]+'"), nonTrivialTokens("r'^[a-z]+'"))
+    }
+
+    fun testRegexLiteralDoesNotTreatDoubledQuoteAsEscape() {
+        val tokens = nonTrivialTokens("r'a''b'")
+        assertEquals(VRLElementTypes.REGEX to "r'a'", tokens.first())
+        assertTrue("expected the rest to not lex as one literal, got $tokens", tokens.size > 1)
+    }
+
+    // The timestamp rule shares vrl's quoted_literal too, so it behaves the same way.
+    fun testTimestampLiteralDoesNotTreatDoubledQuoteAsEscape() {
+        val tokens = nonTrivialTokens("t'a''b'")
+        assertEquals(VRLElementTypes.TIMESTAMP to "t'a'", tokens.first())
+        assertTrue("expected the rest to not lex as one literal, got $tokens", tokens.size > 1)
+    }
+
+    fun testTimestampLiteralWithEscapedQuote() {
+        assertEquals(
+            listOf(VRLElementTypes.TIMESTAMP to "t'a\\'b'"),
+            nonTrivialTokens("t'a\\'b'")
+        )
     }
 
     fun testRegexLiteralWithEscapedQuote() {

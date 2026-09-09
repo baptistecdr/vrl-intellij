@@ -13,9 +13,10 @@ package eu.bcosp.vrlintellij.intentions
  * - `"..."` interpolates `{{ ... }}` while `s'...'` does not: with `x = "V"`, `"got {{x}}"`
  *   evaluates to `got V` but `s'got {{x}}'` stays `got {{x}}`. A single `{`, a single `}`, and
  *   even `}}` are literal - only a doubled `{{` starts an interpolation, and `\{{` escapes it.
- * - A raw string cannot contain a single quote *at all*. Both `s'a'b'` and the doubled
- *   `s'a''b'` are compiler error 203, even though this plugin's own lexer rule spells
- *   RAW_STRING as `s'([^']|'')*'` - the lexer is more permissive than the language.
+ * - A raw string cannot contain a bare single quote: both `s'a'b'` and the doubled `s'a''b'`
+ *   are compiler error 203. It can contain an escaped one - `s'a\'b'` is accepted - but the
+ *   backslash stays in the value (`a\'b`, four characters), so a raw string still has no way to
+ *   express a lone `'`. Writing one is what this conversion refuses over.
  */
 internal object VRLStringLiteralConversion {
 
