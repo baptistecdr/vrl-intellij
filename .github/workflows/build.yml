@@ -27,7 +27,7 @@ jobs:
       - name: Build plugin distribution
         run: ./gradlew buildPlugin
       - name: Upload build artifact
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: vrl-intellij-plugin
           path: build/distributions/*.zip
