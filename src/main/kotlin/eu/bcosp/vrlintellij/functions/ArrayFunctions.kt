@@ -80,6 +80,34 @@ val arrayFunctions = mapOf(
         ),
         returnTypes = setOf("array")
     ),
+    "range" to VRLFunction(
+        name = "range",
+        description = "Returns an array of integers from <code>start</code> (inclusive) to <code>end</code> (exclusive), incremented by <code>step</code>.",
+        isFallible = true,
+        isPure = true,
+        arguments = listOf(
+            VRLFunctionArgument(
+                "start",
+                setOf("integer"),
+                "The first value of the range.",
+                true
+            ),
+            VRLFunctionArgument(
+                "end",
+                setOf("integer"),
+                "The end of the range. This value is not included in the result.",
+                true
+            ),
+            VRLFunctionArgument(
+                "step",
+                setOf("integer"),
+                "The increment between values. Can be negative, but not zero.",
+                false,
+                defaultValue = 1
+            )
+        ),
+        returnTypes = setOf("array", "error")
+    ),
     "zip" to VRLFunction(
         name = "zip",
         description = "<p>Iterate over several arrays in parallel, producing a new array containing arrays of items from each source. The resulting array will be as long as the shortest input array, with all the remaining elements dropped. This function is modeled from the <code>zip</code> function <a href=\"https://docs.python.org/3/library/functions.html#zip\">in Python</a>, but similar methods can be found in <a href=\"https://docs.ruby-lang.org/en/master/Array.html#method-i-zip\">Ruby</a> and <a href=\"https://doc.rust-lang.org/stable/std/iter/trait.Iterator.html#method.zip\">Rust</a>.</p>\n\n<p>If a single parameter is given, it must contain an array of all the input arrays.</p>",
