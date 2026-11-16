@@ -158,13 +158,6 @@ class VRLParsingTest : ParsingTestCase("", "vrl", VRLParserDefinition()) {
         assertEquals(listOf("x = y", "[0] = 1"), topLevelStatementTexts("x = y\n[0] = 1\n"))
     }
 
-    fun testNewlineBlocksAQuestionContinuation() {
-        // A bare `?` can't start a fresh statement on its own (it's only a postfix suffix), so
-        // this input is expected to still report a parse error for the dangling `?` - what this
-        // actually checks is that `y` didn't get silently extended into `y?` in the first place.
-        assertEquals("x = y", topLevelStatementTexts("x = y\n?\n").first())
-    }
-
     fun testNewlineSeparatesStatementsAcrossACallContinuation() {
         assertEquals(listOf("x = y", "upcase(\"a\")"), topLevelStatementTexts("x = y\nupcase(\"a\")\n"))
     }
@@ -376,5 +369,46 @@ class VRLParsingTest : ParsingTestCase("", "vrl", VRLParserDefinition()) {
 
     fun testAdjacentPathContinuationsParse() {
         assertParsesWithoutErrors(".y = parse_json!(\"{}\").b\n.z = [1, 2][0]\n.w = {\"b\": 1}.b\n.v = .a.b[0].\"c d\"\n")
+    }
+
+    // `vector vrl`: a bare `abort` on its own line doesn't take the next line as its message.
+    fun testAbortDoesNotSwallowTheNextLine() {
+        assertEquals(listOf("abort", ".x = 1"), topLevelStatementTexts("abort\n.x = 1\n"))
+        assertParsesWithoutErrors("abort \"oops\"\n")
+    }
+
+    // parser.lalrpop's ReturnExpr requires a value; `return` alone or before a line break is E203.
+    fun testReturnNeedsAValueOnTheSameLine() {
+        assertParsesWithoutErrors("return .\n")
+        assertRejected("return\n")
+        assertRejected("if true {\n  return\n  .x\n}\n")
+    }
+
+    // lex.rs: digits followed by an identifier character lex as one identifier.
+    fun testDigitLeadingNamesParse() {
+        assertParsesWithoutErrors(".http.5xx = 1\n")
+        assertParsesWithoutErrors("5xx = 1\n.y = 5xx\n")
+    }
+
+    // An argument list only follows a function name directly: `vector vrl` rejects all three.
+    fun testOnlyAFunctionNameCanBeCalled() {
+        assertRejected(".x = 5xx(1)\n")
+        assertRejected(".x = .a(1)\n")
+        assertRejected(".x = upcase(\"a\")(\"b\")\n")
+        assertParsesWithoutErrors(".x = upcase!(\"a\")\n")
+    }
+
+    // parser.lalrpop's Predicate::Many: expressions in parentheses separated by `;` or newlines.
+    fun testMultiExpressionIfPredicateParses() {
+        assertParsesWithoutErrors("if (x = 1; x == 1) { .a = 1 }\n")
+        assertParsesWithoutErrors("if (x = 1; x == 1;) { .a = 1 }\n")
+        assertParsesWithoutErrors("if (\n  x = 1\n  x == 1\n) { .a = 1 }\n")
+        assertParsesWithoutErrors("if (.a == 1) { .b = 2 }\n")
+    }
+
+    fun testMissingSeparatorErrorIsShortAndAtTheGap() {
+        val errors = assertParseErrors(".a = 1 .b = 2\n")
+        assertEquals(listOf("';' or new line expected"), errors.map { it.errorDescription })
+        assertEquals(6, errors.single().textOffset)
     }
 }

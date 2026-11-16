@@ -15,6 +15,7 @@ import eu.bcosp.vrlintellij.psi.VRLArgument
 import eu.bcosp.vrlintellij.psi.VRLArgumentList
 import eu.bcosp.vrlintellij.psi.VRLCallSuffix
 import eu.bcosp.vrlintellij.psi.VRLElementTypes
+import eu.bcosp.vrlintellij.psi.VRLFieldName
 import eu.bcosp.vrlintellij.psi.VRLPathSegment
 import eu.bcosp.vrlintellij.psi.VRLPostfixExpr
 import eu.bcosp.vrlintellij.psi.VRLPostfixSuffix
@@ -49,7 +50,7 @@ class VRLCompletionContributor : CompletionContributor() {
         // plugin knows to suggest — it has no schema for event fields, and a function or
         // variable name there wouldn't mean what it looks like it means.
         val parent = position.parent
-        if (parent is VRLPathSegment || parent is VRLPostfixSuffix) return
+        if (parent is VRLFieldName || parent is VRLPathSegment || parent is VRLPostfixSuffix) return
 
         enclosingCall(position)?.let { call ->
             completeArgumentNames(call, result)

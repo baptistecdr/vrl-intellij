@@ -12,7 +12,9 @@ object VRLHighlightingTokenSets {
     val DOT = TokenSet.create(VRLElementTypes.DOT)
 
     val ARROW = TokenSet.create(VRLElementTypes.ARROW)
-    val IDENTIFIER = TokenSet.create(VRLElementTypes.IDENTIFIER)
+    // PATH_FIELD (`@timestamp`) is an identifier-shaped token too; in path position
+    // VRLPathAnnotator recolors it as a field like any other.
+    val IDENTIFIER = TokenSet.create(VRLElementTypes.IDENTIFIER, VRLElementTypes.PATH_FIELD)
 
     val FUNCTION_CALL = TokenSet.create(VRLElementTypes.FUNCTION_CALL)
 

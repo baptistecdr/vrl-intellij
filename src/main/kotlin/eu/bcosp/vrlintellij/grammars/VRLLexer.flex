@@ -40,6 +40,10 @@ LINE_COMMENT="#"[^\r\n]*
 FLOAT=-?[0-9][0-9_]*\.[0-9][0-9_]*
 INTEGER=-?[0-9][0-9_]*
 IDENTIFIER=[a-zA-Z_@][a-zA-Z0-9_@]*
+// lex.rs's numeric_literal_or_identifier: a digit run followed by an identifier character is one
+// identifier, not a number then a name - `5xx = 1` and `.http.5xx` both compile. Never a function
+// call (`5xx(1)` is E203), and a leading `-` keeps it a number (`-5xx` is `-5` then `xx`).
+DIGIT_IDENTIFIER=[0-9][0-9_]*[a-zA-Z_@][a-zA-Z0-9_@]*
 // lex.rs's string_literal runs to the next unescaped `"`, across newlines. The closing quote is
 // optional so a freshly-typed opening quote still lexes as STRING (VRLQuoteHandler needs that).
 STRING_LITERAL=\"([^\"\\]|\\[^])*\"?
@@ -107,6 +111,7 @@ TIMESTAMP_LITERAL=t\'([^\'\\]|\\.)*\'
     {RAW_STRING_LITERAL}   { return RAW_STRING; }
     {REGEX_LITERAL}        { return REGEX; }
     {STRING_LITERAL}       { return STRING; }
+    {DIGIT_IDENTIFIER}     { return identifierType(yytext()); }
     {FLOAT}                { return FLOAT_LITERAL; }
     {INTEGER}              { return INTEGER_LITERAL; }
 

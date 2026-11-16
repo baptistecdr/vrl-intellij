@@ -15,9 +15,19 @@ class VRLNamesValidatorTest {
         assertTrue(validator.isIdentifier("foo_bar_123", null))
     }
 
+    // vrl's lex.rs lexes a digit run followed by an identifier character as one identifier:
+    // `vector vrl '5xx = 1'` compiles. A bare number is still not a name.
     @Test
-    fun `rejects an identifier starting with a digit`() {
-        assertFalse(validator.isIdentifier("1foo", null))
+    fun `accepts an identifier starting with a digit`() {
+        assertTrue(validator.isIdentifier("5xx", null))
+        assertFalse(validator.isIdentifier("123", null))
+    }
+
+    // An identifier containing `@` is a path field (`.@timestamp`), never a variable.
+    @Test
+    fun `rejects an identifier containing an at sign`() {
+        assertFalse(validator.isIdentifier("x@y", null))
+        assertFalse(validator.isIdentifier("@timestamp", null))
     }
 
     @Test
