@@ -5,6 +5,7 @@ import com.intellij.lang.parser.GeneratedParserUtilBase
 import com.intellij.psi.TokenType
 import eu.bcosp.vrlintellij.psi.NEWLINE
 import eu.bcosp.vrlintellij.psi.VRLElementTypes
+import eu.bcosp.vrlintellij.psi.isWhitespaceOrComment
 
 /**
  * Grammar-Kit external predicate, invoked as `<<newlineBefore>>` in VRL.bnf. The generated parser
@@ -24,6 +25,7 @@ object VRLParserUtil : GeneratedParserUtilBase() {
 
     @JvmStatic
     fun newlineBefore(builder: PsiBuilder, level: Int): Boolean {
+        skipToCurrentToken(builder)
         var steps = -1
         while (true) {
             when (builder.rawLookup(steps)) {
@@ -33,5 +35,24 @@ object VRLParserUtil : GeneratedParserUtilBase() {
                 else -> return false
             }
         }
+    }
+
+    /**
+     * `<<adjacent>>` in VRL.bnf: true when the current token directly follows the previous one,
+     * with no whitespace, newline or comment between them - used where vrl's lexer only keeps a
+     * path going on an adjacent character (`.a.b`, `.a[0]`, but not `.a .b`).
+     */
+    @JvmStatic
+    fun adjacent(builder: PsiBuilder, level: Int): Boolean {
+        skipToCurrentToken(builder)
+        val previous = builder.rawLookup(-1) ?: return false
+        return !isWhitespaceOrComment(previous)
+    }
+
+    // PsiBuilder skips whitespace lazily: right after advanceLexer() it still sits just past the
+    // consumed token, so rawLookup(-1) would return that token even when whitespace follows it
+    // (`x. b` looked adjacent). Asking for the current token type moves past the whitespace first.
+    private fun skipToCurrentToken(builder: PsiBuilder) {
+        builder.tokenType
     }
 }

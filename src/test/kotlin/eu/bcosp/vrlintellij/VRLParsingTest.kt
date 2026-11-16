@@ -7,6 +7,9 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.testFramework.ParsingTestCase
 import eu.bcosp.vrlintellij.psi.VRLArrayExpr
 import eu.bcosp.vrlintellij.psi.VRLBlockExpr
+import eu.bcosp.vrlintellij.psi.VRLElementTypes
+import eu.bcosp.vrlintellij.psi.VRLMergeExpr
+import eu.bcosp.vrlintellij.psi.VRLNullCoalesceExpr
 import eu.bcosp.vrlintellij.psi.VRLParserDefinition
 import eu.bcosp.vrlintellij.psi.VRLStatement
 
@@ -112,7 +115,7 @@ class VRLParsingTest : ParsingTestCase("", "vrl", VRLParserDefinition()) {
     }
 
     fun testArrayLiteralElementCountIsNotSwallowedByMultiTargetAssignment() {
-        // Regression check: a naive `(COMMA or_expr)?` folded into `assignment_expr` itself would
+        // Regression check: a naive `(COMMA null_coalesce_expr)?` folded into `assignment_expr` itself would
         // greedily consume the comma in `[a, b]` too, silently collapsing it into a 1-element
         // array whose element is a bogus "a, b" node instead of a proper 2-element array.
         val file = createPsiFile("t", "x = [a, b]\n")
@@ -204,5 +207,174 @@ class VRLParsingTest : ParsingTestCase("", "vrl", VRLParserDefinition()) {
 
     fun testElseOnItsOwnLineStillParses() {
         assertParsesWithoutErrors("if true {\nx = 1\n}\nelse {\nx = 2\n}\n")
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // Divergences from real VRL. Every case below was run through `vector vrl` 0.61.0; the
+    // grammar it mirrors is vrl's src/parser/parser.lalrpop and src/parser/lex.rs.
+    // ---------------------------------------------------------------------------------------
+
+    private fun assertRejected(text: String) {
+        assertTrue("expected a parse error for [$text]", assertParseErrors(text).isNotEmpty())
+    }
+
+    // `vector vrl` runs `e = .` / `p = 1` / `.q = p` as three statements. A path segment used to
+    // be taken across the line break, turning the first two lines into `e = .p = 1`.
+    fun testBareDotAtEndOfLineDoesNotSwallowNextLine() {
+        val text = "e = .\np = 1\n.q = p\n"
+        assertParsesWithoutErrors(text)
+        assertEquals(listOf("e = .", "p = 1", ".q = p"), topLevelStatementTexts(text))
+    }
+
+    fun testBareMetadataRootAtEndOfLineDoesNotSwallowNextLine() {
+        assertEquals(listOf("m = %", "p = 1"), topLevelStatementTexts("m = %\np = 1\n"))
+    }
+
+    // lex.rs: `@` is an identifier character anywhere, and an identifier containing it is a
+    // PathField token, valid only as a path segment.
+    fun testAtSignPathFieldsParse() {
+        assertParsesWithoutErrors(".@timestamp = 1\n.x@y = 1\n.x = .@a\n%@x = 1\nx = {\"@a\": 1}\n.y = x.@a\n")
+    }
+
+    fun testAtSignIdentifierIsNotAVariable() {
+        assertRejected("x@y = 1\n")
+    }
+
+    // parser.lalrpop's AnyIdent: keywords and reserved identifiers are valid field names.
+    fun testKeywordsAsPathFieldsParse() {
+        assertParsesWithoutErrors(".if = 1\n.else = 2\n.null = 3\n.true = 4\n.false = 5\n.abort = 6\n.return = 7\n.break = 8\n")
+        assertParsesWithoutErrors("x = {\"if\": 1}\n.y = x.if\n")
+    }
+
+    fun testReservedIdentifiersAsPathFieldsParse() {
+        assertParsesWithoutErrors(".for = 1\n.while = 2\n.loop = 3\n.continue = 4\n.string = 5\n")
+    }
+
+    // `in` is not a VRL keyword at all; `in = 1` compiles.
+    fun testInIsAnOrdinaryVariable() {
+        assertParsesWithoutErrors("in = 1\n.x = in\n")
+    }
+
+    // Reserved identifiers are rejected as variables (`vector vrl`: E205 reserved keyword).
+    fun testReservedIdentifiersAreNotVariables() {
+        assertRejected("for = 1\n")
+        assertRejected("loop = 1\n")
+        assertRejected("string = 1\n")
+    }
+
+    fun testFunctionNamedLikeAReservedIdentifierStillParses() {
+        assertParsesWithoutErrors(".x = string!(.a)\n.y = int(.b) ?? 0\n")
+    }
+
+    // parser.lalrpop: Merge sits between Compare and Add.
+    fun testObjectMergeParses() {
+        val text = ".x = {\"a\": 1} | {\"b\": 2}\n"
+        assertParsesWithoutErrors(text)
+        val merge = PsiTreeUtil.findChildrenOfType(createPsiFile("t", text), VRLMergeExpr::class.java)
+            .single { it.node.findChildByType(VRLElementTypes.PIPE) != null }
+        assertEquals("{\"a\": 1} | {\"b\": 2}", merge.text)
+    }
+
+    fun testMergeBindsTighterThanComparison() {
+        val text = ".x = {\"a\": 1} | {\"b\": 2} == {\"a\": 1, \"b\": 2}\n"
+        assertParsesWithoutErrors(text)
+        val merge = PsiTreeUtil.findChildrenOfType(createPsiFile("t", text), VRLMergeExpr::class.java)
+            .single { it.node.findChildByType(VRLElementTypes.PIPE) != null }
+        assertEquals("{\"a\": 1} | {\"b\": 2}", merge.text)
+    }
+
+    fun testEmptyClosureParamListParses() {
+        assertParsesWithoutErrors(".x = for_each({}) -> || { null }\n")
+    }
+
+    fun testBreakParses() {
+        assertParsesWithoutErrors("for_each([1]) -> |_i, v| { break }\n")
+    }
+
+    // lex.rs: `-` directly followed by a digit is part of a numeric literal; there is no unary
+    // minus operator. `.x = -1`, `.a[-1]` and `1 - -2` compile; `3-1`, `- 1`, `-y`, `-(1)` are
+    // syntax errors (E203).
+    fun testNegativeNumberLiteralsParse() {
+        assertParsesWithoutErrors(".x = -1\n.y = -1.5\n.z = .a[-1]\n.w = [1, -2]\n.v = 1 - -2\n.u = 3 - 1\n")
+    }
+
+    fun testUnaryMinusIsRejected() {
+        assertRejected(".x = 3-1\n")
+        assertRejected(".x = - 1\n")
+        assertRejected("y = 2\n.x = -y\n")
+        assertRejected(".x = -(1)\n")
+    }
+
+    fun testDoubleNotParses() {
+        assertParsesWithoutErrors(".x = !!true\n.y = ! true\n")
+    }
+
+    // lex.rs's string_literal scans to the next unescaped `"`, newlines included.
+    fun testStringLiteralSpanningLinesParses() {
+        val text = ".x = \"a\nb\"\n.y = 1\n"
+        assertParsesWithoutErrors(text)
+        assertEquals(listOf(".x = \"a\nb\"", ".y = 1"), topLevelStatementTexts(text))
+    }
+
+    // parser.lalrpop: ErrorCoalesce is the loosest binary level, and `||`/`&&` share one level.
+    fun testErrorCoalescingBindsLooserThanLogicalOperators() {
+        val text = "x = false || null ?? true\n"
+        assertParsesWithoutErrors(text)
+        val coalesce = PsiTreeUtil.findChildrenOfType(createPsiFile("t", text), VRLNullCoalesceExpr::class.java)
+            .single { it.node.findChildByType(VRLElementTypes.NULL_COALESCE) != null }
+        assertEquals("false || null", coalesce.logicalExprList.first().text)
+    }
+
+    fun testLogicalOperatorsParse() {
+        assertParsesWithoutErrors(".x = false && true || true\n.y = .b || .c && false\n")
+    }
+
+    fun testNewlineAfterBinaryOperatorContinuesTheExpression() {
+        assertEquals(listOf(".x = 1 +\n2"), topLevelStatementTexts(".x = 1 +\n2\n"))
+    }
+
+    // `%` only starts a metadata path; VRL has no modulo operator (`mod()` is a function).
+    fun testPercentIsNotModulo() {
+        assertRejected(".y = 5 % 2\n")
+    }
+
+    // parser.lalrpop's Exprs require a newline or `;` between expressions.
+    fun testStatementsOnOneLineNeedASeparator() {
+        assertRejected(".a = 1 .b = 2\n")
+        assertRejected("x = 1 y = 2\n")
+        assertParsesWithoutErrors(".a = 1; .b = 2\n")
+        assertParsesWithoutErrors(".a = 1;\n.b = 2;\n")
+        assertParsesWithoutErrors("if true { .a = 1 }\n")
+    }
+
+    fun testMissingSeparatorStillParsesTheNextStatement() {
+        assertEquals(listOf(".a = 1", ".b = 2"), topLevelStatementTexts(".a = 1 .b = 2\n"))
+    }
+
+    fun testQuestionMarkSuffixIsRejected() {
+        assertRejected(".x = .a?\n")
+    }
+
+    // parser.lalrpop's ObjectKey is a string literal only.
+    fun testBareIdentifierObjectKeyIsRejected() {
+        assertRejected(".x = {a: 1}\n")
+    }
+
+    // lex.rs's numeric literal has no exponent part.
+    fun testFloatExponentIsRejected() {
+        assertRejected(".x = 1.5e3\n")
+    }
+
+    // `vector vrl`: whitespace never appears inside a path.
+    fun testWhitespaceInsideAPathIsRejected() {
+        assertRejected("x = {\"b\": 1}\n.y = x .b\n")
+        assertRejected("x = {\"b\": 1}\n.y = x. b\n")
+        assertRejected(".y = .a .b\n")
+        assertRejected(".y = [1] [0]\n")
+        assertRejected(".y = parse_json!(\"{}\") .b\n")
+    }
+
+    fun testAdjacentPathContinuationsParse() {
+        assertParsesWithoutErrors(".y = parse_json!(\"{}\").b\n.z = [1, 2][0]\n.w = {\"b\": 1}.b\n.v = .a.b[0].\"c d\"\n")
     }
 }

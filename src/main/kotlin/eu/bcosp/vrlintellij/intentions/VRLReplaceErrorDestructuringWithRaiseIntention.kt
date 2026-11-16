@@ -34,7 +34,7 @@ class VRLReplaceErrorDestructuringWithRaiseIntention : PsiElementBaseIntentionAc
         val assignment = VRLErrorHandlingForms.enclosingMultiAssignment(element) ?: return
         if (!isConvertible(assignment)) return
         val call = VRLErrorHandlingForms.assignedCall(assignment) ?: return
-        val targets = assignment.orExprList
+        val targets = assignment.nullCoalesceExprList
         val value = targets.getOrNull(0) ?: return
         val error = targets.getOrNull(1) ?: return
 
@@ -53,7 +53,7 @@ class VRLReplaceErrorDestructuringWithRaiseIntention : PsiElementBaseIntentionAc
         // Already raising - there is nothing to convert, and `f!!()` isn't a thing.
         if (call.raiseFlag != null) return false
 
-        val targets = assignment.orExprList
+        val targets = assignment.nullCoalesceExprList
         if (targets.size != 2) return false
 
         // `_ = f!()` is compiler error 640 ("unnecessary no-op assignment"), so a discarded value

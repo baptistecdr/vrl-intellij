@@ -52,14 +52,12 @@ object VRLHighlightingTokenSets {
     val KEYWORD = TokenSet.create(
         VRLElementTypes.IF,
         VRLElementTypes.ELSE,
-        VRLElementTypes.FOR,
-        VRLElementTypes.WHILE,
-        VRLElementTypes.LOOP,
         VRLElementTypes.BREAK,
-        VRLElementTypes.CONTINUE,
         VRLElementTypes.RETURN,
         VRLElementTypes.ABORT,
-        VRLElementTypes.IN,
+        // `for`, `while`, `string`, ...: vrl reports them as "reserved keyword" (E205) when used
+        // as a variable. In path position (`.for`) VRLPathAnnotator recolors them as a field.
+        VRLElementTypes.RESERVED_IDENTIFIER,
     )
 
     val CONSTANT = TokenSet.create(

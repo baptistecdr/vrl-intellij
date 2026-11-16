@@ -132,5 +132,6 @@ class VRLStringLiteralEscaper(host: PsiLanguageInjectionHost) : VRLLiteralTextEs
         return decodedToHostOffsets[index].coerceIn(rangeInsideHost.startOffset, rangeInsideHost.endOffset)
     }
 
-    override fun isOneLine(): Boolean = true
+    // A `"..."` literal may span lines (vrl's lex.rs string_literal scans across newlines).
+    override fun isOneLine(): Boolean = false
 }

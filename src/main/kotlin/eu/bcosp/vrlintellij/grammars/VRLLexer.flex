@@ -15,16 +15,34 @@ import static eu.bcosp.vrlintellij.psi.ElementTypesKt.NEWLINE;
 %function advance
 %type IElementType
 
-%state STRING_STATE
-%state RAW_STRING_STATE
-%state REGEX_STATE
+%{
+    // vrl's lex.rs (Token::ident) reports these as "reserved keyword" (E205) when used as a
+    // variable; they're still valid path fields (`.for`, `.string`), see VRL.bnf's field_name.
+    private static final java.util.Set<String> RESERVED_IDENTIFIERS = java.util.Set.of(
+        "array", "bool", "boolean", "continue", "do", "emit", "float", "for", "forall", "foreach",
+        "all", "each", "any", "try", "undefined", "int", "integer", "iter", "object", "regex",
+        "string", "traverse", "timestamp", "duration", "unless", "walk", "while", "loop"
+    );
+
+    private IElementType identifierType(CharSequence text) {
+        // lex.rs: `@` is an identifier character, and an identifier containing one is a
+        // PathField - only usable as a path segment (`.@timestamp`), never as a variable.
+        if (text.toString().indexOf('@') >= 0) return PATH_FIELD;
+        if (RESERVED_IDENTIFIERS.contains(text.toString())) return RESERVED_IDENTIFIER;
+        return IDENTIFIER;
+    }
+%}
 
 WHITE_SPACE=[\s]+
 LINE_COMMENT="#"[^\r\n]*
-FLOAT=[0-9][0-9_]*\.[0-9][0-9_]*([eE][+-]?[0-9]+)?
-INTEGER=[0-9][0-9_]*
-IDENTIFIER=[a-zA-Z_][a-zA-Z0-9_]*
-STRING_LITERAL=\"([^\"\\\r\n]|\\.|\\\r?\n[ \t]*)*\"?
+// lex.rs's numeric_literal_or_identifier: an optional leading `-` belongs to the literal (there's
+// no unary minus - `- 1` and `-x` are syntax errors), and there's no exponent part.
+FLOAT=-?[0-9][0-9_]*\.[0-9][0-9_]*
+INTEGER=-?[0-9][0-9_]*
+IDENTIFIER=[a-zA-Z_@][a-zA-Z0-9_@]*
+// lex.rs's string_literal runs to the next unescaped `"`, across newlines. The closing quote is
+// optional so a freshly-typed opening quote still lexes as STRING (VRLQuoteHandler needs that).
+STRING_LITERAL=\"([^\"\\]|\\[^])*\"?
 RAW_STRING_LITERAL=s\'([^\'\\]|\\.)*\'
 REGEX_LITERAL=r\'([^\'\\]|\\.)*\'
 TIMESTAMP_LITERAL=t\'([^\'\\]|\\.)*\'
@@ -43,17 +61,12 @@ TIMESTAMP_LITERAL=t\'([^\'\\]|\\.)*\'
     // Keywords
     "if"                   { return IF; }
     "else"                 { return ELSE; }
-    "for"                  { return FOR; }
-    "while"                { return WHILE; }
-    "loop"                 { return LOOP; }
     "break"                { return BREAK; }
-    "continue"             { return CONTINUE; }
     "return"               { return RETURN; }
     "abort"                { return ABORT; }
     "true"                 { return TRUE; }
     "false"                { return FALSE; }
     "null"                 { return NULL; }
-    "in"                   { return IN; }
 
     // Operators
     "="                    { return ASSIGN; }
@@ -98,9 +111,8 @@ TIMESTAMP_LITERAL=t\'([^\'\\]|\\.)*\'
     {INTEGER}              { return INTEGER_LITERAL; }
 
     // Identifiers (including paths)
-    "."                    { return DOT; }
     {IDENTIFIER} / "!"?"(" { return FUNCTION_CALL; }
-    {IDENTIFIER}           { return IDENTIFIER; }
+    {IDENTIFIER}           { return identifierType(yytext()); }
 }
 
 [^]                        { return TokenType.BAD_CHARACTER; }

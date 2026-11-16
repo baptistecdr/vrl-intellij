@@ -25,7 +25,7 @@ internal fun postfixTarget(context: PsiElement, offset: Int): Pair<VRLStatement,
 
 internal fun assignmentTargetText(statement: VRLStatement): String? {
     val assignment = statement.expression?.assignmentExpr ?: return null
-    return if (assignment.assignmentExpr != null) assignment.orExpr.text else null
+    return if (assignment.assignmentExpr != null) assignment.nullCoalesceExpr.text else null
 }
 
 // The FUNCTION_CALL token of a plain, not-yet-raised `name(...)` call the given value expression
