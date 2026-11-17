@@ -22,17 +22,12 @@
         // Keywords
         IF='if'
         ELSE='else'
-        FOR='for'
-        WHILE='while'
-        LOOP='loop'
         BREAK='break'
-        CONTINUE='continue'
         RETURN='return'
         ABORT='abort'
         TRUE='true'
         FALSE='false'
         NULL='null'
-        IN='in'
 
         // Operators
         ASSIGN='='
@@ -80,21 +75,28 @@
         // (error 208). The backslash only affects where the literal *ends*: the escape stays in
         // the token's content, so s'a\'b' is the four characters a \ ' b, which is why
         // VRLRawLiteralEscaper decodes by straight substring copy.
-        FLOAT_LITERAL='regexp:[0-9][0-9_]*\.[0-9][0-9_]*([eE][+-]?[0-9]+)?'
-        INTEGER_LITERAL='regexp:[0-9][0-9_]*'
+        FLOAT_LITERAL='regexp:-?[0-9][0-9_]*\.[0-9][0-9_]*'
+        INTEGER_LITERAL='regexp:-?[0-9][0-9_]*'
         STRING='regexp:"([^"\\]|\\.)*"'
         RAW_STRING="regexp:s'([^'\\]|\\.)*'"
         REGEX="regexp:r'([^'\\]|\\.)*'"
         TIMESTAMP="regexp:t'([^'\\]|\\.)*'"
-        IDENTIFIER='regexp:[a-zA-Z_][a-zA-Z0-9_]*'
-        FUNCTION_CALL='regexp:[a-zA-Z_][a-zA-Z0-9_]*(?=[(!])'
+        IDENTIFIER='regexp:[a-zA-Z_@][a-zA-Z0-9_@]*'
+        FUNCTION_CALL='regexp:[a-zA-Z_@][a-zA-Z0-9_@]*(?=[(!])'
+        // Both shaped like IDENTIFIER; VRLLexer.flex picks them out by content (see there).
+        PATH_FIELD='path field'
+        RESERVED_IDENTIFIER='reserved identifier'
     ]
 }
 
 root ::= statement*
 
-statement ::= multi_assignment_expr (SEMICOLON | &RBRACE)?
-            | expression (SEMICOLON | &RBRACE)?
+// vrl's parser.lalrpop (Exprs/EndOfExpression) needs a newline or `;` between two expressions:
+// `.a = 1 .b = 2` is E203. <<statementEnd>> (VRLParserUtil) reports a missing one as its own
+// short error and still succeeds, so the next statement parses on its own rather than being lost.
+statement ::= statement_body <<statementEnd>>
+
+private statement_body ::= multi_assignment_expr | expression
 
 expression ::= assignment_expr
 
@@ -106,39 +108,49 @@ expression ::= assignment_expr
 // Purely additive positions (LPAREN/LBRACKET/LBRACE bodies, `multi_assignment_expr`'s own
 // required comma) are left unguarded since a failed predicate there would fail the whole rule
 // rather than just stop a repetition, and multi-line calls/arrays/objects must keep working.
-assignment_expr ::= or_expr (!<<newlineBefore>> (ASSIGN | MERGE_ASSIGN) assignment_expr)?
+assignment_expr ::= null_coalesce_expr (!<<newlineBefore>> (ASSIGN | MERGE_ASSIGN) assignment_expr)?
 
 // `value, err = fallible_call()` is VRL's standard error-destructuring assignment form, used
 // alongside the `!` raise-on-error suffix. Kept separate from `assignment_expr` (rather than an
-// optional `(COMMA or_expr)?` folded into it) because that would greedily swallow any following
+// optional `(COMMA null_coalesce_expr)?` folded into it) because that would greedily swallow any following
 // `, <expr>` - breaking argument lists and array/object literals, which also route through
 // `assignment_expr` via `expression`. Scoping this to `statement` matches how VRL actually uses
 // it: only as a standalone statement, never nested inside another expression.
-multi_assignment_expr ::= or_expr COMMA or_expr (ASSIGN | MERGE_ASSIGN) assignment_expr
+multi_assignment_expr ::= null_coalesce_expr COMMA null_coalesce_expr (ASSIGN | MERGE_ASSIGN) assignment_expr
 
-or_expr ::= and_expr (!<<newlineBefore>> OR and_expr)*
+// Binary precedence, loosest first, per vrl's parser.lalrpop: ErrorCoalesce (`??`), Logical
+// (`||` and `&&` on one level), Equal/Compare, Merge (`|`), Add, Factor, Not.
+null_coalesce_expr ::= logical_expr (!<<newlineBefore>> NULL_COALESCE logical_expr)*
 
-and_expr ::= null_coalesce_expr (!<<newlineBefore>> AND null_coalesce_expr)*
+logical_expr ::= comparison_expr (!<<newlineBefore>> (OR | AND) comparison_expr)*
 
-null_coalesce_expr ::= comparison_expr (!<<newlineBefore>> NULL_COALESCE comparison_expr)*
+// parser.lalrpop splits this into Equal and Compare and lets both chain, but the compiler then
+// rejects any chain (E650 "comparison operators can't be chained together"), so one
+// non-repeating level reports the same programs as broken.
+comparison_expr ::= merge_expr (!<<newlineBefore>> (EQ | NE | GT | GE | LT | LE) merge_expr)?
 
-comparison_expr ::= additive_expr (!<<newlineBefore>> (EQ | NE | GT | GE | LT | LE) additive_expr)?
+merge_expr ::= additive_expr (!<<newlineBefore>> PIPE additive_expr)*
 
 additive_expr ::= multiplicative_expr (!<<newlineBefore>> (PLUS | MINUS) multiplicative_expr)*
 
-multiplicative_expr ::= unary_expr (!<<newlineBefore>> (STAR | SLASH | PERCENT) unary_expr)*
+// No `%`: it only ever starts a metadata path (`5 % 2` is E203; modulo is the `mod` function).
+multiplicative_expr ::= unary_expr (!<<newlineBefore>> (STAR | SLASH) unary_expr)*
 
-unary_expr ::= (NOT | MINUS)* postfix_expr
+// Only `!`: there's no unary minus - a `-` glued to a digit is part of the number literal
+// (see VRLLexer.flex), and `-x` / `-(1)` / `- 1` are all E203.
+unary_expr ::= NOT* postfix_expr
 
 postfix_expr ::= primary_expr (!<<newlineBefore>> postfix_suffix)*
 
 // Bracket indexing is integer-literal only in VRL - there's no dynamic/computed indexing by a
 // variable or arbitrary expression (confirmed against the vrl CLI: `.x[i]` and `.x["key"]` are
 // both syntax errors, only `.x[0]` is valid).
-postfix_suffix ::= call_suffix
-                 | bracket_index
-                 | DOT (IDENTIFIER | STRING)
-                 | QUESTION
+// A path never has whitespace inside it: `x .b`, `x. b`, `.a .b` and `[1] [0]` are all E203 in
+// `vector vrl` (vrl's lexer only continues a query on an adjacent character). Without this,
+// `.a = 1 .b = 2` parsed as `.a = (1.b = 2)` instead of reporting the missing separator.
+postfix_suffix ::= <<afterFunctionName>> call_suffix
+                 | <<adjacent>> bracket_index
+                 | <<adjacent>> DOT <<adjacent>> (field_name | STRING)
 
 // Pinned so `.foo[not-an-integer]` reports a real "integer literal expected" error at the bad
 // token. Without the pin, a failed match here would just make postfix_expr's repetition stop
@@ -163,10 +175,10 @@ primary_expr ::= literal
                | if_expr
                | abort_expr
                | return_expr
+               | break_expr
                | LPAREN expression RPAREN
                | array_expr
                | object_expr
-               | closure_expr
 {
   mixin="eu.bcosp.vrlintellij.psi.impl.VRLPrimaryExprMixin"
 }
@@ -184,32 +196,55 @@ literal ::= FLOAT_LITERAL
   mixin="eu.bcosp.vrlintellij.psi.impl.VRLLiteralMixin"
 }
 
-path_expr ::= DOT path_segment*
+// Segments must touch (see postfix_suffix) - which also stops one continuing past a line break:
+// `e = .` then `p = 1` on the next line are two statements in `vector vrl`, not `e = .p = 1`.
+path_expr ::= DOT (<<adjacent>> path_segment)*
 
 // The `%` sigil addresses event metadata instead of the event body, e.g. `%datadog_api_key`;
 // otherwise it follows the same segment syntax as a `.` event path.
-metadata_path_expr ::= PERCENT path_segment*
+metadata_path_expr ::= PERCENT (<<adjacent>> path_segment)*
 
 // Brackets are array-index only (`.items[0]`) - a quoted object key uses the dot-string form
 // instead (`.headers."User-Agent"`), never brackets (`.headers["User-Agent"]` is a syntax error
 // in real VRL, confirmed against the vrl CLI).
-path_segment ::= IDENTIFIER | STRING | LBRACKET INTEGER_LITERAL RBRACKET
+path_segment ::= field_name | STRING | LBRACKET INTEGER_LITERAL RBRACKET
+
+// parser.lalrpop's Field: any identifier, a PathField (`@timestamp`), a reserved identifier, or a
+// keyword - `.if`, `.null`, `.for` and `.string` are all ordinary field names. A node of its own
+// so VRLPathAnnotator and completion can recognize field position without re-listing these.
+field_name ::= IDENTIFIER | PATH_FIELD | RESERVED_IDENTIFIER
+                     | IF | ELSE | NULL | TRUE | FALSE | ABORT | RETURN | BREAK
 
 block_expr ::= LBRACE statement* RBRACE
 
-if_expr ::= IF expression block_expr (ELSE (if_expr | block_expr))?
+if_expr ::= IF (predicate_list | expression) block_expr (ELSE (if_expr | block_expr))?
 
-abort_expr ::= ABORT expression?
+// parser.lalrpop's Predicate::Many: `if (x = 1; x == 1) { }` - several expressions in parentheses,
+// separated by `;` or newlines, the last one being the condition. It needs at least one
+// separator, so a plain `(x == 1)` falls through to an ordinary parenthesized `expression`.
+predicate_list ::= LPAREN (assignment_expr predicate_separator)+ assignment_expr? RPAREN
 
-return_expr ::= RETURN expression?
+private predicate_separator ::= SEMICOLON+ | <<newlineBefore>>
+
+// The message is optional but must start on the same line: `abort` followed by `.x = 1` on the
+// next line is two statements in `vector vrl`.
+abort_expr ::= ABORT (!<<newlineBefore>> expression)?
+
+// parser.lalrpop's ReturnExpr requires a value on the same line: a bare `return` is E203.
+return_expr ::= RETURN <<sameLineValue expression>>
+
+break_expr ::= BREAK
 
 array_expr ::= LBRACKET (expression (COMMA expression)* COMMA?)? RBRACKET
 
 object_expr ::= LBRACE (object_field (COMMA object_field)* COMMA?)? RBRACE
 
-object_field ::= (IDENTIFIER | STRING) COLON expression
+// parser.lalrpop's ObjectKey is a string literal only: `{a: 1}` is E203.
+object_field ::= STRING COLON expression
 
-closure_expr ::= PIPE closure_params? PIPE expression
+// Only reachable after `->` (call_suffix): anywhere else a `|` is the merge operator. `||` lexes
+// as OR, which is how an empty parameter list is spelled.
+closure_expr ::= (PIPE closure_params? PIPE | OR) expression
 
 closure_params ::= closure_param (COMMA closure_param)*
 

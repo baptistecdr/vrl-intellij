@@ -32,7 +32,7 @@ class VRLTypeHintsProvider : InlayHintsProvider {
         override fun collectFromElement(element: PsiElement, sink: InlayTreeSink) {
             when (element) {
                 is VRLMultiAssignmentExpr -> {
-                    val targets = element.orExprList
+                    val targets = element.nullCoalesceExprList
                     if (targets.size != 2) return
                     val function = resolveDirectCallReturnType(element.assignmentExpr.node) ?: return
                     addHint(sink, targets[0].textRange.endOffset, successTypes(function))
@@ -42,7 +42,7 @@ class VRLTypeHintsProvider : InlayHintsProvider {
                 is VRLAssignmentExpr -> {
                     val rhs = element.assignmentExpr ?: return
                     val function = resolveDirectCallReturnType(rhs.node) ?: return
-                    addHint(sink, element.orExpr.textRange.endOffset, successTypes(function))
+                    addHint(sink, element.nullCoalesceExpr.textRange.endOffset, successTypes(function))
                 }
             }
         }

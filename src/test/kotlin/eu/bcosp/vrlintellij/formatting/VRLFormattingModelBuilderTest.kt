@@ -63,4 +63,17 @@ class VRLFormattingModelBuilderTest : BasePlatformTestCase() {
         val result = reformat("map_values(.) -> |value| {\nupcase(value)\n}\n")
         assertEquals("map_values(.) -> |value| {\n    upcase(value)\n}\n", result)
     }
+
+    fun testSpacesAroundMergeOperator() {
+        assertEquals(".x = {\"a\": 1} | {\"b\": 2}\n", reformat(".x={\"a\":1}|{\"b\":2}\n"))
+    }
+
+    // `-1` is one literal token (there's no unary minus), so its sign must not be split off.
+    fun testKeepsNegativeLiteralsTight() {
+        assertEquals("x = [1, -2]\ny = 1 - -2\n", reformat("x=[1,-2]\ny=1 - -2\n"))
+    }
+
+    fun testSpacesAroundLogicalOperators() {
+        assertEquals("x = true && false || true\n", reformat("x=true&&false||true\n"))
+    }
 }

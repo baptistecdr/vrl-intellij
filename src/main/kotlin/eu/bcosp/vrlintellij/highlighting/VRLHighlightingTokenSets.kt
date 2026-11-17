@@ -12,7 +12,9 @@ object VRLHighlightingTokenSets {
     val DOT = TokenSet.create(VRLElementTypes.DOT)
 
     val ARROW = TokenSet.create(VRLElementTypes.ARROW)
-    val IDENTIFIER = TokenSet.create(VRLElementTypes.IDENTIFIER)
+    // PATH_FIELD (`@timestamp`) is an identifier-shaped token too; in path position
+    // VRLPathAnnotator recolors it as a field like any other.
+    val IDENTIFIER = TokenSet.create(VRLElementTypes.IDENTIFIER, VRLElementTypes.PATH_FIELD)
 
     val FUNCTION_CALL = TokenSet.create(VRLElementTypes.FUNCTION_CALL)
 
@@ -52,14 +54,12 @@ object VRLHighlightingTokenSets {
     val KEYWORD = TokenSet.create(
         VRLElementTypes.IF,
         VRLElementTypes.ELSE,
-        VRLElementTypes.FOR,
-        VRLElementTypes.WHILE,
-        VRLElementTypes.LOOP,
         VRLElementTypes.BREAK,
-        VRLElementTypes.CONTINUE,
         VRLElementTypes.RETURN,
         VRLElementTypes.ABORT,
-        VRLElementTypes.IN,
+        // `for`, `while`, `string`, ...: vrl reports them as "reserved keyword" (E205) when used
+        // as a variable. In path position (`.for`) VRLPathAnnotator recolors them as a field.
+        VRLElementTypes.RESERVED_IDENTIFIER,
     )
 
     val CONSTANT = TokenSet.create(

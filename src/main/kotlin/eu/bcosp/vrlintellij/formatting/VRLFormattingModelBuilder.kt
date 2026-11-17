@@ -52,8 +52,6 @@ class VRLFormattingModelBuilder : FormattingModelBuilder {
             .after(VRLElementTypes.ELSE).spaces(1)
             .after(VRLElementTypes.RETURN).spaces(1)
             .after(VRLElementTypes.ABORT).spaces(1)
-            .before(VRLElementTypes.IN).spaces(1)
-            .after(VRLElementTypes.IN).spaces(1)
 
             // Closures: `-> |param| { ... }`
             .around(VRLElementTypes.ARROW).spaces(1)
@@ -64,10 +62,10 @@ class VRLFormattingModelBuilder : FormattingModelBuilder {
             .aroundInside(VRLElementTypes.ASSIGN, VRLElementTypes.MULTI_ASSIGNMENT_EXPR).spaces(1)
             .aroundInside(VRLElementTypes.MERGE_ASSIGN, VRLElementTypes.MULTI_ASSIGNMENT_EXPR).spaces(1)
 
-            // Binary operators - scoped to their precedence level's node so unary `!`/`-` (which
-            // share tokens with NOT/MINUS here) are left untouched.
-            .aroundInside(VRLElementTypes.OR, VRLElementTypes.OR_EXPR).spaces(1)
-            .aroundInside(VRLElementTypes.AND, VRLElementTypes.AND_EXPR).spaces(1)
+            // Binary operators - scoped to their precedence level's node so unary `!` (NOT) and
+            // closure pipes (PIPE/OR inside a CLOSURE_EXPR) are left untouched.
+            .aroundInside(VRLElementTypes.OR, VRLElementTypes.LOGICAL_EXPR).spaces(1)
+            .aroundInside(VRLElementTypes.AND, VRLElementTypes.LOGICAL_EXPR).spaces(1)
             .aroundInside(VRLElementTypes.NULL_COALESCE, VRLElementTypes.NULL_COALESCE_EXPR).spaces(1)
             .aroundInside(VRLElementTypes.EQ, VRLElementTypes.COMPARISON_EXPR).spaces(1)
             .aroundInside(VRLElementTypes.NE, VRLElementTypes.COMPARISON_EXPR).spaces(1)
@@ -75,10 +73,10 @@ class VRLFormattingModelBuilder : FormattingModelBuilder {
             .aroundInside(VRLElementTypes.GE, VRLElementTypes.COMPARISON_EXPR).spaces(1)
             .aroundInside(VRLElementTypes.LT, VRLElementTypes.COMPARISON_EXPR).spaces(1)
             .aroundInside(VRLElementTypes.LE, VRLElementTypes.COMPARISON_EXPR).spaces(1)
+            .aroundInside(VRLElementTypes.PIPE, VRLElementTypes.MERGE_EXPR).spaces(1)
             .aroundInside(VRLElementTypes.PLUS, VRLElementTypes.ADDITIVE_EXPR).spaces(1)
             .aroundInside(VRLElementTypes.MINUS, VRLElementTypes.ADDITIVE_EXPR).spaces(1)
             .aroundInside(VRLElementTypes.STAR, VRLElementTypes.MULTIPLICATIVE_EXPR).spaces(1)
             .aroundInside(VRLElementTypes.SLASH, VRLElementTypes.MULTIPLICATIVE_EXPR).spaces(1)
-            .aroundInside(VRLElementTypes.PERCENT, VRLElementTypes.MULTIPLICATIVE_EXPR).spaces(1)
     }
 }

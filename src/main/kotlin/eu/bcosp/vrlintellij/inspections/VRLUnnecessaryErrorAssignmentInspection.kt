@@ -33,7 +33,7 @@ class VRLUnnecessaryErrorAssignmentInspection : LocalInspectionTool() {
                 val value = multiAssignment.assignmentExpr ?: return
                 if (!isStructurallyInfallible(value.node)) return
 
-                val errorTarget = multiAssignment.orExprList.getOrNull(1) ?: return
+                val errorTarget = multiAssignment.nullCoalesceExprList.getOrNull(1) ?: return
                 holder.registerProblem(
                     errorTarget,
                     "Unnecessary error assignment: the assigned expression can't fail, so this " +

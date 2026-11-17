@@ -95,7 +95,7 @@ class VRLInlineVariableHandler : InlineActionHandler() {
         // composite itself, all the way to its sole child - the raw identifier leaf token (a
         // primary_expr's own single IDENTIFIER child is, in turn, just one more pass-through
         // level) - so the comparison has to be leaf-to-leaf, not leaf-to-composite.
-        if (collapsePassThroughWrappers(assignment.orExpr.node) != target.identifier?.node) return null
+        if (collapsePassThroughWrappers(assignment.nullCoalesceExpr.node) != target.identifier?.node) return null
         if (assignment.assignmentExpr?.assignmentExpr != null) return null
 
         val statement = PsiTreeUtil.getParentOfType(assignment, VRLStatement::class.java) ?: return null

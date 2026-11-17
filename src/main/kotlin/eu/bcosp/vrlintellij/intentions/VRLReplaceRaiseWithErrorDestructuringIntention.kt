@@ -32,7 +32,7 @@ class VRLReplaceRaiseWithErrorDestructuringIntention : PsiElementBaseIntentionAc
         val assignment = VRLErrorHandlingForms.enclosingAssignment(element) ?: return
         val call = VRLErrorHandlingForms.assignedCall(assignment) ?: return
         val raiseFlag = call.raiseFlag ?: return
-        val target = assignment.orExpr
+        val target = assignment.nullCoalesceExpr
 
         val errorName = VRLErrorHandlingForms.freeErrorName(assignment)
         val documentManager = PsiDocumentManager.getInstance(project)

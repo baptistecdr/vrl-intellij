@@ -51,13 +51,13 @@ class VRLStructureViewElement(element: PsiElement) : PsiTreeElementBase<PsiEleme
 
     private fun describe(statement: VRLStatement): String {
         statement.multiAssignmentExpr?.let { multi ->
-            return multi.orExprList.joinToString(", ") { truncate(it.text) }
+            return multi.nullCoalesceExprList.joinToString(", ") { truncate(it.text) }
         }
         val assignment = statement.expression?.assignmentExpr ?: return truncate(statement.text)
         if (assignment.assignmentExpr != null) {
-            return "${truncate(assignment.orExpr.text)} ${operatorSymbol(assignment)}"
+            return "${truncate(assignment.nullCoalesceExpr.text)} ${operatorSymbol(assignment)}"
         }
-        return describeConstruct(assignment.orExpr) ?: truncate(assignment.text)
+        return describeConstruct(assignment.nullCoalesceExpr) ?: truncate(assignment.text)
     }
 
     private fun operatorSymbol(assignment: VRLAssignmentExpr): String = when {

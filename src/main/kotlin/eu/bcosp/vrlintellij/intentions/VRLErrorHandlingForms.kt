@@ -51,7 +51,7 @@ internal object VRLErrorHandlingForms {
      * The nearest enclosing assignment that actually assigns something.
      *
      * The search has to keep walking rather than stop at the first `VRLAssignmentExpr`: the rule
-     * is right-recursive (`assignment_expr ::= or_expr ((ASSIGN | MERGE_ASSIGN) assignment_expr)?`),
+     * is right-recursive (`assignment_expr ::= null_coalesce_expr ((ASSIGN | MERGE_ASSIGN) assignment_expr)?`),
      * so in `x = parse_json!("{}")` the right-hand side is *itself* an `ASSIGNMENT_EXPR` with no
      * `=` of its own, and a caret inside the call lands on that one first.
      */

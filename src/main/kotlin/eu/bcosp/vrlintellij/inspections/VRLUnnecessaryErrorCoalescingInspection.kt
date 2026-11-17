@@ -33,7 +33,7 @@ class VRLUnnecessaryErrorCoalescingInspection : LocalInspectionTool() {
                 if (node.elementType != VRLElementTypes.NULL_COALESCE_EXPR) return
                 if (!isCoalescing(node)) return
 
-                val left = (element as VRLNullCoalesceExpr).comparisonExprList.firstOrNull() ?: return
+                val left = (element as VRLNullCoalesceExpr).logicalExprList.firstOrNull() ?: return
                 if (!isStructurallyInfallible(left.node)) return
 
                 holder.registerProblem(
