@@ -20,7 +20,8 @@ class VRLBreadcrumbsProvider : BreadcrumbsProvider {
     override fun acceptElement(element: PsiElement): Boolean = element is VRLIfExpr || element is VRLClosureExpr
 
     override fun getElementInfo(element: PsiElement): String = when (element) {
-        is VRLIfExpr -> "if ${truncate(element.expression.text)}"
+        // `if (x = 1; x == 1) { }` has a predicate list instead of a single condition expression.
+        is VRLIfExpr -> "if ${truncate((element.expression ?: element.predicateList)?.text.orEmpty())}"
         is VRLClosureExpr -> "|${element.closureParams?.text.orEmpty()}|"
         else -> truncate(element.text)
     }

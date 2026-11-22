@@ -36,7 +36,7 @@ internal class VRLComparison(
             var candidate = PsiTreeUtil.getParentOfType(element, VRLComparisonExpr::class.java, false)
             while (candidate != null) {
                 val operator = candidate.node.getChildren(null).firstOrNull { it.elementType in OPERATORS }
-                val operands = candidate.additiveExprList
+                val operands = candidate.mergeExprList
                 if (operator != null && operands.size == 2) {
                     return VRLComparison(candidate, operator, operands[0], operands[1])
                 }

@@ -11,7 +11,9 @@ class VRLHighlighterTest : TestCase() {
 
     fun testKeywordsAreColored() {
         assertEquals(listOf(VRLColor.KEYWORD.textAttributesKey), colorFor(VRLElementTypes.IF))
-        assertEquals(listOf(VRLColor.KEYWORD.textAttributesKey), colorFor(VRLElementTypes.IN))
+        assertEquals(listOf(VRLColor.KEYWORD.textAttributesKey), colorFor(VRLElementTypes.BREAK))
+        // vrl's lexer reports `for`, `while`, `string`, ... as "reserved keyword" (E205).
+        assertEquals(listOf(VRLColor.KEYWORD.textAttributesKey), colorFor(VRLElementTypes.RESERVED_IDENTIFIER))
     }
 
     fun testFunctionCallIsColoredDistinctlyFromIdentifier() {

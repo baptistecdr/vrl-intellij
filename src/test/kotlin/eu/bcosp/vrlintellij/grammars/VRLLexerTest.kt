@@ -47,15 +47,43 @@ class VRLLexerTest : TestCase() {
         assertEquals(VRLElementTypes.LPAREN to "(", tokens[2])
     }
 
-    fun testInIsAKeywordNotAnIdentifier() {
+    // `in` isn't a keyword in vrl's lex.rs (Token::ident), so `in = 1` compiles.
+    fun testInIsAnIdentifier() {
         assertEquals(
-            listOf(
-                VRLElementTypes.IDENTIFIER to "a",
-                VRLElementTypes.IN to "in",
-                VRLElementTypes.IDENTIFIER to "b",
-            ),
-            nonTrivialTokens("a in b")
+            listOf(VRLElementTypes.IDENTIFIER to "a", VRLElementTypes.IDENTIFIER to "in"),
+            nonTrivialTokens("a in")
         )
+    }
+
+    fun testReservedIdentifiers() {
+        val tokens = nonTrivialTokens("for while loop continue string timestamp")
+        assertTrue(tokens.all { it.first == VRLElementTypes.RESERVED_IDENTIFIER })
+    }
+
+    fun testFunctionCallNamedLikeAReservedIdentifier() {
+        assertEquals(VRLElementTypes.FUNCTION_CALL to "string", nonTrivialTokens("string!(.a)")[0])
+    }
+
+    fun testIdentifierContainingAtSignIsAPathField() {
+        assertEquals(
+            listOf(VRLElementTypes.PATH_FIELD to "@timestamp", VRLElementTypes.PATH_FIELD to "x@y"),
+            nonTrivialTokens("@timestamp x@y")
+        )
+    }
+
+    fun testNegativeNumberLiterals() {
+        assertEquals(
+            listOf(VRLElementTypes.INTEGER_LITERAL to "-1", VRLElementTypes.FLOAT_LITERAL to "-1.5"),
+            nonTrivialTokens("-1 -1.5")
+        )
+        assertEquals(
+            listOf(VRLElementTypes.INTEGER_LITERAL to "3", VRLElementTypes.MINUS to "-", VRLElementTypes.INTEGER_LITERAL to "1"),
+            nonTrivialTokens("3 - 1")
+        )
+    }
+
+    fun testStringLiteralSpansLines() {
+        assertEquals(listOf(VRLElementTypes.STRING to "\"a\nb\""), nonTrivialTokens("\"a\nb\""))
     }
 
     fun testStringLiteral() {
@@ -147,12 +175,10 @@ class VRLLexerTest : TestCase() {
     }
 
     fun testKeywords() {
-        val text = "if else for while loop break continue return abort true false null in"
+        val text = "if else break return abort true false null"
         val expectedTypes = listOf(
-            VRLElementTypes.IF, VRLElementTypes.ELSE, VRLElementTypes.FOR, VRLElementTypes.WHILE,
-            VRLElementTypes.LOOP, VRLElementTypes.BREAK, VRLElementTypes.CONTINUE, VRLElementTypes.RETURN,
+            VRLElementTypes.IF, VRLElementTypes.ELSE, VRLElementTypes.BREAK, VRLElementTypes.RETURN,
             VRLElementTypes.ABORT, VRLElementTypes.TRUE, VRLElementTypes.FALSE, VRLElementTypes.NULL,
-            VRLElementTypes.IN,
         )
         assertEquals(expectedTypes, nonTrivialTokens(text).map { it.first })
     }

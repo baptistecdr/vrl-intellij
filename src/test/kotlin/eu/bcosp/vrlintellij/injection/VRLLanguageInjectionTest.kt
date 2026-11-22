@@ -78,4 +78,13 @@ class VRLLanguageInjectionTest : BasePlatformTestCase() {
         val relevant = host.createLiteralTextEscaper().relevantTextRange
         assertEquals(TextRange(1, literal.text.length - 1), relevant)
     }
+
+    // A `"..."` literal may span lines (vrl's lex.rs string_literal scans across newlines), so
+    // the escaper must not claim to be single-line and must decode the raw newline as-is.
+    fun testStringLiteralSpanningLinesDecodesTheNewline() {
+        val literal = literalAt("x = \"a\nb\"\n", "a")
+        val host = literal as PsiLanguageInjectionHost
+        assertFalse(host.createLiteralTextEscaper().isOneLine)
+        assertEquals("a\nb", decode(host))
+    }
 }
